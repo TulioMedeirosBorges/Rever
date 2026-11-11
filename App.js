@@ -23,6 +23,7 @@ import EditarHabito from './screens/EditarHabito';
 import Agenda from './screens/Agenda';
 import Progresso from './screens/Progresso';
 import Perfil from './screens/Perfil';
+import { HabitosProvider } from './contexto/HabitosContexto';
 import { cores } from './styles/tema';
 
 SplashScreen.preventAutoHideAsync();
@@ -50,37 +51,39 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName="Splash"
-          screenOptions={{
-            headerShown: false,
-            animation: 'fade',
-            contentStyle: { backgroundColor: cores.fundo },
-          }}
-        >
-          <Stack.Screen name="Splash" component={Splash} />
-          <Stack.Screen name="Onboarding" component={Onboarding} />
-          <Stack.Screen name="Login" component={Login} />
-          <Stack.Screen name="Cadastro" component={Cadastro} />
-          <Stack.Screen name="EsqueceuSenha" component={EsqueceuSenha} />
-          <Stack.Screen name="VerificarEmail" component={VerificarEmail} />
-          <Stack.Screen name="Inicio" component={Inicio} />
-          <Stack.Screen
-            name="CriarHabito"
-            component={CriarHabito}
-            options={{ animation: 'slide_from_bottom' }}
-          />
-          <Stack.Screen
-            name="EditarHabito"
-            component={EditarHabito}
-            options={{ animation: 'slide_from_right' }}
-          />
-          <Stack.Screen name="Agenda" component={Agenda} />
-          <Stack.Screen name="Progresso" component={Progresso} />
-          <Stack.Screen name="Perfil" component={Perfil} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <HabitosProvider>
+        <NavigationContainer>
+          <Stack.Navigator
+            initialRouteName="Splash"
+            screenOptions={{
+              headerShown: false,
+              animation: 'fade',
+              contentStyle: { backgroundColor: cores.fundo },
+            }}
+          >
+            <Stack.Screen name="Splash" component={Splash} />
+            <Stack.Screen name="Onboarding" component={Onboarding} />
+            <Stack.Screen name="Login" component={Login} />
+            <Stack.Screen name="Cadastro" component={Cadastro} />
+            <Stack.Screen name="EsqueceuSenha" component={EsqueceuSenha} />
+            <Stack.Screen name="VerificarEmail" component={VerificarEmail} />
+            <Stack.Screen name="Inicio" component={Inicio} />
+            <Stack.Screen
+              name="CriarHabito"
+              component={CriarHabito}
+              options={{ animation: 'slide_from_bottom' }}
+            />
+            <Stack.Screen
+              name="EditarHabito"
+              component={EditarHabito}
+              options={{ animation: 'slide_from_right' }}
+            />
+            <Stack.Screen name="Agenda" component={Agenda} />
+            <Stack.Screen name="Progresso" component={Progresso} />
+            <Stack.Screen name="Perfil" component={Perfil} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </HabitosProvider>
       <StatusBar style="light" />
     </SafeAreaProvider>
   );

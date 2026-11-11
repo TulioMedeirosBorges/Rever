@@ -8,7 +8,7 @@ import IconePixel from '../components/IconePixel';
 import CartaoEstatistica from '../components/CartaoEstatistica';
 import BarraProgresso from '../components/BarraProgresso';
 import BarraInferior from '../components/BarraInferior';
-import { habitos } from '../data/habitos';
+import { useHabitos } from '../contexto/HabitosContexto';
 import { cores, fontes } from '../styles/tema';
 
 const ALTURA_GRAFICO = 130;
@@ -48,6 +48,7 @@ const graficos = {
 const periodos = Object.keys(graficos);
 
 export default function Progresso() {
+  const { habitos } = useHabitos();
   const [periodo, setPeriodo] = useState('sem');
 
   const dados = graficos[periodo];

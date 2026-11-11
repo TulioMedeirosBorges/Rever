@@ -10,7 +10,7 @@ import CartaoEstatistica from '../components/CartaoEstatistica';
 import ItemMenu from '../components/ItemMenu';
 import Botao from '../components/Botao';
 import BarraInferior from '../components/BarraInferior';
-import { habitos } from '../data/habitos';
+import { useHabitos } from '../contexto/HabitosContexto';
 import { cores, fontes } from '../styles/tema';
 
 const conquistas = [
@@ -28,6 +28,7 @@ const opcoes = [
 ];
 
 export default function Perfil({ navigation }) {
+  const { habitos } = useHabitos();
   const sair = () => navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
 
   return (

@@ -5,7 +5,7 @@ import CabecalhoTela from '../components/CabecalhoTela';
 import ItemHabito from '../components/ItemHabito';
 import MolduraPixel from '../components/MolduraPixel';
 import BarraInferior from '../components/BarraInferior';
-import { habitos } from '../data/habitos';
+import { useHabitos } from '../contexto/HabitosContexto';
 import { cores, fontes } from '../styles/tema';
 
 const semana = [
@@ -19,6 +19,7 @@ const semana = [
 ];
 
 export default function Agenda() {
+  const { habitos, alternarConcluido } = useHabitos();
   const diaSelecionado = 13;
   const indiceDia = semana.findIndex(({ dia }) => dia === diaSelecionado);
   const habitosDoDia = habitos.filter(({ frequencia }) => frequencia.includes(indiceDia));
@@ -52,7 +53,13 @@ export default function Agenda() {
           <Text style={styles.contagem}>{`${concluidos} de ${habitosDoDia.length}`}</Text>
         </View>
         {habitosDoDia.map(({ id, nome, icone, concluido }) => (
-          <ItemHabito key={id} nome={nome} icone={icone} concluido={concluido} />
+          <ItemHabito
+            key={id}
+            nome={nome}
+            icone={icone}
+            concluido={concluido}
+            aoMarcar={() => alternarConcluido(id)}
+          />
         ))}
       </ScrollView>
       <BarraInferior abaAtiva="Agenda" />

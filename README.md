@@ -18,13 +18,13 @@ Nome e RGM.
 - **Perfil**: dados do usuário, estatísticas, conquistas e configurações.
 
 ## Fonte de dados
-Dados locais em `data/habitos.js` e `data/semana.js`.
+Dados locais em `data/habitos.js` e `data/semana.js`. A lista de hábitos fica em estado compartilhado (`contexto/HabitosContexto.js`): marcar, criar, editar e excluir atualizam todas as telas.
 
 ## Onde estão os requisitos
 - Componentes: `components/` (Botao, CampoTexto, ItemHabito, BarraInferior, CabecalhoTela, TelaAuth, FormularioHabito, MolduraPixel, AnelProgresso, CartaoEstatistica, ...)
-- Props com callback: `aoPressionar` em `components/Botao.js`, `components/ItemHabito.js` e `components/LinkTexto.js`; `aoVoltar` em `components/CabecalhoTela.js`
-- useState: período selecionado em `screens/Progresso.js`
-- useEffect: esconde a splash quando as fontes carregam, em `App.js`
+- Props com callback: `aoPressionar` em `components/Botao.js`, `components/ItemHabito.js` e `components/LinkTexto.js`; `aoVoltar` em `components/CabecalhoTela.js`; `aoMarcar` em `components/ItemHabito.js`; `aoSalvar` em `components/FormularioHabito.js`
+- useState: lista de hábitos em `contexto/HabitosContexto.js`, campos do formulário em `components/FormularioHabito.js` e período selecionado em `screens/Progresso.js`
+- useEffect: esconde a splash quando as fontes carregam, em `App.js`; em `screens/Inicio.js` um relógio atualiza a data a cada minuto e é limpo com `clearInterval` ao sair da tela
 - Navegação com parâmetros: `screens/Inicio.js` envia `{ id }` para `screens/EditarHabito.js`, que lê com `route.params`
 
 ## Vídeo de demonstração
