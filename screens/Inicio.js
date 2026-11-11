@@ -1,4 +1,4 @@
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, ImageBackground, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Tela from '../components/Tela';
 import FaixaArcoIris from '../components/FaixaArcoIris';
 import ItemHabito from '../components/ItemHabito';
@@ -24,9 +24,13 @@ export default function Inicio({ navigation }) {
         <FaixaArcoIris />
 
         <View style={styles.cartao}>
-          <View style={styles.anel}>
+          <ImageBackground
+            source={require('../assets/Icon Propio/Roda da porcentagem.png')}
+            style={styles.anel}
+            resizeMode="contain"
+          >
             <Text style={styles.porcentagem}>50%</Text>
-          </View>
+          </ImageBackground>
           <View style={styles.resumo}>
             <Text style={styles.contagem}>{`${concluidos} de ${habitos.length}`}</Text>
             <Text style={styles.textoResumo}>Hábitos{'\n'}concluídos</Text>
@@ -96,13 +100,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   anel: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    borderWidth: 16,
-    borderColor: cores.branco,
-    borderRightColor: cores.roxoEscuro,
-    borderBottomColor: cores.roxoEscuro,
+    width: 123,
+    height: 121,
     alignItems: 'center',
     justifyContent: 'center',
   },
