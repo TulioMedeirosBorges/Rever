@@ -117,6 +117,9 @@ export default function Inicio({ navigation }) {
           total={total}
           nivel={estatisticas.nivel}
           xpNoNivel={estatisticas.xpNoNivel}
+          sequencia={estatisticas.sequenciaAtual}
+          proximo={proximo}
+          nomeUsuario={usuario.nome}
           aparencia={revi}
           aoPersonalizar={() => navigation.navigate('PersonalizarRevi')}
         />

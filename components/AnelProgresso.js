@@ -72,7 +72,11 @@ export default function AnelProgresso({
       <Text
         style={[
           styles.porcentagem,
-          { color: cor, fontSize: tamanhoTexto, maxWidth: (texto ? LARGURA_BURACO + 1.6 * BLOCO : LARGURA_BURACO) * escala },
+          {
+            color: cor,
+            fontSize: tamanhoTexto,
+            maxWidth: (texto ? LARGURA_BURACO + 1.6 * BLOCO : LARGURA_BURACO) * escala,
+          },
         ]}
         numberOfLines={1}
         adjustsFontSizeToFit

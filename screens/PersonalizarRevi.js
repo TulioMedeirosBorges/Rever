@@ -83,7 +83,10 @@ export default function PersonalizarRevi({ navigation }) {
           maxLength={10}
         />
 
-        <Text style={styles.rotulo}>Cor</Text>
+        <Text style={styles.rotulo}>
+          {'Cor '}
+          <Text style={styles.escolhida}>{coresRevi.find(({ id }) => id === cor)?.nome ?? ''}</Text>
+        </Text>
         <View style={styles.linhaOpcoes}>
           {coresRevi.map((opcao) => {
             const bloqueada = nivel < opcao.nivel;
@@ -116,8 +119,8 @@ export default function PersonalizarRevi({ navigation }) {
                     {bloqueada ? <IconePixel nome="lock" tamanho={18} cor={cores.cinza} /> : null}
                   </MolduraPixel>
                 </MolduraPixel>
-                <Text style={[styles.legenda, bloqueada && styles.legendaBloqueada]}>
-                  {bloqueada ? `NV ${opcao.nivel}` : opcao.nome}
+                <Text style={[styles.legenda, styles.legendaBloqueada]}>
+                  {bloqueada ? `NV ${opcao.nivel}` : ' '}
                 </Text>
               </Pressionavel>
             );
@@ -240,6 +243,11 @@ const styles = StyleSheet.create({
     fontVariant: fontes.semLigaduras,
     marginTop: 18,
   },
+  escolhida: {
+    color: cores.cinzaClaro,
+    fontFamily: fontes.media,
+    fontSize: 16,
+  },
   linhaOpcoes: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -249,14 +257,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   bordaCor: {
-    width: 48,
-    height: 48,
+    width: 46,
+    height: 46,
     alignItems: 'center',
     justifyContent: 'center',
   },
   cor: {
-    width: 36,
-    height: 36,
+    width: 34,
+    height: 34,
     alignItems: 'center',
     justifyContent: 'center',
   },

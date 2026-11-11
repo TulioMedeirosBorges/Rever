@@ -61,8 +61,8 @@ export default function CartaoResumo({
                   tamanho={16}
                   cor={sequencia > 0 ? cores.laranja : cores.cinza}
                 />
-                <Text style={styles.textoChip}>
-                  {sequencia === 1 ? '1 dia seguido' : `${sequencia} dias seguidos`}
+                <Text style={styles.textoChip} numberOfLines={1}>
+                  {sequencia === 1 ? '1 dia' : `${sequencia} dias`}
                 </Text>
               </View>
             </MolduraPixel>

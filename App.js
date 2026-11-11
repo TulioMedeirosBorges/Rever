@@ -1,12 +1,8 @@
 import { useEffect } from 'react';
+import { LogBox } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
-import {
-  BitcountPropSingle_500Medium,
-  BitcountPropSingle_600SemiBold,
-  BitcountPropSingle_800ExtraBold,
-} from '@expo-google-fonts/bitcount-prop-single';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -32,6 +28,10 @@ import { HabitosProvider, useHabitos } from './contexto/HabitosContexto';
 import { cores, fontes } from './styles/tema';
 
 SplashScreen.preventAutoHideAsync();
+
+// No Expo Go o expo-notifications avisa que notificações *push* não existem lá.
+// O app só usa notificações locais, que funcionam; os avisos só cobriam a tela.
+LogBox.ignoreLogs([/expo-notifications/]);
 
 const Stack = createNativeStackNavigator();
 
@@ -118,9 +118,10 @@ function Conteudo({ fontesProntas }) {
 
 export default function App() {
   const [fontesCarregadas, erroFontes] = useFonts({
-    BitcountPropSingle_500Medium,
-    BitcountPropSingle_600SemiBold,
-    BitcountPropSingle_800ExtraBold,
+    // Cópia local da Bitcount com a altura das letras corrigida (os acentos não são cortados no Android).
+    BitcountPropSingle_500Medium: require('./assets/fontes/BitcountPropSingle_500Medium.ttf'),
+    BitcountPropSingle_600SemiBold: require('./assets/fontes/BitcountPropSingle_600SemiBold.ttf'),
+    BitcountPropSingle_800ExtraBold: require('./assets/fontes/BitcountPropSingle_800ExtraBold.ttf'),
   });
 
   return (

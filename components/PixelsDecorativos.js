@@ -25,7 +25,11 @@ export default function PixelsDecorativos() {
 
 const styles = StyleSheet.create({
   camada: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
   },
   pixel: {
     position: 'absolute',

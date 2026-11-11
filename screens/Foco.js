@@ -8,6 +8,7 @@ import MascoteRevi from '../components/MascoteRevi';
 import MolduraPixel from '../components/MolduraPixel';
 import IconePixel from '../components/IconePixel';
 import Botao from '../components/Botao';
+import BalaoFala from '../components/BalaoFala';
 import Pressionavel from '../components/Pressionavel';
 import { useHabitos } from '../contexto/HabitosContexto';
 import { cores, fontes } from '../styles/tema';
@@ -126,9 +127,7 @@ export default function Foco({ navigation, route }) {
 
         <View style={styles.conversa}>
           <MascoteRevi humor={humores[estado]} aparencia={revi} bloco={5} />
-          <MolduraPixel corFundo={cores.cartao} pixel={3} style={styles.balao}>
-            <Text style={styles.fala}>{falas[estado]}</Text>
-          </MolduraPixel>
+          <BalaoFala texto={falas[estado]} falando={estado !== 'pronto'} />
         </View>
 
         {configurando ? (
@@ -256,17 +255,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 18,
-  },
-  balao: {
-    flex: 1,
-    marginLeft: 14,
-  },
-  fala: {
-    color: cores.branco,
-    fontFamily: fontes.regular,
-    fontVariant: fontes.semLigaduras,
-    fontSize: 15,
-    padding: 12,
   },
   rotulo: {
     color: cores.branco,

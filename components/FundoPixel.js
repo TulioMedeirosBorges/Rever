@@ -24,9 +24,10 @@ const estrelas = Array.from({ length: 26 }, (_, indice) => ({
 }));
 
 // Estrelas maiores, no formato da estrela da logo, que piscam em tempos diferentes.
+// Ficam só nas margens laterais para nunca encostar em texto ou botões.
 const brilhos = Array.from({ length: 6 }, (_, indice) => ({
   chave: `brilho-${indice}`,
-  left: `${(6 + sortear() * 86).toFixed(1)}%`,
+  left: `${(indice % 2 === 0 ? 0.6 + sortear() * 1.2 : 96.9 + sortear() * 0.4).toFixed(1)}%`,
   top: `${(8 + sortear() * 78).toFixed(1)}%`,
   cor: indice % 2 === 0 ? cores.creme : cores.amarelo,
   fase: indice / 6,
@@ -108,7 +109,11 @@ export default function FundoPixel() {
 
 const styles = StyleSheet.create({
   camada: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
     overflow: 'hidden',
   },
   estrela: {

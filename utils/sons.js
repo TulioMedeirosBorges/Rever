@@ -13,6 +13,9 @@ const arquivos = {
   reviRadiante: require('../assets/sons/revi_radiante.wav'),
   reviNeutro: require('../assets/sons/revi_neutro.wav'),
   reviSono: require('../assets/sons/revi_sono.wav'),
+  reviFala1: require('../assets/sons/revi_fala1.wav'),
+  reviFala2: require('../assets/sons/revi_fala2.wav'),
+  reviFala3: require('../assets/sons/revi_fala3.wav'),
   focoInicio: require('../assets/sons/foco_inicio.wav'),
   focoFim: require('../assets/sons/foco_fim.wav'),
 };
