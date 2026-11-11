@@ -65,6 +65,7 @@ export default function BarraInferior({ abaAtiva }) {
               aoPressionar={() => selecionar(nome)}
               escala={0.86}
               vibracaoSoltar="selecao"
+              som="navegar"
               accessibilityRole="tab"
               accessibilityState={{ selected: ativa }}
             >

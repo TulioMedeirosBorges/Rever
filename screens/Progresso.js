@@ -10,51 +10,20 @@ import BarraProgresso from '../components/BarraProgresso';
 import BarraInferior from '../components/BarraInferior';
 import { useHabitos } from '../contexto/HabitosContexto';
 import { cores, fontes } from '../styles/tema';
+import { dadosDoGrafico } from '../utils/estatisticas';
 import Pressionavel from '../components/Pressionavel';
 
 const ALTURA_GRAFICO = 130;
 
 const corDaBarra = (indice) => cores.arcoIris[indice % (cores.arcoIris.length - 1)];
 
-const graficos = {
-  sem: [
-    { rotulo: 'SEG', valor: 8 },
-    { rotulo: 'TER', valor: 5 },
-    { rotulo: 'QUA', valor: 8 },
-    { rotulo: 'QUI', valor: 5 },
-    { rotulo: 'SEX', valor: 8 },
-    { rotulo: 'SAB', valor: 6 },
-    { rotulo: 'DOM', valor: 4 },
-  ],
-  mês: [
-    { rotulo: 'S1', valor: 38 },
-    { rotulo: 'S2', valor: 44 },
-    { rotulo: 'S3', valor: 31 },
-    { rotulo: 'S4', valor: 47 },
-  ],
-  ano: [
-    { rotulo: 'J', valor: 120 },
-    { rotulo: 'F', valor: 98 },
-    { rotulo: 'M', valor: 135 },
-    { rotulo: 'A', valor: 110 },
-    { rotulo: 'M', valor: 150 },
-    { rotulo: 'J', valor: 142 },
-    { rotulo: 'J', valor: 160 },
-    { rotulo: 'A', valor: 128 },
-    { rotulo: 'S', valor: 155 },
-    { rotulo: 'O', valor: 170 },
-    { rotulo: 'N', valor: 90 },
-    { rotulo: 'D', valor: 0 },
-  ],
-};
-
-const periodos = Object.keys(graficos);
+const periodos = ['sem', 'mês', 'ano'];
 
 export default function Progresso() {
-  const { habitos } = useHabitos();
+  const { habitos, historico, estatisticas } = useHabitos();
   const [periodo, setPeriodo] = useState('sem');
 
-  const dados = graficos[periodo];
+  const dados = dadosDoGrafico(historico, periodo);
   const maiorValor = Math.max(...dados.map(({ valor }) => valor));
   const larguraBarra = periodo === 'ano' ? 16 : 24;
 
@@ -73,6 +42,7 @@ export default function Progresso() {
                 aoPressionar={() => setPeriodo(item)}
                 escala={0.92}
                 vibracaoSoltar="selecao"
+                som="navegar"
               >
                 <MolduraPixel
                   corFundo={item === periodo ? cores.cartaoDestaque : 'transparent'}
@@ -125,38 +95,50 @@ export default function Progresso() {
           <IconePixel nome="fire" tamanho={72} cor={cores.laranja} style={styles.fogo} />
           <View>
             <Text style={styles.numero}>
-              5 <Text style={styles.dias}>dias</Text>
+              {estatisticas.sequenciaAtual}{' '}
+              <Text style={styles.dias}>{estatisticas.sequenciaAtual === 1 ? 'dia' : 'dias'}</Text>
             </Text>
-            <Text style={styles.recorde}>Recorde: 12 dias</Text>
+            <Text style={styles.recorde}>{`Recorde: ${estatisticas.melhorSequencia} dias`}</Text>
           </View>
         </View>
 
         <View style={styles.estatisticas}>
           <CartaoEstatistica
             icone="check"
-            valor="85%"
-            rotulo="Taxa de conclusão"
+            valor={`${Math.round(estatisticas.taxaSemana * 100)}%`}
+            rotulo="Feito na semana"
             cor={cores.turquesa}
           />
           <CartaoEstatistica
             icone="trophy"
-            valor="42"
+            valor={estatisticas.totalFeitos}
             rotulo="Hábitos feitos"
             cor={cores.amarelo}
           />
-          <CartaoEstatistica icone="zap" valor="12" rotulo="Melhor sequência" cor={cores.laranja} />
+          <CartaoEstatistica
+            icone="sparkle"
+            valor={estatisticas.diasPerfeitos}
+            rotulo="Dias perfeitos"
+            cor={cores.laranja}
+          />
         </View>
 
         <Text style={styles.secao}>Por hábito</Text>
-        {habitos.map(({ id, nome, icone, feitosNaSemana }) => (
+        <Text style={styles.legendaHabito}>Últimos 7 dias</Text>
+        {habitos.map(({ id, nome, icone }) => (
           <MolduraPixel key={id} corFundo={cores.cartao} pixel={3} style={styles.molduraHabito}>
             <View style={styles.habito}>
               <View style={styles.linhaHabito}>
                 <IconePixel nome={icone} tamanho={20} cor={cores.branco} />
                 <Text style={styles.nomeHabito}>{nome}</Text>
-                <Text style={styles.contagemHabito}>{`${feitosNaSemana}/7`}</Text>
+                <Text style={styles.contagemHabito}>
+                  {`${estatisticas.porHabito[id].feitos}/${estatisticas.porHabito[id].meta}`}
+                </Text>
               </View>
-              <BarraProgresso feitos={feitosNaSemana} total={7} />
+              <BarraProgresso
+                feitos={estatisticas.porHabito[id].feitos}
+                total={estatisticas.porHabito[id].meta}
+              />
             </View>
           </MolduraPixel>
         ))}
@@ -270,6 +252,14 @@ const styles = StyleSheet.create({
     fontVariant: fontes.semLigaduras,
     fontSize: 18,
     marginLeft: 10,
+  },
+  legendaHabito: {
+    color: cores.cinza,
+    fontFamily: fontes.regular,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 14,
+    marginTop: -8,
+    marginBottom: 12,
   },
   contagemHabito: {
     color: cores.turquesa,

@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { Animated, Pressable } from 'react-native';
 import { vibracoes } from '../utils/tato';
+import { tocar } from '../utils/sons';
 
 const PressableAnimado = Animated.createAnimatedComponent(Pressable);
 
@@ -8,6 +9,7 @@ export default function Pressionavel({
   aoPressionar,
   vibracaoApertar = 'apertarLeve',
   vibracaoSoltar = 'soltar',
+  som = 'toque',
   escala = 0.94,
   afundar = 0,
   style,
@@ -19,6 +21,9 @@ export default function Pressionavel({
 
   const apertar = () => {
     vibracoes[vibracaoApertar]?.();
+    if (som) {
+      tocar(som);
+    }
     Animated.timing(pressao, {
       toValue: 1,
       duration: 70,

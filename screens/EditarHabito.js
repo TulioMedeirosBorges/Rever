@@ -43,6 +43,11 @@ export default function EditarHabito({ navigation, route }) {
         <CabecalhoTela titulo="Editar Hábito" mostrarVoltar aoVoltar={() => navigation.goBack()} />
       </View>
       <FormularioHabito valoresIniciais={habito} textoBotao="Salvar alterações" aoSalvar={salvar}>
+        <Botao
+          texto="Focar neste hábito"
+          variante="claro"
+          aoPressionar={() => navigation.navigate('Foco', { habitoId: id })}
+        />
         <Botao texto="Excluir hábito" variante="perigo" aoPressionar={excluir} />
       </FormularioHabito>
       <View>

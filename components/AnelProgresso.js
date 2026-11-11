@@ -42,25 +42,43 @@ const blocos = DESENHO.flatMap((linha, indiceLinha) =>
     .filter(({ preenchido }) => preenchido),
 );
 
-export default function AnelProgresso({ progresso, cor = cores.principal }) {
+export default function AnelProgresso({
+  progresso,
+  cor = cores.principal,
+  bloco = BLOCO,
+  texto,
+  tamanhoTexto = 24,
+}) {
+  const escala = bloco / BLOCO;
+  const lado = TAMANHO * bloco;
+
   return (
-    <View style={styles.anel}>
+    <View style={[styles.anel, { width: lado, height: lado }]}>
       {blocos.map(({ chave, left, top, fracao }) => (
         <View
           key={chave}
           style={[
             styles.bloco,
-            { left, top, backgroundColor: fracao < progresso ? cor : cores.trilha },
+            {
+              left: left * escala,
+              top: top * escala,
+              width: bloco,
+              height: bloco,
+              backgroundColor: fracao < progresso ? cor : cores.trilha,
+            },
           ]}
         />
       ))}
       <Text
-        style={[styles.porcentagem, { color: cor }]}
+        style={[
+          styles.porcentagem,
+          { color: cor, fontSize: tamanhoTexto, maxWidth: (texto ? LARGURA_BURACO + 1.6 * BLOCO : LARGURA_BURACO) * escala },
+        ]}
         numberOfLines={1}
         adjustsFontSizeToFit
         allowFontScaling={false}
       >
-        {`${Math.round(progresso * 100)}%`}
+        {texto ?? `${Math.round(progresso * 100)}%`}
       </Text>
     </View>
   );
@@ -68,23 +86,16 @@ export default function AnelProgresso({ progresso, cor = cores.principal }) {
 
 const styles = StyleSheet.create({
   anel: {
-    width: TAMANHO * BLOCO,
-    height: TAMANHO * BLOCO,
     flexShrink: 0,
     alignItems: 'center',
     justifyContent: 'center',
   },
   bloco: {
     position: 'absolute',
-    width: BLOCO,
-    height: BLOCO,
   },
   porcentagem: {
-    maxWidth: LARGURA_BURACO,
-    color: cores.branco,
     fontFamily: fontes.negrito,
     fontVariant: fontes.semLigaduras,
-    fontSize: 24,
     textAlign: 'center',
   },
 });

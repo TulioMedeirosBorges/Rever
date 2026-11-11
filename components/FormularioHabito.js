@@ -8,6 +8,8 @@ import { diasSemana } from '../data/semana';
 import { cores, fontes } from '../styles/tema';
 import Pressionavel from './Pressionavel';
 import { erro as vibrarErro } from '../utils/tato';
+import { tocar } from '../utils/sons';
+import { horariosDoLembrete } from '../utils/datas';
 
 const icones = [
   'bottle-wine',
@@ -24,6 +26,14 @@ const icones = [
 
 const categorias = ['Saúde', 'Estudos', 'Bem-estar', 'Lazer', 'Trabalho'];
 
+const repeticoes = [
+  { horas: 0, rotulo: 'Não' },
+  { horas: 1, rotulo: '1h' },
+  { horas: 2, rotulo: '2h' },
+  { horas: 3, rotulo: '3h' },
+  { horas: 4, rotulo: '4h' },
+];
+
 const formatarHorario = (texto) => {
   const digitos = texto.replace(/\D/g, '').slice(0, 4);
   return digitos.length > 2 ? `${digitos.slice(0, 2)}:${digitos.slice(2)}` : digitos;
@@ -34,7 +44,7 @@ const horarioValido = (horario) => {
   return partes !== null && Number(partes[1]) < 24 && Number(partes[2]) < 60;
 };
 
-const validar = ({ nome, frequencia, lembrete }) => {
+const validar = ({ nome, frequencia, lembrete, repetir, ate }) => {
   if (nome.trim() === '') {
     return 'Dê um nome ao hábito.';
   }
@@ -43,6 +53,17 @@ const validar = ({ nome, frequencia, lembrete }) => {
   }
   if (lembrete !== '' && !horarioValido(lembrete)) {
     return 'Lembrete inválido. Use o formato 19:00.';
+  }
+  if (repetir > 0) {
+    if (lembrete === '') {
+      return 'Defina o horário do primeiro lembrete.';
+    }
+    if (!horarioValido(ate)) {
+      return 'Horário final inválido. Use o formato 22:00.';
+    }
+    if (ate <= lembrete) {
+      return 'O horário final precisa ser depois do primeiro.';
+    }
   }
   return '';
 };
@@ -53,6 +74,8 @@ export default function FormularioHabito({ valoresIniciais = {}, textoBotao, aoS
   const [categoria, setCategoria] = useState(valoresIniciais.categoria ?? categorias[0]);
   const [frequencia, setFrequencia] = useState(valoresIniciais.frequencia ?? []);
   const [lembrete, setLembrete] = useState(valoresIniciais.lembrete ?? '');
+  const [repetir, setRepetir] = useState(valoresIniciais.repetir ?? 0);
+  const [ate, setAte] = useState(valoresIniciais.ate || '22:00');
   const [categoriasAbertas, setCategoriasAbertas] = useState(false);
   const [erro, setErro] = useState('');
 
@@ -70,12 +93,32 @@ export default function FormularioHabito({ valoresIniciais = {}, textoBotao, aoS
     setCategoriasAbertas(false);
   };
 
+  const horarios =
+    repetir > 0 && horarioValido(lembrete) && horarioValido(ate)
+      ? horariosDoLembrete({ lembrete, repetir, ate })
+      : [];
+  const resumoLembrete =
+    horarios.length > 1
+      ? `${horarios.length} lembretes por dia: ${horarios.slice(0, 4).join(', ')}${
+          horarios.length > 4 ? '…' : ''
+        }`
+      : '';
+
   const salvar = () => {
-    const dados = { nome: nome.trim(), icone, categoria, frequencia, lembrete };
+    const dados = {
+      nome: nome.trim(),
+      icone,
+      categoria,
+      frequencia,
+      lembrete,
+      repetir,
+      ate: repetir > 0 ? ate : '',
+    };
     const mensagem = validar(dados);
 
     if (mensagem !== '') {
       vibrarErro();
+      tocar('erro');
       setErro(mensagem);
       return;
     }
@@ -103,6 +146,7 @@ export default function FormularioHabito({ valoresIniciais = {}, textoBotao, aoS
               aoPressionar={() => setIcone(opcao)}
               escala={0.85}
               vibracaoSoltar="selecao"
+              som="navegar"
               accessibilityRole="button"
               accessibilityState={{ selected: selecionado }}
             >
@@ -154,6 +198,7 @@ export default function FormularioHabito({ valoresIniciais = {}, textoBotao, aoS
               aoPressionar={() => escolherCategoria(opcao)}
               escala={0.96}
               vibracaoSoltar="selecao"
+              som="navegar"
             >
               <Text style={[styles.textoSeletor, opcao === categoria && styles.categoriaAtual]}>
                 {opcao}
@@ -177,6 +222,7 @@ export default function FormularioHabito({ valoresIniciais = {}, textoBotao, aoS
               aoPressionar={() => alternarDia(indice)}
               escala={0.8}
               vibracaoSoltar="selecao"
+              som="navegar"
               hitSlop={4}
               accessibilityRole="checkbox"
               accessibilityState={{ checked: selecionado }}
@@ -207,6 +253,58 @@ export default function FormularioHabito({ valoresIniciais = {}, textoBotao, aoS
         keyboardType="number-pad"
         maxLength={5}
       />
+
+      <Text style={styles.rotuloPequeno}>Repetir a cada</Text>
+      <View style={styles.repeticoes}>
+        {repeticoes.map(({ horas, rotulo }) => {
+          const selecionado = horas === repetir;
+
+          return (
+            <Pressionavel
+              key={rotulo}
+              style={styles.opcaoRepetir}
+              aoPressionar={() => {
+                setRepetir(horas);
+                setErro('');
+              }}
+              escala={0.85}
+              vibracaoSoltar="selecao"
+              som="navegar"
+              accessibilityRole="radio"
+              accessibilityState={{ selected: selecionado }}
+            >
+              <MolduraPixel
+                corFundo={selecionado ? cores.sucesso : cores.cartao}
+                pixel={3}
+                degraus={1}
+                style={styles.chip}
+              >
+                <Text style={[styles.textoChip, selecionado && styles.textoChipAtivo]}>
+                  {rotulo}
+                </Text>
+              </MolduraPixel>
+            </Pressionavel>
+          );
+        })}
+      </View>
+
+      {repetir > 0 ? (
+        <>
+          <Text style={styles.rotuloPequeno}>Até</Text>
+          <CampoTexto
+            icone="clock"
+            placeholder="22:00"
+            value={ate}
+            onChangeText={(texto) => {
+              setAte(formatarHorario(texto));
+              setErro('');
+            }}
+            keyboardType="number-pad"
+            maxLength={5}
+          />
+          {resumoLembrete !== '' ? <Text style={styles.resumo}>{resumoLembrete}</Text> : null}
+        </>
+      ) : null}
 
       <View style={styles.acoes}>
         {erro !== '' ? <Text style={styles.erro}>{erro}</Text> : null}
@@ -299,6 +397,43 @@ const styles = StyleSheet.create({
     fontVariant: fontes.semLigaduras,
     fontSize: 20,
     color: cores.preto,
+  },
+  rotuloPequeno: {
+    color: cores.cinzaClaro,
+    fontSize: 17,
+    fontFamily: fontes.media,
+    fontVariant: fontes.semLigaduras,
+    marginTop: 2,
+  },
+  repeticoes: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 12,
+  },
+  opcaoRepetir: {
+    flex: 1,
+    marginHorizontal: 3,
+  },
+  chip: {
+    height: 38,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  textoChip: {
+    color: cores.branco,
+    fontFamily: fontes.media,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 16,
+  },
+  textoChipAtivo: {
+    color: cores.preto,
+  },
+  resumo: {
+    color: cores.turquesa,
+    fontFamily: fontes.regular,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 14,
+    marginBottom: 4,
   },
   acoes: {
     marginTop: 16,

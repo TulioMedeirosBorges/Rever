@@ -22,6 +22,7 @@ export default function ItemHabito({
             disabled={!aoMarcar}
             escala={0.75}
             vibracaoSoltar={concluido ? 'soltar' : 'sucesso'}
+            som={concluido ? 'desmarcar' : 'marcar'}
             hitSlop={10}
             accessibilityRole="checkbox"
             accessibilityState={{ checked: Boolean(concluido) }}

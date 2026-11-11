@@ -3,35 +3,32 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Tela from '../components/Tela';
 import PixelsDecorativos from '../components/PixelsDecorativos';
 import IconePixel from '../components/IconePixel';
-import AnelProgresso from '../components/AnelProgresso';
 import MolduraPixel from '../components/MolduraPixel';
 import FaixaArcoIris from '../components/FaixaArcoIris';
 import ItemHabito from '../components/ItemHabito';
 import BarraInferior from '../components/BarraInferior';
 import { useHabitos } from '../contexto/HabitosContexto';
-import { diasSemana } from '../data/semana';
 import { cores, fontes } from '../styles/tema';
 import Pressionavel from '../components/Pressionavel';
+import CartaoRevi from '../components/CartaoRevi';
+import { horariosDoLembrete, nomesMeses, paraHorario } from '../utils/datas';
+import CartaoResumo from '../components/CartaoResumo';
+import { XP_POR_FOCO } from '../utils/estatisticas';
 
 const nomesDias = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
-const nomesMeses = [
-  'janeiro',
-  'fevereiro',
-  'março',
-  'abril',
-  'maio',
-  'junho',
-  'julho',
-  'agosto',
-  'setembro',
-  'outubro',
-  'novembro',
-  'dezembro',
-];
+
+const repeticao = ({ categoria, lembrete, repetir }) => {
+  if (!lembrete) {
+    return categoria;
+  }
+  return repetir > 0
+    ? `${categoria} · ${lembrete} · a cada ${repetir}h`
+    : `${categoria} · ${lembrete}`;
+};
 
 const mensagem = (concluidos, total) => {
   if (total === 0) {
-    return 'Crie seu primeiro hábito no +';
+    return 'Dia livre! Nenhum hábito pra hoje.';
   }
   if (concluidos === total) {
     return 'Tudo feito por hoje. Mandou bem!';
@@ -44,7 +41,7 @@ const mensagem = (concluidos, total) => {
 };
 
 export default function Inicio({ navigation }) {
-  const { habitos, alternarConcluido } = useHabitos();
+  const { habitos, usuario, revi, estatisticas, alternarConcluido } = useHabitos();
   const [agora, setAgora] = useState(() => new Date());
 
   useEffect(() => {
@@ -52,22 +49,36 @@ export default function Inicio({ navigation }) {
     return () => clearInterval(relogio);
   }, []);
 
-  const total = habitos.length;
-  const concluidos = habitos.filter((habito) => habito.concluido).length;
-  const progresso = total > 0 ? concluidos / total : 0;
-  const completo = total > 0 && concluidos === total;
   const hoje = (agora.getDay() + 6) % 7;
+  const deHoje = habitos.filter(({ frequencia }) => frequencia.includes(hoje));
+  const outros = habitos.filter(({ frequencia }) => !frequencia.includes(hoje));
+  const total = deHoje.length;
+  const concluidos = deHoje.filter((habito) => habito.concluido).length;
   const data = `${nomesDias[agora.getDay()]}, ${agora.getDate()} de ${nomesMeses[agora.getMonth()]}`;
 
-  const corDoFogo = (indice) => {
-    if (indice < hoje) {
-      return cores.vermelho;
-    }
-    if (indice === hoje && concluidos > 0) {
-      return cores.hoje;
-    }
-    return cores.cinza;
-  };
+  // Próximo lembrete de hoje entre os hábitos que ainda faltam.
+  const agoraHorario = paraHorario(agora.getHours() * 60 + agora.getMinutes());
+  const proximo = deHoje
+    .filter(({ concluido }) => !concluido)
+    .flatMap(({ nome, ...habito }) =>
+      horariosDoLembrete(habito)
+        .filter((horario) => horario >= agoraHorario)
+        .map((horario) => ({ nome, horario })),
+    )
+    .sort((a, b) => a.horario.localeCompare(b.horario))[0];
+
+  const item = (habito) => (
+    <ItemHabito
+      key={habito.id}
+      nome={habito.nome}
+      icone={habito.icone}
+      detalhe={repeticao(habito)}
+      concluido={habito.concluido}
+      mostrarSeta
+      aoMarcar={() => alternarConcluido(habito.id)}
+      aoPressionar={() => navigation.navigate('EditarHabito', { id: habito.id })}
+    />
+  );
 
   return (
     <Tela bordas={['top']}>
@@ -77,7 +88,7 @@ export default function Inicio({ navigation }) {
           <View style={styles.textosTopo}>
             <Text style={styles.data}>{data}</Text>
             <Text style={styles.ola} numberOfLines={1} adjustsFontSizeToFit>
-              Olá, Usuário
+              {`Olá, ${usuario.nome}`}
             </Text>
             <Text style={styles.subtitulo}>{mensagem(concluidos, total)}</Text>
           </View>
@@ -92,56 +103,58 @@ export default function Inicio({ navigation }) {
         </View>
         <FaixaArcoIris />
 
-        <MolduraPixel
-          corFundo={completo ? cores.cartaoDestaque : cores.cartao}
-          corTopo={cores.sombra}
-          pixel={6}
-          style={styles.molduraCartao}
+        <CartaoResumo
+          concluidos={concluidos}
+          total={total}
+          semana={estatisticas.semana}
+          indiceHoje={hoje}
+          sequencia={estatisticas.sequenciaAtual}
+          proximo={proximo}
+        />
+
+        <CartaoRevi
+          concluidos={concluidos}
+          total={total}
+          nivel={estatisticas.nivel}
+          xpNoNivel={estatisticas.xpNoNivel}
+          aparencia={revi}
+          aoPersonalizar={() => navigation.navigate('PersonalizarRevi')}
+        />
+
+        <Pressionavel
+          aoPressionar={() => navigation.navigate('Foco')}
+          escala={0.97}
+          accessibilityRole="button"
+          accessibilityLabel="Abrir modo foco"
         >
-          <View style={styles.cartao}>
-            <AnelProgresso progresso={progresso} cor={completo ? cores.amarelo : cores.principal} />
-            <View style={styles.resumo}>
-              <Text style={styles.contagem}>
-                <Text style={completo ? styles.contagemCompleta : null}>{concluidos}</Text>
-                {` de ${total}`}
-              </Text>
-              <Text style={styles.textoResumo}>Hábitos{'\n'}concluídos</Text>
-              <View style={styles.sequencia}>
-                {diasSemana.map((dia, indice) => (
-                  <View key={`${dia}-${indice}`} style={styles.diaSequencia}>
-                    <IconePixel nome="fire" tamanho={18} cor={corDoFogo(indice)} />
-                    <Text style={[styles.letraDia, indice === hoje && styles.letraHoje]}>
-                      {dia}
-                    </Text>
-                    <View style={[styles.marcaHoje, indice === hoje && styles.marcaHojeAtiva]} />
-                  </View>
-                ))}
+          <MolduraPixel corFundo={cores.cartaoDestaque} pixel={4} style={styles.molduraFoco}>
+            <View style={styles.foco}>
+              <MolduraPixel corFundo={cores.fundo} pixel={3} degraus={1} style={styles.seloFoco}>
+                <IconePixel nome="clock" tamanho={26} cor={cores.amarelo} />
+              </MolduraPixel>
+              <View style={styles.textosFoco}>
+                <Text style={styles.tituloFoco}>Modo foco</Text>
+                <Text style={styles.detalheFoco}>
+                  {`Foque com o ${revi.nome} e ganhe +${XP_POR_FOCO} XP`}
+                </Text>
               </View>
+              <IconePixel nome="chevron-right-2" tamanho={30} cor={cores.cinzaClaro} />
             </View>
-          </View>
-        </MolduraPixel>
-
-        <View style={styles.cabecalhoLista}>
-          <Text style={styles.secao}>Seus hábitos</Text>
-          <MolduraPixel corFundo={cores.trilha} pixel={2} degraus={1} style={styles.selo}>
-            <Text style={styles.textoSelo}>{`${concluidos}/${total}`}</Text>
           </MolduraPixel>
-        </View>
+        </Pressionavel>
 
-        {habitos.map(({ id, nome, icone, categoria, lembrete, concluido }) => (
-          <ItemHabito
-            key={id}
-            nome={nome}
-            icone={icone}
-            detalhe={lembrete ? `${categoria} · ${lembrete}` : categoria}
-            concluido={concluido}
-            mostrarSeta
-            aoMarcar={() => alternarConcluido(id)}
-            aoPressionar={() => navigation.navigate('EditarHabito', { id })}
-          />
-        ))}
+        <Text style={styles.secao}>Para hoje</Text>
 
-        {total === 0 ? (
+        {deHoje.map(item)}
+
+        {outros.length > 0 ? (
+          <>
+            <Text style={styles.secaoOutros}>Outros dias</Text>
+            {outros.map(item)}
+          </>
+        ) : null}
+
+        {habitos.length === 0 ? (
           <MolduraPixel corFundo={cores.cartao} pixel={3} style={styles.vazio}>
             <IconePixel nome="sparkle" tamanho={40} cor={cores.amarelo} />
             <Text style={styles.textoVazio}>Nenhum hábito ainda.</Text>
@@ -195,67 +208,12 @@ const styles = StyleSheet.create({
     padding: 8,
     marginRight: -8,
   },
-  molduraCartao: {
-    marginTop: 22,
-    marginBottom: 26,
-  },
-  cartao: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingTop: 22,
-    paddingBottom: 16,
-    paddingHorizontal: 22,
-  },
-  resumo: {
-    flex: 1,
-    marginLeft: 24,
-  },
-  contagem: {
-    color: cores.branco,
-    fontSize: 22,
+  secaoOutros: {
+    color: cores.cinzaClaro,
+    fontSize: 18,
     fontFamily: fontes.negrito,
     fontVariant: fontes.semLigaduras,
-  },
-  contagemCompleta: {
-    color: cores.amarelo,
-  },
-  textoResumo: {
-    color: cores.branco,
-    fontFamily: fontes.regular,
-    fontVariant: fontes.semLigaduras,
-    fontSize: 22,
-    lineHeight: 24,
-    marginBottom: 10,
-  },
-  sequencia: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  diaSequencia: {
-    alignItems: 'center',
-  },
-  letraDia: {
-    color: cores.cinza,
-    fontFamily: fontes.regular,
-    fontVariant: fontes.semLigaduras,
-    fontSize: 11,
-  },
-  letraHoje: {
-    color: cores.branco,
-    fontFamily: fontes.negrito,
-  },
-  marcaHoje: {
-    width: 4,
-    height: 4,
-    marginTop: 2,
-  },
-  marcaHojeAtiva: {
-    backgroundColor: cores.branco,
-  },
-  cabecalhoLista: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    marginTop: 12,
     marginBottom: 12,
   },
   secao: {
@@ -263,16 +221,38 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontFamily: fontes.negrito,
     fontVariant: fontes.semLigaduras,
+    marginBottom: 12,
   },
-  selo: {
-    paddingHorizontal: 10,
-    paddingVertical: 3,
+  molduraFoco: {
+    marginBottom: 26,
   },
-  textoSelo: {
+  foco: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    paddingTop: 14,
+  },
+  seloFoco: {
+    width: 46,
+    height: 46,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  textosFoco: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  tituloFoco: {
     color: cores.branco,
-    fontFamily: fontes.media,
+    fontFamily: fontes.negrito,
     fontVariant: fontes.semLigaduras,
-    fontSize: 15,
+    fontSize: 19,
+  },
+  detalheFoco: {
+    color: cores.cinzaClaro,
+    fontFamily: fontes.regular,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 13,
   },
   vazio: {
     alignItems: 'center',

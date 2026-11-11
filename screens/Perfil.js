@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Tela from '../components/Tela';
 import PixelsDecorativos from '../components/PixelsDecorativos';
 import CabecalhoTela from '../components/CabecalhoTela';
@@ -9,26 +9,68 @@ import CartaoEstatistica from '../components/CartaoEstatistica';
 import ItemMenu from '../components/ItemMenu';
 import Botao from '../components/Botao';
 import BarraInferior from '../components/BarraInferior';
+import LinkTexto from '../components/LinkTexto';
+import Pressionavel from '../components/Pressionavel';
 import { useHabitos } from '../contexto/HabitosContexto';
 import { cores, fontes } from '../styles/tema';
-
-const conquistas = [
-  { id: 1, icone: 'fire', nome: '7 dias', cor: cores.laranja, desbloqueada: true },
-  { id: 2, icone: 'trophy', nome: '1º hábito', cor: cores.amarelo, desbloqueada: true },
-  { id: 3, icone: 'star', nome: '50 feitos', cor: cores.turquesa, desbloqueada: true },
-  { id: 4, icone: 'crown', nome: '30 dias', cor: cores.petroleo, desbloqueada: false },
-];
-
-const opcoes = [
-  { id: 1, icone: 'pencil', texto: 'Editar perfil' },
-  { id: 2, icone: 'bell', texto: 'Notificações', detalhe: 'Ativadas' },
-  { id: 3, icone: 'clock', texto: 'Lembretes', detalhe: '19:00' },
-  { id: 4, icone: 'info-box', texto: 'Sobre o Rever' },
-];
+import { nomesMeses } from '../utils/datas';
 
 export default function Perfil({ navigation }) {
-  const { habitos } = useHabitos();
+  const { habitos, usuario, estatisticas, conquistas, config, alternarSons } = useHabitos();
   const sair = () => navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+
+  const [ano, mes] = usuario.membroDesde.split('-').map(Number);
+  const abertas = conquistas.filter(({ desbloqueada }) => desbloqueada);
+  // Mostra as abertas e completa com as próximas a abrir.
+  const vitrine = [...abertas, ...conquistas.filter(({ desbloqueada }) => !desbloqueada)].slice(
+    0,
+    4,
+  );
+  const comLembrete = habitos.filter(({ lembrete }) => lembrete !== '').length;
+
+  const opcoes = [
+    {
+      id: 'editar',
+      icone: 'pencil',
+      texto: 'Editar perfil',
+      acao: () => navigation.navigate('EditarPerfil'),
+    },
+    {
+      id: 'conquistas',
+      icone: 'trophy',
+      texto: 'Conquistas',
+      detalhe: `${abertas.length}/${conquistas.length}`,
+      acao: () => navigation.navigate('Conquistas'),
+    },
+    {
+      id: 'sons',
+      icone: config.sons ? 'volume-2' : 'volume-x',
+      texto: 'Sons',
+      detalhe: config.sons ? 'Ligados' : 'Desligados',
+      acao: alternarSons,
+    },
+    {
+      id: 'lembretes',
+      icone: 'bell',
+      texto: 'Lembretes',
+      detalhe: `${comLembrete} ativos`,
+      acao: () =>
+        Alert.alert(
+          'Lembretes',
+          'Os lembretes são definidos em cada hábito. Abra um hábito na tela Início para mudar o horário ou repetir ao longo do dia.',
+        ),
+    },
+    {
+      id: 'sobre',
+      icone: 'info-box',
+      texto: 'Sobre o Rever',
+      acao: () =>
+        Alert.alert(
+          'Rever',
+          'Pequenos hábitos, grandes mudanças. Cada hábito feito dá XP pro Revi crescer.',
+        ),
+    },
+  ];
 
   return (
     <Tela bordas={['top']}>
@@ -37,15 +79,24 @@ export default function Perfil({ navigation }) {
         <CabecalhoTela titulo="Perfil" />
 
         <View style={styles.topo}>
-          <MolduraPixel corFundo={cores.cartaoDestaque} pixel={6} style={styles.avatar}>
-            <IconePixel nome="user" tamanho={64} cor={cores.branco} />
-          </MolduraPixel>
-          <Text style={styles.nome}>Usuário</Text>
-          <Text style={styles.email}>usuario@email.com</Text>
+          <Pressionavel
+            aoPressionar={() => navigation.navigate('EditarPerfil')}
+            escala={0.92}
+            accessibilityLabel="Editar perfil"
+          >
+            <MolduraPixel corFundo={cores.cartaoDestaque} pixel={6} style={styles.avatar}>
+              <IconePixel nome={usuario.avatar} tamanho={64} cor={usuario.cor} />
+            </MolduraPixel>
+            <MolduraPixel corFundo={cores.principal} pixel={2} degraus={1} style={styles.lapis}>
+              <IconePixel nome="pencil" tamanho={18} cor={cores.preto} />
+            </MolduraPixel>
+          </Pressionavel>
+          <Text style={styles.nome}>{usuario.nome}</Text>
+          <Text style={styles.email}>{usuario.email}</Text>
           <View style={styles.faixa}>
             <FaixaArcoIris altura={4} />
           </View>
-          <Text style={styles.membro}>Membro desde novembro de 2026</Text>
+          <Text style={styles.membro}>{`Membro desde ${nomesMeses[mes - 1]} de ${ano}`}</Text>
         </View>
 
         <View style={styles.estatisticas}>
@@ -55,13 +106,26 @@ export default function Perfil({ navigation }) {
             rotulo="Hábitos ativos"
             cor={cores.turquesa}
           />
-          <CartaoEstatistica icone="zap" valor="5" rotulo="Dias seguidos" cor={cores.laranja} />
-          <CartaoEstatistica icone="trophy" valor="3" rotulo="Conquistas" cor={cores.amarelo} />
+          <CartaoEstatistica
+            icone="zap"
+            valor={estatisticas.sequenciaAtual}
+            rotulo="Dias seguidos"
+            cor={cores.laranja}
+          />
+          <CartaoEstatistica
+            icone="heart"
+            valor={`NV ${estatisticas.nivel}`}
+            rotulo="Nível do Revi"
+            cor={cores.amarelo}
+          />
         </View>
 
-        <Text style={styles.secao}>Conquistas</Text>
+        <View style={styles.linhaSecao}>
+          <Text style={styles.secao}>Conquistas</Text>
+          <LinkTexto texto="Ver todas" aoPressionar={() => navigation.navigate('Conquistas')} />
+        </View>
         <View style={styles.conquistas}>
-          {conquistas.map(({ id, icone, nome, cor, desbloqueada }) => (
+          {vitrine.map(({ id, icone, nome, cor, desbloqueada }) => (
             <View key={id} style={styles.conquista}>
               <MolduraPixel
                 corFundo={desbloqueada ? cores.cartaoDestaque : cores.cartao}
@@ -74,14 +138,19 @@ export default function Perfil({ navigation }) {
                   cor={desbloqueada ? cor : cores.cinza}
                 />
               </MolduraPixel>
-              <Text style={[styles.nomeConquista, !desbloqueada && styles.bloqueada]}>{nome}</Text>
+              <Text
+                style={[styles.nomeConquista, !desbloqueada && styles.bloqueada]}
+                numberOfLines={2}
+              >
+                {nome}
+              </Text>
             </View>
           ))}
         </View>
 
         <Text style={styles.secao}>Configurações</Text>
-        {opcoes.map(({ id, icone, texto, detalhe }) => (
-          <ItemMenu key={id} icone={icone} texto={texto} detalhe={detalhe} />
+        {opcoes.map(({ id, icone, texto, detalhe, acao }) => (
+          <ItemMenu key={id} icone={icone} texto={texto} detalhe={detalhe} aoPressionar={acao} />
         ))}
 
         <View style={styles.sair}>
@@ -101,6 +170,20 @@ const styles = StyleSheet.create({
   topo: {
     alignItems: 'center',
     marginBottom: 24,
+  },
+  lapis: {
+    position: 'absolute',
+    right: -6,
+    bottom: -6,
+    width: 30,
+    height: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  linhaSecao: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
   },
   avatar: {
     width: 104,
