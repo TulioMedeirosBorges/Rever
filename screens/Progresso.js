@@ -12,6 +12,7 @@ import { useHabitos } from '../contexto/HabitosContexto';
 import { cores, fontes } from '../styles/tema';
 import { dadosDoGrafico } from '../utils/estatisticas';
 import Pressionavel from '../components/Pressionavel';
+import Entrada from '../components/Entrada';
 
 const ALTURA_GRAFICO = 130;
 
@@ -61,9 +62,10 @@ export default function Progresso() {
             const altura = maiorValor > 0 ? (valor / maiorValor) * ALTURA_GRAFICO : 0;
 
             return (
-              <View key={`${rotulo}-${indice}`} style={styles.colunaGrafico}>
+              // A chave inclui o período: trocar sem/mês/ano faz as barras crescerem de novo.
+              <View key={`${periodo}-${rotulo}-${indice}`} style={styles.colunaGrafico}>
                 {altura > 0 ? (
-                  <>
+                  <Entrada tipo="crescer" ordem={indice} mola="quique" style={styles.colunaGrafico}>
                     <View
                       style={[
                         styles.topoBarra,
@@ -80,7 +82,7 @@ export default function Progresso() {
                         },
                       ]}
                     />
-                  </>
+                  </Entrada>
                 ) : (
                   <View style={[styles.barraVazia, { width: larguraBarra }]} />
                 )}
@@ -92,7 +94,9 @@ export default function Progresso() {
 
         <Text style={styles.secao}>Sequência atual</Text>
         <View style={styles.sequencia}>
-          <IconePixel nome="fire" tamanho={72} cor={cores.laranja} style={styles.fogo} />
+          <Entrada tipo="escala" mola="quique" ordem={4}>
+            <IconePixel nome="fire" tamanho={72} cor={cores.laranja} style={styles.fogo} />
+          </Entrada>
           <View>
             <Text style={styles.numero}>
               {estatisticas.sequenciaAtual}{' '}
@@ -102,7 +106,7 @@ export default function Progresso() {
           </View>
         </View>
 
-        <View style={styles.estatisticas}>
+        <Entrada ordem={5} style={styles.estatisticas}>
           <CartaoEstatistica
             icone="check"
             valor={`${Math.round(estatisticas.taxaSemana * 100)}%`}
@@ -121,7 +125,7 @@ export default function Progresso() {
             rotulo="Dias perfeitos"
             cor={cores.laranja}
           />
-        </View>
+        </Entrada>
 
         <Text style={styles.secao}>Por hábito</Text>
         <Text style={styles.legendaHabito}>Últimos 7 dias</Text>

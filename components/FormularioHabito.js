@@ -5,26 +5,12 @@ import CampoTexto from './CampoTexto';
 import MolduraPixel from './MolduraPixel';
 import Botao from './Botao';
 import { diasSemana } from '../data/semana';
+import { categorias, icones } from '../data/opcoes';
 import { cores, fontes } from '../styles/tema';
 import Pressionavel from './Pressionavel';
 import { erro as vibrarErro } from '../utils/tato';
 import { tocar } from '../utils/sons';
 import { horariosDoLembrete } from '../utils/datas';
-
-const icones = [
-  'bottle-wine',
-  'book-open',
-  'fire',
-  'sparkle',
-  'notebook',
-  'headphone',
-  'heart',
-  'coffee',
-  'music',
-  'moon',
-];
-
-const categorias = ['Saúde', 'Estudos', 'Bem-estar', 'Lazer', 'Trabalho'];
 
 const repeticoes = [
   { horas: 0, rotulo: 'Não' },

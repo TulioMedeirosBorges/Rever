@@ -41,15 +41,21 @@ function TelaAcesa() {
 }
 
 export default function Foco({ navigation, route }) {
-  const { habitos, revi, estatisticas, registrarFoco } = useHabitos();
+  const { habitos, revi, estatisticas, registrarFoco, concluirSessao } = useHabitos();
+  // Sessão de projeto vinda da aba Projetos (opcional).
+  const sessao = route.params?.sessao;
   const deHoje = habitos.filter(({ frequencia }) => frequencia.includes(indiceSemana(new Date())));
-  const sugerido = route.params?.habitoId ?? deHoje.find(({ concluido }) => !concluido)?.id ?? null;
+  const sugerido = sessao
+    ? null
+    : (route.params?.habitoId ?? deHoje.find(({ concluido }) => !concluido)?.id ?? null);
+  const minutosIniciais = sessao?.minutos ?? 25;
+  const opcoesDuracao = [...new Set([...duracoes, minutosIniciais])].sort((a, b) => a - b);
 
   const [habitoId, setHabitoId] = useState(sugerido);
-  const [minutos, setMinutos] = useState(25);
+  const [minutos, setMinutos] = useState(minutosIniciais);
   const [estado, setEstado] = useState('pronto');
   const [fimEm, setFimEm] = useState(0);
-  const [restante, setRestante] = useState(25 * 60 * 1000);
+  const [restante, setRestante] = useState(minutosIniciais * 60 * 1000);
 
   const total = minutos * 60 * 1000;
   const habito = habitos.find(({ id }) => id === habitoId);
@@ -67,12 +73,15 @@ export default function Foco({ navigation, route }) {
         tocar('focoFim');
         sucesso();
         registrarFoco(minutos, habitoId);
+        if (sessao) {
+          concluirSessao(sessao.projetoId, sessao.sessaoId);
+        }
       } else {
         setRestante(falta);
       }
     }, 250);
     return () => clearInterval(relogio);
-  }, [estado, fimEm, minutos, habitoId, registrarFoco]);
+  }, [estado, fimEm, minutos, habitoId, registrarFoco, sessao, concluirSessao]);
 
   const escolherDuracao = (valor) => {
     setMinutos(valor);
@@ -121,7 +130,11 @@ export default function Foco({ navigation, route }) {
             cor={estado === 'concluido' ? cores.amarelo : cores.principal}
           />
           <Text style={styles.alvo} numberOfLines={1}>
-            {habito ? `${habito.nome} · ${minutos} min` : `Foco livre · ${minutos} min`}
+            {sessao
+              ? `${sessao.titulo} · ${minutos} min`
+              : habito
+                ? `${habito.nome} · ${minutos} min`
+                : `Foco livre · ${minutos} min`}
           </Text>
         </View>
 
@@ -132,48 +145,52 @@ export default function Foco({ navigation, route }) {
 
         {configurando ? (
           <>
-            <Text style={styles.rotulo}>Focar em</Text>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.chips}
-            >
-              {[{ id: null, nome: 'Livre', icone: 'sparkle' }, ...habitos].map((opcao) => {
-                const selecionado = opcao.id === habitoId;
-                return (
-                  <Pressionavel
-                    key={opcao.id ?? 'livre'}
-                    aoPressionar={() => setHabitoId(opcao.id)}
-                    escala={0.9}
-                    vibracaoSoltar="selecao"
-                    som="navegar"
-                    accessibilityRole="radio"
-                    accessibilityState={{ selected: selecionado }}
-                  >
-                    <MolduraPixel
-                      corFundo={selecionado ? cores.sucesso : cores.cartao}
-                      pixel={3}
-                      degraus={1}
-                    >
-                      <View style={styles.chip}>
-                        <IconePixel
-                          nome={opcao.icone}
-                          tamanho={18}
-                          cor={selecionado ? cores.preto : cores.branco}
-                        />
-                        <Text style={[styles.textoChip, selecionado && styles.textoChipAtivo]}>
-                          {opcao.nome}
-                        </Text>
-                      </View>
-                    </MolduraPixel>
-                  </Pressionavel>
-                );
-              })}
-            </ScrollView>
+            {sessao ? null : (
+              <>
+                <Text style={styles.rotulo}>Focar em</Text>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.chips}
+                >
+                  {[{ id: null, nome: 'Livre', icone: 'sparkle' }, ...habitos].map((opcao) => {
+                    const selecionado = opcao.id === habitoId;
+                    return (
+                      <Pressionavel
+                        key={opcao.id ?? 'livre'}
+                        aoPressionar={() => setHabitoId(opcao.id)}
+                        escala={0.9}
+                        vibracaoSoltar="selecao"
+                        som="navegar"
+                        accessibilityRole="radio"
+                        accessibilityState={{ selected: selecionado }}
+                      >
+                        <MolduraPixel
+                          corFundo={selecionado ? cores.sucesso : cores.cartao}
+                          pixel={3}
+                          degraus={1}
+                        >
+                          <View style={styles.chip}>
+                            <IconePixel
+                              nome={opcao.icone}
+                              tamanho={18}
+                              cor={selecionado ? cores.preto : cores.branco}
+                            />
+                            <Text style={[styles.textoChip, selecionado && styles.textoChipAtivo]}>
+                              {opcao.nome}
+                            </Text>
+                          </View>
+                        </MolduraPixel>
+                      </Pressionavel>
+                    );
+                  })}
+                </ScrollView>
+              </>
+            )}
 
             <Text style={styles.rotulo}>Duração</Text>
             <View style={styles.duracoes}>
-              {duracoes.map((valor) => {
+              {opcoesDuracao.map((valor) => {
                 const selecionado = valor === minutos;
                 return (
                   <Pressionavel

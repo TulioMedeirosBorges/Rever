@@ -2,6 +2,7 @@ import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import Tela from './Tela';
 import Logo from './Logo';
 import Botao from './Botao';
+import Entrada from './Entrada';
 import { cores, fontes } from '../styles/tema';
 
 export const ALTURA_ARTE = 390;
@@ -13,6 +14,8 @@ export default function TelaApresentacao({
   textoBotao,
   aoPressionar,
   rodape,
+  atrasoConteudo = 0,
+  logo,
 }) {
   const { height: alturaTela } = useWindowDimensions();
   const alturaArte = Math.min(ALTURA_ARTE, Math.round(alturaTela * 0.46));
@@ -23,25 +26,38 @@ export default function TelaApresentacao({
       <View style={[styles.arte, { height: alturaArte }]}>{arte(escala)}</View>
 
       <View style={styles.conteudo}>
-        <View style={styles.destaque}>
-          {titulo ? (
-            <Text style={styles.titulo} numberOfLines={2} adjustsFontSizeToFit>
-              {titulo}
-            </Text>
-          ) : (
-            <Logo />
-          )}
-        </View>
+        {logo ? (
+          <View style={styles.destaque}>{logo}</View>
+        ) : (
+          <Entrada
+            tipo={titulo ? 'direita' : 'escala'}
+            mola={titulo ? 'viva' : 'quique'}
+            atraso={atrasoConteudo}
+            style={styles.destaque}
+          >
+            {titulo ? (
+              <Text style={styles.titulo} numberOfLines={2} adjustsFontSizeToFit>
+                {titulo}
+              </Text>
+            ) : (
+              <Logo />
+            )}
+          </Entrada>
+        )}
 
-        <Text style={styles.texto} numberOfLines={2}>
-          {texto}
-        </Text>
+        <Entrada ordem={1} atraso={atrasoConteudo}>
+          <Text style={styles.texto} numberOfLines={2}>
+            {texto}
+          </Text>
+        </Entrada>
 
-        <View style={styles.botao}>
+        <Entrada ordem={2} atraso={atrasoConteudo} style={styles.botao}>
           <Botao texto={textoBotao} aoPressionar={aoPressionar} />
-        </View>
+        </Entrada>
 
-        <View style={styles.rodape}>{rodape}</View>
+        <Entrada ordem={3} atraso={atrasoConteudo} style={styles.rodape}>
+          {rodape}
+        </Entrada>
       </View>
     </Tela>
   );

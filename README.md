@@ -16,6 +16,8 @@ Nome e RGM.
 - **Início**: resumo do dia, Revi com nível e XP, hábitos de hoje e de outros dias.
 - **Criar Hábito** e **Editar Hábito**: formulário do hábito.
 - **Agenda**: semana atual; escolha um dia para ver e marcar os hábitos dele.
+- **Revi (conversa com IA)**: chat com o Revi usando o Gemini; ele faz perguntas e sugere hábitos, que entram na rotina com um toque.
+- **Projetos**: o Revi divide um projeto em etapas e separa as sessões de foco nos dias mais leves da sua semana, até o prazo. Detalhe do projeto recebe `{ id }` por parâmetro.
 - **Progresso**: gráfico por semana/mês/ano, sequência atual, estatísticas e progresso por hábito.
 - **Perfil**: dados do usuário, estatísticas, vitrine de conquistas e configurações.
 - **Editar perfil**: nome, e-mail, avatar e cor.
@@ -36,6 +38,12 @@ Dados iniciais em `data/habitos.js`, `data/semana.js` e `data/conquistas.js`. O 
 
 ## Vídeo de demonstração
 demo/demo.mp4
+
+## IA do Revi (Gemini, grátis)
+1. Crie uma chave grátis em https://aistudio.google.com/apikey.
+2. Cole a chave no app (aba **Revi**) ou crie um `.env.local` a partir do `.env.example`.
+   O `.env.local` não vai para o GitHub. Nunca coloque a chave em arquivos versionados.
+3. Quando a cota gratuita acaba, o Revi avisa no chat e os projetos passam a ser planejados no próprio app, sem IA.
 
 ## Como executar
 ```bash

@@ -1,6 +1,7 @@
 import { Image, StyleSheet, View } from 'react-native';
 import TelaApresentacao, { ALTURA_ARTE } from '../components/TelaApresentacao';
 import MolduraPixel from '../components/MolduraPixel';
+import Entrada from '../components/Entrada';
 import { cores } from '../styles/tema';
 
 const passos = [
@@ -46,8 +47,14 @@ export default function Onboarding({ navigation, route }) {
   return (
     <TelaApresentacao
       arte={(escala) => (
-        <Image source={imagem} style={{ width: largura * escala, height: ALTURA_ARTE * escala }} />
+        <Entrada tipo="direita" mola="viva">
+          <Image
+            source={imagem}
+            style={{ width: largura * escala, height: ALTURA_ARTE * escala }}
+          />
+        </Entrada>
       )}
+      atrasoConteudo={120}
       titulo={titulo}
       texto={texto}
       textoBotao={botao}

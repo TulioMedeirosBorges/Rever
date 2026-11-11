@@ -13,6 +13,7 @@ import Pressionavel from '../components/Pressionavel';
 import CartaoRevi from '../components/CartaoRevi';
 import { horariosDoLembrete, nomesMeses, paraHorario } from '../utils/datas';
 import CartaoResumo from '../components/CartaoResumo';
+import Entrada from '../components/Entrada';
 import { XP_POR_FOCO } from '../utils/estatisticas';
 
 const nomesDias = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
@@ -67,24 +68,25 @@ export default function Inicio({ navigation }) {
     )
     .sort((a, b) => a.horario.localeCompare(b.horario))[0];
 
-  const item = (habito) => (
-    <ItemHabito
-      key={habito.id}
-      nome={habito.nome}
-      icone={habito.icone}
-      detalhe={repeticao(habito)}
-      concluido={habito.concluido}
-      mostrarSeta
-      aoMarcar={() => alternarConcluido(habito.id)}
-      aoPressionar={() => navigation.navigate('EditarHabito', { id: habito.id })}
-    />
+  const item = (habito, indice) => (
+    <Entrada key={habito.id} ordem={5 + indice}>
+      <ItemHabito
+        nome={habito.nome}
+        icone={habito.icone}
+        detalhe={repeticao(habito)}
+        concluido={habito.concluido}
+        mostrarSeta
+        aoMarcar={() => alternarConcluido(habito.id)}
+        aoPressionar={() => navigation.navigate('EditarHabito', { id: habito.id })}
+      />
+    </Entrada>
   );
 
   return (
     <Tela bordas={['top']}>
       <PixelsDecorativos />
       <ScrollView contentContainerStyle={styles.conteudo} showsVerticalScrollIndicator={false}>
-        <View style={styles.topo}>
+        <Entrada tipo="esquerda" style={styles.topo}>
           <View style={styles.textosTopo}>
             <Text style={styles.data}>{data}</Text>
             <Text style={styles.ola} numberOfLines={1} adjustsFontSizeToFit>
@@ -94,66 +96,74 @@ export default function Inicio({ navigation }) {
           </View>
           <Pressionavel
             style={styles.engrenagem}
-            aoPressionar={() => navigation.replace('Perfil')}
+            aoPressionar={() => navigation.replace('Perfil', { direcao: 'direita' })}
             escala={0.8}
             accessibilityLabel="Configurações"
           >
             <IconePixel nome="settings-cog" tamanho={30} cor={cores.branco} />
           </Pressionavel>
-        </View>
+        </Entrada>
         <FaixaArcoIris />
 
-        <CartaoResumo
-          concluidos={concluidos}
-          total={total}
-          semana={estatisticas.semana}
-          indiceHoje={hoje}
-          sequencia={estatisticas.sequenciaAtual}
-          proximo={proximo}
-        />
+        <Entrada ordem={1}>
+          <CartaoResumo
+            concluidos={concluidos}
+            total={total}
+            semana={estatisticas.semana}
+            indiceHoje={hoje}
+            sequencia={estatisticas.sequenciaAtual}
+            proximo={proximo}
+          />
+        </Entrada>
 
-        <CartaoRevi
-          concluidos={concluidos}
-          total={total}
-          nivel={estatisticas.nivel}
-          xpNoNivel={estatisticas.xpNoNivel}
-          sequencia={estatisticas.sequenciaAtual}
-          proximo={proximo}
-          nomeUsuario={usuario.nome}
-          aparencia={revi}
-          aoPersonalizar={() => navigation.navigate('PersonalizarRevi')}
-        />
+        <Entrada ordem={2}>
+          <CartaoRevi
+            concluidos={concluidos}
+            total={total}
+            nivel={estatisticas.nivel}
+            xpNoNivel={estatisticas.xpNoNivel}
+            sequencia={estatisticas.sequenciaAtual}
+            proximo={proximo}
+            nomeUsuario={usuario.nome}
+            aparencia={revi}
+            aoPersonalizar={() => navigation.navigate('PersonalizarRevi')}
+          />
+        </Entrada>
 
-        <Pressionavel
-          aoPressionar={() => navigation.navigate('Foco')}
-          escala={0.97}
-          accessibilityRole="button"
-          accessibilityLabel="Abrir modo foco"
-        >
-          <MolduraPixel corFundo={cores.cartaoDestaque} pixel={4} style={styles.molduraFoco}>
-            <View style={styles.foco}>
-              <MolduraPixel corFundo={cores.fundo} pixel={3} degraus={1} style={styles.seloFoco}>
-                <IconePixel nome="clock" tamanho={26} cor={cores.amarelo} />
-              </MolduraPixel>
-              <View style={styles.textosFoco}>
-                <Text style={styles.tituloFoco}>Modo foco</Text>
-                <Text style={styles.detalheFoco}>
-                  {`Foque com o ${revi.nome} e ganhe +${XP_POR_FOCO} XP`}
-                </Text>
+        <Entrada ordem={3} tipo="escala">
+          <Pressionavel
+            aoPressionar={() => navigation.navigate('Foco')}
+            escala={0.97}
+            accessibilityRole="button"
+            accessibilityLabel="Abrir modo foco"
+          >
+            <MolduraPixel corFundo={cores.cartaoDestaque} pixel={4} style={styles.molduraFoco}>
+              <View style={styles.foco}>
+                <MolduraPixel corFundo={cores.fundo} pixel={3} degraus={1} style={styles.seloFoco}>
+                  <IconePixel nome="clock" tamanho={26} cor={cores.amarelo} />
+                </MolduraPixel>
+                <View style={styles.textosFoco}>
+                  <Text style={styles.tituloFoco}>Modo foco</Text>
+                  <Text style={styles.detalheFoco}>
+                    {`Foque com o ${revi.nome} e ganhe +${XP_POR_FOCO} XP`}
+                  </Text>
+                </View>
+                <IconePixel nome="chevron-right-2" tamanho={30} cor={cores.cinzaClaro} />
               </View>
-              <IconePixel nome="chevron-right-2" tamanho={30} cor={cores.cinzaClaro} />
-            </View>
-          </MolduraPixel>
-        </Pressionavel>
+            </MolduraPixel>
+          </Pressionavel>
+        </Entrada>
 
-        <Text style={styles.secao}>Para hoje</Text>
+        <Entrada ordem={4} tipo="esquerda">
+          <Text style={styles.secao}>Para hoje</Text>
+        </Entrada>
 
         {deHoje.map(item)}
 
         {outros.length > 0 ? (
           <>
             <Text style={styles.secaoOutros}>Outros dias</Text>
-            {outros.map(item)}
+            {outros.map((habito, indice) => item(habito, deHoje.length + 1 + indice))}
           </>
         ) : null}
 

@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
-import { horariosDoLembrete, paraMinutos } from './datas';
+import { deChave, horariosDoLembrete, paraMinutos } from './datas';
 
 const CANAL = 'lembretes';
 // Margem de segurança: sistemas limitam quantas notificações um app pode deixar agendadas.
@@ -58,28 +58,58 @@ const gatilhos = ({ frequencia, ...lembrete }) =>
     }));
   });
 
-// Refaz todos os agendamentos a partir da lista de hábitos.
-export async function sincronizarLembretes(habitos) {
+// Sessões de projeto ainda por fazer viram notificações de data marcada.
+const sessoesAgendaveis = (projetos) => {
+  const agora = Date.now();
+  return projetos
+    .filter(({ horario }) => /^\d{2}:\d{2}$/.test(horario ?? ''))
+    .flatMap((projeto) =>
+      projeto.sessoes
+        .filter(({ feita }) => !feita)
+        .map((sessao) => {
+          const data = deChave(sessao.data);
+          const minutos = paraMinutos(projeto.horario);
+          data.setHours(Math.floor(minutos / 60), minutos % 60, 0, 0);
+          return { projeto, sessao, data };
+        })
+        .filter(({ data }) => data.getTime() > agora),
+    )
+    .sort((a, b) => a.data - b.data);
+};
+
+// Refaz todos os agendamentos a partir dos hábitos e dos projetos.
+export async function sincronizarLembretes(habitos, projetos = []) {
   if (Platform.OS === 'web') {
     return;
   }
   await Notifications.cancelAllScheduledNotificationsAsync();
 
-  const agendamentos = habitos
+  const deHabitos = habitos
     .filter(({ lembrete, frequencia }) => lembrete !== '' && frequencia.length > 0)
-    .flatMap((habito) => gatilhos(habito).map((trigger) => ({ habito, trigger })))
-    .slice(0, LIMITE);
+    .flatMap((habito) =>
+      gatilhos(habito).map((trigger, indice) => ({
+        trigger,
+        content: { title: habito.nome, body: frases[indice % frases.length] },
+      })),
+    );
+  const deProjetos = sessoesAgendaveis(projetos).map(({ projeto, sessao, data }) => ({
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.DATE,
+      date: data,
+      channelId: CANAL,
+    },
+    content: { title: `Foco: ${projeto.nome}`, body: `${sessao.titulo} · ${sessao.minutos} min` },
+  }));
+  // Hábitos primeiro (se repetem), depois as sessões mais próximas.
+  const agendamentos = [...deHabitos, ...deProjetos].slice(0, LIMITE);
 
   if (agendamentos.length === 0 || !(await pedirPermissao())) {
     return;
   }
 
   await Promise.all(
-    agendamentos.map(({ habito, trigger }, indice) =>
-      Notifications.scheduleNotificationAsync({
-        content: { title: habito.nome, body: frases[indice % frases.length] },
-        trigger,
-      }),
+    agendamentos.map(({ content, trigger }) =>
+      Notifications.scheduleNotificationAsync({ content, trigger }),
     ),
   );
 }

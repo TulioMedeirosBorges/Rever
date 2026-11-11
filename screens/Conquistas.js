@@ -4,6 +4,7 @@ import MolduraPixel from '../components/MolduraPixel';
 import IconePixel from '../components/IconePixel';
 import BarraProgresso from '../components/BarraProgresso';
 import FaixaArcoIris from '../components/FaixaArcoIris';
+import Entrada from '../components/Entrada';
 import { useHabitos } from '../contexto/HabitosContexto';
 import { cores, fontes } from '../styles/tema';
 
@@ -41,47 +42,49 @@ export default function Conquistas() {
         <FaixaArcoIris />
 
         <View style={styles.grade}>
-          {ordenadas.map(({ id, nome, descricao, icone, cor, meta, atual, desbloqueada }) => (
-            <MolduraPixel
-              key={id}
-              corFundo={desbloqueada ? cores.cartaoDestaque : cores.cartao}
-              pixel={3}
-              style={styles.cartao}
-            >
-              <View style={styles.interno}>
+          {ordenadas.map(
+            ({ id, nome, descricao, icone, cor, meta, atual, desbloqueada }, indice) => (
+              <Entrada key={id} ordem={indice} tipo="escala" mola="quique" style={styles.cartao}>
                 <MolduraPixel
-                  corFundo={desbloqueada ? cores.fundo : cores.trilha}
+                  corFundo={desbloqueada ? cores.cartaoDestaque : cores.cartao}
                   pixel={3}
-                  degraus={1}
-                  style={styles.selo}
                 >
-                  <IconePixel
-                    nome={desbloqueada ? icone : 'lock'}
-                    tamanho={30}
-                    cor={desbloqueada ? cor : cores.cinza}
-                  />
-                </MolduraPixel>
-                <Text style={[styles.nome, !desbloqueada && styles.apagado]} numberOfLines={1}>
-                  {nome}
-                </Text>
-                <Text style={styles.descricao} numberOfLines={2}>
-                  {descricao}
-                </Text>
-                {desbloqueada ? (
-                  <Text style={[styles.status, { color: cor }]}>Desbloqueada</Text>
-                ) : (
-                  <View style={styles.progresso}>
-                    <BarraProgresso
-                      feitos={Math.round((atual / meta) * 6)}
-                      total={6}
-                      cor={cores.cinzaClaro}
-                    />
-                    <Text style={styles.fracao}>{`${atual}/${meta}`}</Text>
+                  <View style={styles.interno}>
+                    <MolduraPixel
+                      corFundo={desbloqueada ? cores.fundo : cores.trilha}
+                      pixel={3}
+                      degraus={1}
+                      style={styles.selo}
+                    >
+                      <IconePixel
+                        nome={desbloqueada ? icone : 'lock'}
+                        tamanho={30}
+                        cor={desbloqueada ? cor : cores.cinza}
+                      />
+                    </MolduraPixel>
+                    <Text style={[styles.nome, !desbloqueada && styles.apagado]} numberOfLines={1}>
+                      {nome}
+                    </Text>
+                    <Text style={styles.descricao} numberOfLines={2}>
+                      {descricao}
+                    </Text>
+                    {desbloqueada ? (
+                      <Text style={[styles.status, { color: cor }]}>Desbloqueada</Text>
+                    ) : (
+                      <View style={styles.progresso}>
+                        <BarraProgresso
+                          feitos={Math.round((atual / meta) * 6)}
+                          total={6}
+                          cor={cores.cinzaClaro}
+                        />
+                        <Text style={styles.fracao}>{`${atual}/${meta}`}</Text>
+                      </View>
+                    )}
                   </View>
-                )}
-              </View>
-            </MolduraPixel>
-          ))}
+                </MolduraPixel>
+              </Entrada>
+            ),
+          )}
         </View>
       </ScrollView>
     </Tela>

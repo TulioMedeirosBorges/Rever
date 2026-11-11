@@ -16,6 +16,13 @@ const arquivos = {
   reviFala1: require('../assets/sons/revi_fala1.wav'),
   reviFala2: require('../assets/sons/revi_fala2.wav'),
   reviFala3: require('../assets/sons/revi_fala3.wav'),
+  logoRisco: require('../assets/sons/logo_risco.wav'),
+  logoLetra1: require('../assets/sons/logo_letra1.wav'),
+  logoLetra2: require('../assets/sons/logo_letra2.wav'),
+  logoLetra3: require('../assets/sons/logo_letra3.wav'),
+  logoLetra4: require('../assets/sons/logo_letra4.wav'),
+  logoLetra5: require('../assets/sons/logo_letra5.wav'),
+  logoBrilho: require('../assets/sons/logo_brilho.wav'),
   focoInicio: require('../assets/sons/foco_inicio.wav'),
   focoFim: require('../assets/sons/foco_fim.wav'),
 };

@@ -11,12 +11,16 @@ import Botao from '../components/Botao';
 import BarraInferior from '../components/BarraInferior';
 import LinkTexto from '../components/LinkTexto';
 import Pressionavel from '../components/Pressionavel';
+import Entrada from '../components/Entrada';
 import { useHabitos } from '../contexto/HabitosContexto';
 import { cores, fontes } from '../styles/tema';
 import { nomesMeses } from '../utils/datas';
+import { chaveDoAmbiente } from '../utils/gemini';
 
 export default function Perfil({ navigation }) {
-  const { habitos, usuario, estatisticas, conquistas, config, alternarSons } = useHabitos();
+  const { habitos, usuario, estatisticas, conquistas, config, alternarSons, definirChaveGemini } =
+    useHabitos();
+  const iaConectada = Boolean(config.chaveGemini || chaveDoAmbiente);
   const sair = () => navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
 
   const [ano, mes] = usuario.membroDesde.split('-').map(Number);
@@ -41,6 +45,19 @@ export default function Perfil({ navigation }) {
       texto: 'Conquistas',
       detalhe: `${abertas.length}/${conquistas.length}`,
       acao: () => navigation.navigate('Conquistas'),
+    },
+    {
+      id: 'ia',
+      icone: 'robot-face-happy',
+      texto: 'IA do Revi (Gemini)',
+      detalhe: iaConectada ? 'Conectada' : 'Desligada',
+      acao: () =>
+        config.chaveGemini
+          ? Alert.alert('IA do Revi', 'Desconectar a chave do Gemini deste celular?', [
+              { text: 'Cancelar', style: 'cancel' },
+              { text: 'Desconectar', style: 'destructive', onPress: () => definirChaveGemini('') },
+            ])
+          : navigation.replace('Conversar', { direcao: 'esquerda' }),
     },
     {
       id: 'sons',
@@ -78,7 +95,7 @@ export default function Perfil({ navigation }) {
       <ScrollView contentContainerStyle={styles.conteudo} showsVerticalScrollIndicator={false}>
         <CabecalhoTela titulo="Perfil" />
 
-        <View style={styles.topo}>
+        <Entrada tipo="escala" mola="quique" style={styles.topo}>
           <Pressionavel
             aoPressionar={() => navigation.navigate('EditarPerfil')}
             escala={0.92}
@@ -97,9 +114,9 @@ export default function Perfil({ navigation }) {
             <FaixaArcoIris altura={4} />
           </View>
           <Text style={styles.membro}>{`Membro desde ${nomesMeses[mes - 1]} de ${ano}`}</Text>
-        </View>
+        </Entrada>
 
-        <View style={styles.estatisticas}>
+        <Entrada ordem={2} style={styles.estatisticas}>
           <CartaoEstatistica
             icone="check"
             valor={habitos.length}
@@ -118,15 +135,21 @@ export default function Perfil({ navigation }) {
             rotulo="Nível do Revi"
             cor={cores.amarelo}
           />
-        </View>
+        </Entrada>
 
         <View style={styles.linhaSecao}>
           <Text style={styles.secao}>Conquistas</Text>
           <LinkTexto texto="Ver todas" aoPressionar={() => navigation.navigate('Conquistas')} />
         </View>
         <View style={styles.conquistas}>
-          {vitrine.map(({ id, icone, nome, cor, desbloqueada }) => (
-            <View key={id} style={styles.conquista}>
+          {vitrine.map(({ id, icone, nome, cor, desbloqueada }, indice) => (
+            <Entrada
+              key={id}
+              ordem={3 + indice}
+              tipo="escala"
+              mola="quique"
+              style={styles.conquista}
+            >
               <MolduraPixel
                 corFundo={desbloqueada ? cores.cartaoDestaque : cores.cartao}
                 pixel={4}
@@ -144,7 +167,7 @@ export default function Perfil({ navigation }) {
               >
                 {nome}
               </Text>
-            </View>
+            </Entrada>
           ))}
         </View>
 

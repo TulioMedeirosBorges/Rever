@@ -1,7 +1,7 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Tela from './Tela';
 import FaixaArcoIris from './FaixaArcoIris';
-import Logo from './Logo';
+import LogoAnimada from './LogoAnimada';
 import { cores, fontes } from '../styles/tema';
 
 export default function TelaAuth({ titulo, subtitulo, children }) {
@@ -16,7 +16,7 @@ export default function TelaAuth({ titulo, subtitulo, children }) {
         <View style={styles.coluna}>
           <FaixaArcoIris altura={6} />
           <View style={styles.logo}>
-            <Logo />
+            <LogoAnimada atraso={150} som={false} />
           </View>
           <Text style={styles.titulo}>{titulo}</Text>
           <Text style={styles.subtitulo}>{subtitulo}</Text>

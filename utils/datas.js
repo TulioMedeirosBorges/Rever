@@ -52,3 +52,16 @@ export const horariosDoLembrete = ({ lembrete, repetir = 0, ate = '' }) => {
   }
   return horarios;
 };
+
+const siglas = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
+
+export const deChave = (chave) => {
+  const [ano, mes, dia] = chave.split('-').map(Number);
+  return new Date(ano, mes - 1, dia);
+};
+
+// "qua 19/11"
+export const rotuloData = (chave) => {
+  const data = deChave(chave);
+  return `${siglas[data.getDay()]} ${doisDigitos(data.getDate())}/${doisDigitos(data.getMonth() + 1)}`;
+};

@@ -11,9 +11,11 @@ import { cores, fontes } from '../styles/tema';
 const abas = [
   { nome: 'Inicio', rotulo: 'Início', icone: 'home', cor: cores.vermelho },
   { nome: 'Agenda', rotulo: 'Agenda', icone: 'calendar-2', cor: cores.laranja },
+  { nome: 'Conversar', rotulo: 'Revi', icone: 'message-text', cor: cores.amarelo },
   { nome: 'CriarHabito' },
-  { nome: 'Progresso', rotulo: 'Progresso', icone: 'chart', cor: cores.amarelo },
-  { nome: 'Perfil', rotulo: 'Perfil', icone: 'user', cor: cores.turquesa },
+  { nome: 'Projetos', rotulo: 'Projetos', icone: 'clipboard-note', cor: cores.turquesa },
+  { nome: 'Progresso', rotulo: 'Progresso', icone: 'chart', cor: cores.creme },
+  { nome: 'Perfil', rotulo: 'Perfil', icone: 'user', cor: cores.cinzaClaro },
 ];
 
 const ALTURA_BASE = 4;
@@ -22,9 +24,12 @@ export default function BarraInferior({ abaAtiva }) {
   const navigation = useNavigation();
   const { bottom } = useSafeAreaInsets();
 
+  // A nova aba desliza do lado em que está na barra, como páginas lado a lado.
+  const posicao = (nome) => abas.findIndex((aba) => aba.nome === nome);
   const selecionar = (nome) => {
     if (nome !== abaAtiva) {
-      navigation.replace(nome);
+      const direcao = posicao(nome) > posicao(abaAtiva) ? 'direita' : 'esquerda';
+      navigation.replace(nome, { direcao });
     }
   };
 
@@ -70,8 +75,15 @@ export default function BarraInferior({ abaAtiva }) {
               accessibilityState={{ selected: ativa }}
             >
               <View style={[styles.indicador, ativa && { backgroundColor: cor }]} />
-              <IconePixel nome={icone} tamanho={28} cor={corAtual} />
-              <Text style={[styles.rotulo, { color: corAtual }]}>{rotulo}</Text>
+              <IconePixel nome={icone} tamanho={26} cor={corAtual} />
+              {/* Só a aba ativa mostra o nome; o espaço fica reservado para nada pular. */}
+              <Text
+                style={[styles.rotulo, { color: ativa ? corAtual : 'transparent' }]}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+              >
+                {rotulo}
+              </Text>
             </Pressionavel>
           );
         })}
@@ -115,8 +127,8 @@ const styles = StyleSheet.create({
     right: 0,
   },
   botaoMais: {
-    width: 52,
-    height: 48,
+    width: 46,
+    height: 44,
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -138,6 +138,15 @@ export const conquistas = [
     valor: (e) => e.minutosFoco,
   },
   {
+    id: 'planejador',
+    nome: 'Planejador',
+    descricao: 'Crie um projeto com o Revi.',
+    icone: 'clipboard-note',
+    cor: cores.turquesa,
+    meta: 1,
+    valor: (e) => e.projetos ?? 0,
+  },
+  {
     id: 'estiloso',
     nome: 'Estiloso',
     descricao: 'Personalize o visual do Revi.',

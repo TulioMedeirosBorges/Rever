@@ -7,6 +7,7 @@ import ItemHabito from '../components/ItemHabito';
 import MolduraPixel from '../components/MolduraPixel';
 import BarraInferior from '../components/BarraInferior';
 import Pressionavel from '../components/Pressionavel';
+import Entrada from '../components/Entrada';
 import { useHabitos } from '../contexto/HabitosContexto';
 import { cores, fontes } from '../styles/tema';
 import { chaveDia, indiceSemana, inicioDaSemana, nomesMeses, somarDias } from '../utils/datas';
@@ -14,7 +15,7 @@ import { chaveDia, indiceSemana, inicioDaSemana, nomesMeses, somarDias } from '.
 const siglas = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB', 'DOM'];
 
 export default function Agenda() {
-  const { habitos, historico, alternarConcluido } = useHabitos();
+  const { habitos, historico, alternarConcluido, projetos, alternarSessao } = useHabitos();
   const hoje = new Date();
   const [indiceDia, setIndiceDia] = useState(indiceSemana(hoje));
 
@@ -27,6 +28,12 @@ export default function Agenda() {
     .filter(({ frequencia }) => frequencia.includes(indiceDia))
     .map((habito) => ({ ...habito, concluido: feitos.includes(habito.id) }));
   const concluidos = habitosDoDia.filter(({ concluido }) => concluido).length;
+  // Sessões de projeto que o Revi marcou para este dia.
+  const sessoesDoDia = projetos.flatMap((projeto) =>
+    projeto.sessoes
+      .filter(({ data }) => data === chaveDia(dataSelecionada))
+      .map((sessao) => ({ projeto, sessao })),
+  );
 
   return (
     <Tela bordas={['top']}>
@@ -42,29 +49,30 @@ export default function Agenda() {
             const teveFeito = (historico[chaveDia(data)] ?? []).length > 0;
 
             return (
-              <Pressionavel
-                key={sigla}
-                style={styles.coluna}
-                aoPressionar={() => setIndiceDia(indice)}
-                escala={0.88}
-                vibracaoSoltar="selecao"
-                som="navegar"
-                accessibilityRole="tab"
-                accessibilityState={{ selected: selecionado }}
-              >
-                <Text style={[styles.sigla, ehHoje && styles.siglaHoje]}>{sigla}</Text>
-                <MolduraPixel
-                  corFundo={selecionado ? cores.sucesso : 'transparent'}
-                  pixel={3}
-                  degraus={1}
-                  style={styles.dia}
+              <Entrada key={sigla} ordem={indice} tipo="escala" mola="quique" style={styles.coluna}>
+                <Pressionavel
+                  style={styles.coluna}
+                  aoPressionar={() => setIndiceDia(indice)}
+                  escala={0.88}
+                  vibracaoSoltar="selecao"
+                  som="navegar"
+                  accessibilityRole="tab"
+                  accessibilityState={{ selected: selecionado }}
                 >
-                  <Text style={[styles.numeroDia, selecionado && styles.numeroSelecionado]}>
-                    {data.getDate()}
-                  </Text>
-                </MolduraPixel>
-                <View style={[styles.ponto, teveFeito && styles.pontoAtivo]} />
-              </Pressionavel>
+                  <Text style={[styles.sigla, ehHoje && styles.siglaHoje]}>{sigla}</Text>
+                  <MolduraPixel
+                    corFundo={selecionado ? cores.sucesso : 'transparent'}
+                    pixel={3}
+                    degraus={1}
+                    style={styles.dia}
+                  >
+                    <Text style={[styles.numeroDia, selecionado && styles.numeroSelecionado]}>
+                      {data.getDate()}
+                    </Text>
+                  </MolduraPixel>
+                  <View style={[styles.ponto, teveFeito && styles.pontoAtivo]} />
+                </Pressionavel>
+              </Entrada>
             );
           })}
         </View>
@@ -73,21 +81,40 @@ export default function Agenda() {
           <Text style={styles.secao}>Hábitos do dia</Text>
           <Text style={styles.contagem}>{`${concluidos} de ${habitosDoDia.length}`}</Text>
         </View>
-        {habitosDoDia.map(({ id, nome, icone, lembrete, concluido }) => (
-          <ItemHabito
-            key={id}
-            nome={nome}
-            icone={icone}
-            detalhe={lembrete || undefined}
-            concluido={concluido}
-            aoMarcar={futuro ? undefined : () => alternarConcluido(id, dataSelecionada)}
-          />
+        {/* A chave inclui o dia: trocar de dia faz a lista entrar de novo. */}
+        {habitosDoDia.map(({ id, nome, icone, lembrete, concluido }, indice) => (
+          <Entrada key={`${indiceDia}-${id}`} ordem={indice + 2}>
+            <ItemHabito
+              nome={nome}
+              icone={icone}
+              detalhe={lembrete || undefined}
+              concluido={concluido}
+              aoMarcar={futuro ? undefined : () => alternarConcluido(id, dataSelecionada)}
+            />
+          </Entrada>
         ))}
         {habitosDoDia.length === 0 ? (
           <Text style={styles.vazio}>Nenhum hábito neste dia.</Text>
         ) : null}
         {futuro && habitosDoDia.length > 0 ? (
           <Text style={styles.vazio}>Dia futuro: dá para marcar quando ele chegar.</Text>
+        ) : null}
+
+        {sessoesDoDia.length > 0 ? (
+          <>
+            <Text style={[styles.secao, styles.secaoProjetos]}>Projetos do dia</Text>
+            {sessoesDoDia.map(({ projeto, sessao }, indice) => (
+              <Entrada key={`${indiceDia}-${projeto.id}-${sessao.id}`} ordem={indice + 2}>
+                <ItemHabito
+                  nome={sessao.titulo}
+                  icone="clipboard-note"
+                  detalhe={`${projeto.nome} · ${sessao.minutos} min`}
+                  concluido={sessao.feita}
+                  aoMarcar={futuro ? undefined : () => alternarSessao(projeto.id, sessao.id)}
+                />
+              </Entrada>
+            ))}
+          </>
         ) : null}
       </ScrollView>
       <BarraInferior abaAtiva="Agenda" />
@@ -168,6 +195,10 @@ const styles = StyleSheet.create({
   },
   pontoAtivo: {
     backgroundColor: cores.laranja,
+  },
+  secaoProjetos: {
+    marginTop: 18,
+    marginBottom: 12,
   },
   vazio: {
     color: cores.cinza,

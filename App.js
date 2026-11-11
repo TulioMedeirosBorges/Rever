@@ -23,6 +23,10 @@ import EditarPerfil from './screens/EditarPerfil';
 import Conquistas from './screens/Conquistas';
 import PersonalizarRevi from './screens/PersonalizarRevi';
 import Foco from './screens/Foco';
+import Conversar from './screens/Conversar';
+import Projetos from './screens/Projetos';
+import NovoProjeto from './screens/NovoProjeto';
+import ProjetoDetalhe from './screens/ProjetoDetalhe';
 import AvisoConquista from './components/AvisoConquista';
 import { HabitosProvider, useHabitos } from './contexto/HabitosContexto';
 import { cores, fontes } from './styles/tema';
@@ -34,6 +38,18 @@ SplashScreen.preventAutoHideAsync();
 LogBox.ignoreLogs([/expo-notifications/]);
 
 const Stack = createNativeStackNavigator();
+
+// Abas deslizam conforme a direção na barra; chegando de fora (login), a tela sobe de baixo.
+const transicaoDeAba = ({ route }) => {
+  const direcao = route.params?.direcao;
+  if (direcao === 'direita') {
+    return { animation: 'slide_from_right' };
+  }
+  if (direcao === 'esquerda') {
+    return { animation: 'slide_from_left' };
+  }
+  return { animation: 'fade_from_bottom' };
+};
 
 // Só mostra o app quando as fontes e os dados salvos estiverem prontos.
 function Conteudo({ fontesProntas }) {
@@ -57,17 +73,17 @@ function Conteudo({ fontesProntas }) {
           initialRouteName="Splash"
           screenOptions={{
             headerShown: false,
-            animation: 'fade',
+            animation: 'slide_from_right',
             contentStyle: { backgroundColor: cores.fundo },
           }}
         >
-          <Stack.Screen name="Splash" component={Splash} />
+          <Stack.Screen name="Splash" component={Splash} options={{ animation: 'fade' }} />
           <Stack.Screen name="Onboarding" component={Onboarding} />
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="Cadastro" component={Cadastro} />
           <Stack.Screen name="EsqueceuSenha" component={EsqueceuSenha} />
           <Stack.Screen name="VerificarEmail" component={VerificarEmail} />
-          <Stack.Screen name="Inicio" component={Inicio} />
+          <Stack.Screen name="Inicio" component={Inicio} options={transicaoDeAba} />
           <Stack.Screen
             name="CriarHabito"
             component={CriarHabito}
@@ -78,9 +94,17 @@ function Conteudo({ fontesProntas }) {
             component={EditarHabito}
             options={{ animation: 'slide_from_right' }}
           />
-          <Stack.Screen name="Agenda" component={Agenda} />
-          <Stack.Screen name="Progresso" component={Progresso} />
-          <Stack.Screen name="Perfil" component={Perfil} />
+          <Stack.Screen name="Agenda" component={Agenda} options={transicaoDeAba} />
+          <Stack.Screen name="Conversar" component={Conversar} options={transicaoDeAba} />
+          <Stack.Screen name="Projetos" component={Projetos} options={transicaoDeAba} />
+          <Stack.Screen
+            name="NovoProjeto"
+            component={NovoProjeto}
+            options={{ animation: 'slide_from_bottom' }}
+          />
+          <Stack.Screen name="ProjetoDetalhe" component={ProjetoDetalhe} />
+          <Stack.Screen name="Progresso" component={Progresso} options={transicaoDeAba} />
+          <Stack.Screen name="Perfil" component={Perfil} options={transicaoDeAba} />
           <Stack.Screen
             name="EditarPerfil"
             component={EditarPerfil}
