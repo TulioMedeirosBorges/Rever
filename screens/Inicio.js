@@ -41,9 +41,7 @@ export default function Inicio({ navigation }) {
           style={styles.molduraCartao}
         >
           <View style={styles.cartao}>
-            <AnelProgresso progresso={progresso}>
-              <Text style={styles.porcentagem}>{`${Math.round(progresso * 100)}%`}</Text>
-            </AnelProgresso>
+            <AnelProgresso progresso={progresso} />
             <View style={styles.resumo}>
               <Text style={styles.contagem}>{`${concluidos} de ${habitos.length}`}</Text>
               <Text style={styles.textoResumo}>Hábitos{'\n'}concluídos</Text>
@@ -116,18 +114,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 22,
     paddingBottom: 16,
-    paddingLeft: 30,
-    paddingRight: 12,
-  },
-  porcentagem: {
-    color: cores.branco,
-    fontSize: 26,
-    fontFamily: fontes.negrito,
-    fontVariant: fontes.semLigaduras,
+    paddingHorizontal: 22,
   },
   resumo: {
     flex: 1,
-    marginLeft: 32,
+    marginLeft: 24,
   },
   contagem: {
     color: cores.branco,
@@ -145,10 +136,10 @@ const styles = StyleSheet.create({
   },
   sequencia: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   diaSequencia: {
     alignItems: 'center',
-    marginRight: 1,
   },
   letraDia: {
     color: cores.cinza,

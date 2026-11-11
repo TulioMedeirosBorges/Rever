@@ -1,72 +1,90 @@
-import { StyleSheet, View } from 'react-native';
-import { cores } from '../styles/tema';
+import { StyleSheet, Text, View } from 'react-native';
+import { cores, fontes } from '../styles/tema';
+
+const BLOCO = 10;
 
 const DESENHO = [
-  '....#####....',
-  '..#########..',
-  '.###.....###.',
-  '.##.......##.',
-  '##.........##',
-  '##.........##',
-  '##.........##',
-  '##.........##',
-  '.##.......##.',
-  '.###.....###.',
-  '..#########..',
-  '....#####....',
+  '....####....',
+  '..########..',
+  '.###....###.',
+  '.##......##.',
+  '##........##',
+  '##........##',
+  '##........##',
+  '##........##',
+  '.##......##.',
+  '.###....###.',
+  '..########..',
+  '....####....',
 ];
 
-const LINHAS = DESENHO.length;
-const COLUNAS = DESENHO[0].length;
+const TAMANHO = DESENHO.length;
+const LARGURA_BURACO = 6 * BLOCO;
 
 const fracaoDoBloco = (linha, coluna) => {
-  const dx = coluna + 0.5 - COLUNAS / 2;
-  const dy = linha + 0.5 - LINHAS / 2;
+  const dx = coluna + 0.5 - TAMANHO / 2;
+  const dy = linha + 0.5 - TAMANHO / 2;
   const angulo = Math.atan2(-dx, dy);
   const anguloPositivo = angulo < 0 ? angulo + 2 * Math.PI : angulo;
 
   return anguloPositivo / (2 * Math.PI);
 };
 
-export default function AnelProgresso({ progresso, children }) {
+const blocos = DESENHO.flatMap((linha, indiceLinha) =>
+  [...linha]
+    .map((bloco, indiceColuna) => ({
+      chave: `${indiceLinha}-${indiceColuna}`,
+      preenchido: bloco === '#',
+      left: indiceColuna * BLOCO,
+      top: indiceLinha * BLOCO,
+      fracao: fracaoDoBloco(indiceLinha, indiceColuna),
+    }))
+    .filter(({ preenchido }) => preenchido),
+);
+
+export default function AnelProgresso({ progresso }) {
   return (
     <View style={styles.anel}>
-      {DESENHO.map((linha, indiceLinha) => (
-        <View key={indiceLinha} style={styles.linha}>
-          {[...linha].map((bloco, indiceColuna) => {
-            const preenchido = bloco === '#';
-            const feito = fracaoDoBloco(indiceLinha, indiceColuna) < progresso;
-            const cor = feito ? cores.branco : cores.roxoEscuro;
-
-            return (
-              <View
-                key={indiceColuna}
-                style={[styles.bloco, preenchido && { backgroundColor: cor }]}
-              />
-            );
-          })}
-        </View>
+      {blocos.map(({ chave, left, top, fracao }) => (
+        <View
+          key={chave}
+          style={[
+            styles.bloco,
+            { left, top, backgroundColor: fracao < progresso ? cores.branco : cores.roxoEscuro },
+          ]}
+        />
       ))}
-      <View style={styles.centro}>{children}</View>
+      <Text
+        style={styles.porcentagem}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        allowFontScaling={false}
+      >
+        {`${Math.round(progresso * 100)}%`}
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   anel: {
-    width: 123,
-    height: 121,
-  },
-  linha: {
-    flex: 1,
-    flexDirection: 'row',
-  },
-  bloco: {
-    flex: 1,
-  },
-  centro: {
-    ...StyleSheet.absoluteFillObject,
+    width: TAMANHO * BLOCO,
+    height: TAMANHO * BLOCO,
+    flexShrink: 0,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  bloco: {
+    position: 'absolute',
+    width: BLOCO,
+    height: BLOCO,
+  },
+  porcentagem: {
+    maxWidth: LARGURA_BURACO,
+    color: cores.branco,
+    fontFamily: fontes.negrito,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 24,
+    textAlign: 'center',
   },
 });
