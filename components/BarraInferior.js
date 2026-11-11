@@ -1,15 +1,15 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import IconePixel from './IconePixel';
+import IconeProprio from './IconeProprio';
 import FaixaArcoIris from './FaixaArcoIris';
 import { cores } from '../styles/tema';
 
 const abas = [
-  { nome: 'Inicio', rotulo: 'Início', icone: 'home', cor: cores.arcoIris[0] },
-  { nome: 'Agenda', rotulo: 'Agenda', icone: 'calendar', cor: cores.arcoIris[1] },
-  { nome: 'CriarHabito', rotulo: '', icone: 'plus-box', cor: cores.branco },
-  { nome: 'Progresso', rotulo: 'Progresso', icone: 'trophy', cor: cores.arcoIris[3] },
-  { nome: 'Perfil', rotulo: 'Perfil', icone: 'user', cor: cores.branco, desativada: true },
+  { nome: 'Inicio', rotulo: 'Início', icone: 'casa', cor: cores.arcoIris[0] },
+  { nome: 'Agenda', rotulo: 'Agenda', icone: 'calendario', cor: cores.arcoIris[1] },
+  { nome: 'CriarHabito', rotulo: '', icone: 'mais', cor: cores.branco },
+  { nome: 'Progresso', rotulo: 'Progresso', icone: 'trofeu', cor: cores.arcoIris[3] },
+  { nome: 'Perfil', rotulo: 'Perfil', icone: 'usuario', cor: cores.branco, desativada: true },
 ];
 
 export default function BarraInferior({ abaAtiva }) {
@@ -41,7 +41,7 @@ export default function BarraInferior({ abaAtiva }) {
               disabled={desativada}
               onPress={() => selecionar(nome)}
             >
-              <IconePixel nome={icone} tamanho={rotulo ? 32 : 44} cor={corAtual} />
+              <IconeProprio nome={icone} tamanho={rotulo ? 32 : 44} cor={corAtual} />
               {rotulo ? <Text style={[styles.rotulo, { color: corAtual }]}>{rotulo}</Text> : null}
             </TouchableOpacity>
           );
