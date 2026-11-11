@@ -1,10 +1,7 @@
-import { Image, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
-import Tela from '../components/Tela';
-import Botao from '../components/Botao';
+import { Image, StyleSheet, View } from 'react-native';
+import TelaApresentacao, { ALTURA_ARTE } from '../components/TelaApresentacao';
 import MolduraPixel from '../components/MolduraPixel';
-import { cores, fontes } from '../styles/tema';
-
-const ALTURA_ARTE = 390;
+import { cores } from '../styles/tema';
 
 const passos = [
   {
@@ -38,10 +35,6 @@ export default function Onboarding({ navigation, route }) {
   const { imagem, largura, titulo, texto, botao, cor } = passos[indice];
   const ultimoPasso = indice === passos.length - 1;
 
-  const { height: alturaTela } = useWindowDimensions();
-  const alturaArte = Math.min(ALTURA_ARTE, alturaTela * 0.47);
-  const larguraArte = (largura / ALTURA_ARTE) * alturaArte;
-
   const avancar = () => {
     if (ultimoPasso) {
       navigation.navigate('Cadastro');
@@ -51,17 +44,18 @@ export default function Onboarding({ navigation, route }) {
   };
 
   return (
-    <Tela bordas={['bottom']}>
-      <Image
-        source={imagem}
-        style={[styles.imagem, { width: larguraArte, height: alturaArte }]}
-      />
-      <View style={styles.conteudo}>
-        <Text style={styles.titulo}>{titulo}</Text>
-        <Text style={styles.texto}>{texto}</Text>
-        <View style={styles.botao}>
-          <Botao texto={botao} aoPressionar={avancar} />
-        </View>
+    <TelaApresentacao
+      arte={(escala) => (
+        <Image
+          source={imagem}
+          style={{ width: largura * escala, height: ALTURA_ARTE * escala }}
+        />
+      )}
+      titulo={titulo}
+      texto={texto}
+      textoBotao={botao}
+      aoPressionar={avancar}
+      rodape={
         <View style={styles.pontos}>
           {passos.map((passo, i) => (
             <MolduraPixel
@@ -73,46 +67,14 @@ export default function Onboarding({ navigation, route }) {
             />
           ))}
         </View>
-      </View>
-    </Tela>
+      }
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  imagem: {
-    alignSelf: 'center',
-  },
-  conteudo: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 28,
-    paddingTop: 8,
-    paddingBottom: 48,
-  },
-  botao: {
-    paddingHorizontal: 48,
-  },
-  titulo: {
-    color: cores.branco,
-    fontSize: 38,
-    fontFamily: fontes.negrito,
-    fontVariant: fontes.semLigaduras,
-    lineHeight: 44,
-    textAlign: 'center',
-  },
-  texto: {
-    color: cores.branco,
-    fontFamily: fontes.regular,
-    fontVariant: fontes.semLigaduras,
-    fontSize: 23,
-    lineHeight: 29,
-    textAlign: 'center',
-    marginVertical: 24,
-  },
   pontos: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 32,
   },
   ponto: {
     width: 16,

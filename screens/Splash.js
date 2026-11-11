@@ -1,76 +1,44 @@
-import { Image, StyleSheet, Text, View } from 'react-native';
-import Tela from '../components/Tela';
-import Logo from '../components/Logo';
-import Botao from '../components/Botao';
+import { Image, StyleSheet, View } from 'react-native';
+import TelaApresentacao from '../components/TelaApresentacao';
 import LinkTexto from '../components/LinkTexto';
-import { cores, fontes } from '../styles/tema';
+import { cores } from '../styles/tema';
 
 const faixas = [...cores.arcoIris].reverse();
 
+const TOPO_ARTE = 95;
+const TOPO_FAIXAS = 220;
+const ALTURA_FAIXA = 20;
+
 export default function Splash({ navigation }) {
   return (
-    <Tela bordas={['bottom']} style={styles.tela}>
-      <View style={styles.arte}>
-        <View style={styles.faixas}>
-          {faixas.map((cor) => (
-            <View key={cor} style={[styles.faixa, { backgroundColor: cor }]} />
-          ))}
-        </View>
-        <Image source={require('../assets/imagens/splash-r.png')} style={styles.imagem} />
-      </View>
-
-      <View style={styles.conteudo}>
-        <Logo />
-        <Text style={styles.frase}>Pequenos hábitos,{'\n'}grandes mudanças.</Text>
-        <Botao
-          texto="Começar"
-          aoPressionar={() => navigation.navigate('Onboarding', { passo: 0 })}
-        />
-        <LinkTexto
-          texto="Entrar"
-          tamanho={20}
-          aoPressionar={() => navigation.navigate('Login')}
-        />
-      </View>
-    </Tela>
+    <TelaApresentacao
+      arte={(escala) => (
+        <>
+          <View style={[styles.faixas, { top: TOPO_FAIXAS * escala }]}>
+            {faixas.map((cor) => (
+              <View key={cor} style={{ height: ALTURA_FAIXA * escala, backgroundColor: cor }} />
+            ))}
+          </View>
+          <Image
+            source={require('../assets/imagens/splash-r.png')}
+            style={{ marginTop: TOPO_ARTE * escala, width: 390 * escala, height: 275 * escala }}
+          />
+        </>
+      )}
+      texto={'Pequenos hábitos,\ngrandes mudanças.'}
+      textoBotao="Começar"
+      aoPressionar={() => navigation.navigate('Onboarding', { passo: 0 })}
+      rodape={
+        <LinkTexto texto="Entrar" tamanho={20} aoPressionar={() => navigation.navigate('Login')} />
+      }
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  tela: {
-    justifyContent: 'center',
-  },
-  arte: {
-    height: 275,
-    alignItems: 'center',
-    overflow: 'hidden',
-  },
   faixas: {
     position: 'absolute',
-    top: 125,
     left: 0,
     right: 0,
-  },
-  faixa: {
-    height: 20,
-  },
-  imagem: {
-    width: 390,
-    height: 275,
-  },
-  conteudo: {
-    width: 238,
-    alignSelf: 'center',
-    marginTop: 60,
-    marginBottom: 60,
-  },
-  frase: {
-    color: cores.branco,
-    fontFamily: fontes.regular,
-    fontVariant: fontes.semLigaduras,
-    fontSize: 24,
-    lineHeight: 29,
-    textAlign: 'center',
-    marginVertical: 24,
   },
 });
