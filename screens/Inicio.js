@@ -1,20 +1,23 @@
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Tela from '../components/Tela';
+import PixelsDecorativos from '../components/PixelsDecorativos';
 import IconeProprio from '../components/IconeProprio';
 import MolduraPixel from '../components/MolduraPixel';
 import FaixaArcoIris from '../components/FaixaArcoIris';
 import ItemHabito from '../components/ItemHabito';
 import BarraInferior from '../components/BarraInferior';
 import { habitos } from '../data/habitos';
-import { cores } from '../styles/tema';
+import { cores, fontes } from '../styles/tema';
 
 const diasSemana = ['s', 't', 'q', 'q', 's', 's', 'd'];
 
 export default function Inicio({ navigation }) {
   const concluidos = habitos.filter((habito) => habito.concluido).length;
+  const porcentagem = Math.round((concluidos / habitos.length) * 100);
 
   return (
     <Tela bordas={['top']}>
+      <PixelsDecorativos />
       <ScrollView contentContainerStyle={styles.conteudo}>
         <View style={styles.topo}>
           <View>
@@ -34,7 +37,7 @@ export default function Inicio({ navigation }) {
           <View style={styles.cartao}>
             <View style={styles.anel}>
               <IconeProprio nome="roda" tamanho={121} style={StyleSheet.absoluteFill} />
-              <Text style={styles.porcentagem}>50%</Text>
+              <Text style={styles.porcentagem}>{`${porcentagem}%`}</Text>
             </View>
             <View style={styles.resumo}>
               <Text style={styles.contagem}>{`${concluidos} de ${habitos.length}`}</Text>
@@ -84,12 +87,15 @@ const styles = StyleSheet.create({
   },
   ola: {
     color: cores.branco,
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: 33,
+    fontFamily: fontes.negrito,
+    fontVariant: fontes.semLigaduras,
   },
   subtitulo: {
     color: cores.branco,
-    fontSize: 13,
+    fontFamily: fontes.regular,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 15,
   },
   engrenagem: {
     width: 32,
@@ -114,8 +120,9 @@ const styles = StyleSheet.create({
   },
   porcentagem: {
     color: cores.branco,
-    fontSize: 22,
-    fontWeight: 'bold',
+    fontSize: 26,
+    fontFamily: fontes.negrito,
+    fontVariant: fontes.semLigaduras,
   },
   resumo: {
     flex: 1,
@@ -123,12 +130,15 @@ const styles = StyleSheet.create({
   },
   contagem: {
     color: cores.branco,
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 22,
+    fontFamily: fontes.negrito,
+    fontVariant: fontes.semLigaduras,
   },
   textoResumo: {
     color: cores.branco,
-    fontSize: 18,
+    fontFamily: fontes.regular,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 22,
     marginBottom: 6,
   },
   sequencia: {
@@ -144,12 +154,15 @@ const styles = StyleSheet.create({
   },
   letraDia: {
     color: cores.cinza,
-    fontSize: 10,
+    fontFamily: fontes.regular,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 11,
   },
   secao: {
     color: cores.branco,
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 24,
+    fontFamily: fontes.negrito,
+    fontVariant: fontes.semLigaduras,
     marginBottom: 12,
   },
 });

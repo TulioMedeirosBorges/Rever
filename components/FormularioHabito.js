@@ -2,17 +2,23 @@ import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import IconePixel from './IconePixel';
 import CampoTexto from './CampoTexto';
 import MolduraPixel from './MolduraPixel';
-import { cores } from '../styles/tema';
+import { cores, fontes } from '../styles/tema';
 
 const diasSemana = ['s', 't', 'q', 'q', 's', 's', 'd'];
 
-export default function FormularioHabito({ nome, categoria, frequencia = [], lembrete }) {
+export default function FormularioHabito({
+  nome,
+  categoria,
+  frequencia = [],
+  lembrete,
+  children,
+}) {
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
       <Image source={require('../assets/imagens/habito-badge.png')} style={styles.badge} />
 
       <Text style={styles.rotulo}>Nome do hábito</Text>
-      <CampoTexto placeholder="Nome do hábito" value={nome} />
+      <CampoTexto placeholder="Ex.: Beber água" value={nome} />
 
       <Text style={styles.rotulo}>Categoria</Text>
       <MolduraPixel corFundo={cores.branco} corTopo={cores.cinzaClaro} style={styles.moldura}>
@@ -50,13 +56,15 @@ export default function FormularioHabito({ nome, categoria, frequencia = [], lem
           <Text style={styles.textoSeletor}>{lembrete}</Text>
         </View>
       </MolduraPixel>
+
+      <View style={styles.acoes}>{children}</View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 32,
+    paddingHorizontal: 48,
     paddingBottom: 24,
   },
   badge: {
@@ -67,8 +75,9 @@ const styles = StyleSheet.create({
   },
   rotulo: {
     color: cores.branco,
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 21,
+    fontFamily: fontes.negrito,
+    fontVariant: fontes.semLigaduras,
     marginTop: 8,
   },
   moldura: {
@@ -88,7 +97,9 @@ const styles = StyleSheet.create({
   textoSeletor: {
     flex: 1,
     marginLeft: 10,
-    fontSize: 18,
+    fontFamily: fontes.regular,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 20,
     color: cores.preto,
   },
   dias: {
@@ -102,8 +113,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  acoes: {
+    marginTop: 16,
+  },
   textoDia: {
-    fontSize: 18,
+    fontFamily: fontes.regular,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 20,
     color: cores.preto,
   },
 });

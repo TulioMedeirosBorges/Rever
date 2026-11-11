@@ -1,11 +1,12 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Tela from '../components/Tela';
+import PixelsDecorativos from '../components/PixelsDecorativos';
 import CabecalhoTela from '../components/CabecalhoTela';
 import ItemHabito from '../components/ItemHabito';
 import MolduraPixel from '../components/MolduraPixel';
 import BarraInferior from '../components/BarraInferior';
 import { habitos } from '../data/habitos';
-import { cores } from '../styles/tema';
+import { cores, fontes } from '../styles/tema';
 
 const semana = [
   { sigla: 'SEG', dia: 13 },
@@ -22,6 +23,7 @@ export default function Agenda() {
 
   return (
     <Tela bordas={['top']}>
+      <PixelsDecorativos />
       <ScrollView contentContainerStyle={styles.conteudo}>
         <CabecalhoTela titulo="Agenda" />
         <Text style={styles.mes}>novembro 2026</Text>
@@ -58,8 +60,9 @@ const styles = StyleSheet.create({
   },
   mes: {
     color: cores.branco,
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 30,
+    fontFamily: fontes.negrito,
+    fontVariant: fontes.semLigaduras,
     textAlign: 'center',
     marginTop: 32,
     marginBottom: 16,
@@ -74,7 +77,9 @@ const styles = StyleSheet.create({
   },
   sigla: {
     color: cores.roxo,
-    fontSize: 15,
+    fontFamily: fontes.regular,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 19,
     marginBottom: 8,
   },
   dia: {
@@ -85,6 +90,8 @@ const styles = StyleSheet.create({
   },
   numeroDia: {
     color: cores.branco,
-    fontSize: 16,
+    fontFamily: fontes.regular,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 20,
   },
 });

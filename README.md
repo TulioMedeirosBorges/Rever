@@ -1,25 +1,31 @@
-# Nome do App
+# Rever
 
 ## Descrição
-O que o app faz, em 2 ou 3 frases.
+Rever é um app de hábitos com visual pixel art. O usuário cadastra hábitos, marca o que fez no dia e acompanha a sequência e o progresso ao longo da semana, do mês e do ano.
 
 ## Aluno
 Nome e RGM.
 
 ## Telas
-- **Home**: ...
-- **Detalhes**: ...
-- **Formulario**: ...
+- **Splash**: abertura do app, com acesso ao cadastro ou ao login.
+- **Onboarding**: três passos de apresentação (a mesma tela, trocando o passo por parâmetro).
+- **Login** e **Cadastro**: entrada e criação de conta.
+- **Esqueceu a senha** e **Verificar e-mail**: recuperação de senha.
+- **Início**: resumo do dia e lista de hábitos.
+- **Criar Hábito** e **Editar Hábito**: formulário do hábito.
+- **Agenda**: semana atual e hábitos do dia.
+- **Progresso**: gráfico por semana/mês/ano, sequência atual, estatísticas e progresso por hábito.
+- **Perfil**: dados do usuário, estatísticas, conquistas e configurações.
 
 ## Fonte de dados
-API pública (nome e URL), API própria ou dados locais.
+Dados locais em `data/habitos.js`.
 
 ## Onde estão os requisitos
-- Componentes: `components/` (Botao, CampoTexto, ItemHabito, BarraInferior, CabecalhoTela, FormularioHabito, ...)
-- Props com callback: ...
-- useState: ...
-- useEffect: ...
-- Navegação com parâmetros: ...
+- Componentes: `components/` (Botao, CampoTexto, ItemHabito, BarraInferior, CabecalhoTela, FormularioHabito, MolduraPixel, CartaoEstatistica, ...)
+- Props com callback: `aoPressionar` em `components/Botao.js`, `components/ItemHabito.js` e `components/LinkTexto.js`; `aoVoltar` em `components/CabecalhoTela.js`
+- useState: período selecionado em `screens/Progresso.js`
+- useEffect: esconde a splash quando as fontes carregam, em `App.js`
+- Navegação com parâmetros: `screens/Inicio.js` envia `{ id }` para `screens/EditarHabito.js`, que lê com `route.params`
 
 ## Vídeo de demonstração
 demo/demo.mp4

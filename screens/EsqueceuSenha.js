@@ -5,7 +5,7 @@ import Logo from '../components/Logo';
 import CampoTexto from '../components/CampoTexto';
 import Botao from '../components/Botao';
 import LinkTexto from '../components/LinkTexto';
-import { cores } from '../styles/tema';
+import { cores, fontes } from '../styles/tema';
 
 export default function EsqueceuSenha({ navigation }) {
   return (
@@ -36,13 +36,16 @@ const styles = StyleSheet.create({
   },
   titulo: {
     color: cores.branco,
-    fontSize: 22,
-    fontWeight: 'bold',
+    fontSize: 25,
+    fontFamily: fontes.negrito,
+    fontVariant: fontes.semLigaduras,
     marginTop: 8,
   },
   subtitulo: {
     color: cores.branco,
-    fontSize: 16,
+    fontFamily: fontes.regular,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 19,
     textAlign: 'center',
     marginTop: 4,
   },

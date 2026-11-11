@@ -1,7 +1,7 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import IconePixel from './IconePixel';
 import FaixaArcoIris from './FaixaArcoIris';
-import { cores } from '../styles/tema';
+import { cores, fontes } from '../styles/tema';
 
 export default function CabecalhoTela({ titulo, mostrarVoltar, aoVoltar }) {
   return (
@@ -35,8 +35,9 @@ const styles = StyleSheet.create({
   },
   titulo: {
     color: cores.branco,
-    fontSize: 26,
-    fontWeight: 'bold',
+    fontSize: 32,
+    fontFamily: fontes.negrito,
+    fontVariant: fontes.semLigaduras,
   },
   tituloCentro: {
     flex: 1,

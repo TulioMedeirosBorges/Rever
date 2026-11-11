@@ -2,7 +2,7 @@ import { Image, StyleSheet, Text, View } from 'react-native';
 import Tela from '../components/Tela';
 import Botao from '../components/Botao';
 import MolduraPixel from '../components/MolduraPixel';
-import { cores } from '../styles/tema';
+import { cores, fontes } from '../styles/tema';
 
 const passos = [
   {
@@ -50,7 +50,9 @@ export default function Onboarding({ navigation, route }) {
       <View style={styles.conteudo}>
         <Text style={styles.titulo}>{titulo}</Text>
         <Text style={styles.texto}>{texto}</Text>
-        <Botao texto={botao} aoPressionar={avancar} />
+        <View style={styles.botao}>
+          <Botao texto={botao} aoPressionar={avancar} />
+        </View>
         <View style={styles.pontos}>
           {passos.map((passo, i) => (
             <MolduraPixel
@@ -74,18 +76,24 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   conteudo: {
-    paddingHorizontal: 76,
+    paddingHorizontal: 28,
+  },
+  botao: {
+    paddingHorizontal: 48,
   },
   titulo: {
     color: cores.branco,
-    fontSize: 32,
-    fontWeight: 'bold',
+    fontSize: 38,
+    fontFamily: fontes.negrito,
+    fontVariant: fontes.semLigaduras,
     textAlign: 'center',
     marginTop: 40,
   },
   texto: {
     color: cores.branco,
-    fontSize: 18,
+    fontFamily: fontes.regular,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 23,
     textAlign: 'center',
     marginVertical: 24,
   },

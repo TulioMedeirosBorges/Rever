@@ -1,20 +1,26 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import IconeProprio from './IconeProprio';
 import MolduraPixel from './MolduraPixel';
-import { cores } from '../styles/tema';
+import { cores, fontes } from '../styles/tema';
+
+const variantes = {
+  escuro: { fundo: cores.botao, texto: cores.branco },
+  claro: { fundo: cores.branco, topo: cores.cinzaClaro, texto: cores.preto },
+  perigo: { fundo: cores.arcoIris[0], texto: cores.branco },
+};
 
 export default function Botao({ texto, aoPressionar, variante = 'escuro', icone }) {
+  const { fundo, topo, texto: corTexto } = variantes[variante];
   const claro = variante === 'claro';
 
   return (
-    <TouchableOpacity style={styles.toque} onPress={aoPressionar}>
-      <MolduraPixel
-        corFundo={claro ? cores.branco : cores.botao}
-        corTopo={claro ? cores.cinzaClaro : undefined}
-      >
+    <TouchableOpacity style={styles.toque} onPress={aoPressionar} activeOpacity={0.7}>
+      <MolduraPixel corFundo={fundo} corTopo={topo}>
         <View style={[styles.conteudo, claro && styles.conteudoClaro]}>
           {icone ? <IconeProprio nome={icone} cor={cores.preto} style={styles.icone} /> : null}
-          <Text style={[styles.texto, claro && styles.textoClaro]}>{texto}</Text>
+          <Text style={[styles.texto, claro && styles.textoClaro, { color: corTexto }]}>
+            {texto}
+          </Text>
         </View>
       </MolduraPixel>
     </TouchableOpacity>
@@ -39,13 +45,13 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   texto: {
-    color: cores.branco,
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 24,
+    fontFamily: fontes.negrito,
+    fontVariant: fontes.semLigaduras,
   },
   textoClaro: {
-    color: cores.preto,
-    fontSize: 16,
-    fontWeight: 'normal',
+    fontSize: 20,
+    fontFamily: fontes.regular,
+    fontVariant: fontes.semLigaduras,
   },
 });

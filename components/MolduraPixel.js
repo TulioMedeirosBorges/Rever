@@ -13,7 +13,7 @@ export default function MolduraPixel({
   const intermediarios = niveis.slice(1, -1);
 
   return (
-    <View style={style}>
+    <View style={[styles.moldura, style]}>
       {niveis.map((nivel) => (
         <View
           key={`camada-${nivel}`}
@@ -68,7 +68,11 @@ export default function MolduraPixel({
 }
 
 const styles = StyleSheet.create({
+  moldura: {
+    zIndex: 0,
+  },
   camada: {
     position: 'absolute',
+    zIndex: -1,
   },
 });

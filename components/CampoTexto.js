@@ -1,7 +1,7 @@
 import { StyleSheet, TextInput, View } from 'react-native';
 import IconePixel from './IconePixel';
 import MolduraPixel from './MolduraPixel';
-import { cores } from '../styles/tema';
+import { cores, fontes } from '../styles/tema';
 
 export default function CampoTexto({ icone, placeholder, value, onChangeText, secureTextEntry }) {
   return (
@@ -23,7 +23,7 @@ export default function CampoTexto({ icone, placeholder, value, onChangeText, se
 
 const styles = StyleSheet.create({
   moldura: {
-    marginVertical: 10,
+    marginVertical: 12,
   },
   campo: {
     flexDirection: 'row',
@@ -35,7 +35,9 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     marginLeft: 10,
-    fontSize: 16,
+    fontFamily: fontes.regular,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 19,
     color: cores.preto,
   },
 });

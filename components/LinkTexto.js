@@ -1,10 +1,10 @@
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { cores } from '../styles/tema';
+import { cores, fontes } from '../styles/tema';
 
-export default function LinkTexto({ texto, aoPressionar }) {
+export default function LinkTexto({ texto, aoPressionar, tamanho = 16 }) {
   return (
-    <TouchableOpacity style={styles.area} onPress={aoPressionar}>
-      <Text style={styles.texto}>{texto}</Text>
+    <TouchableOpacity style={styles.area} onPress={aoPressionar} activeOpacity={0.6}>
+      <Text style={[styles.texto, { fontSize: tamanho }]}>{texto}</Text>
     </TouchableOpacity>
   );
 }
@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
   },
   texto: {
     color: cores.amarelo,
-    fontSize: 14,
-    fontWeight: 'bold',
+    fontFamily: fontes.negrito,
+    fontVariant: fontes.semLigaduras,
   },
 });

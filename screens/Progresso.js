@@ -1,61 +1,130 @@
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Tela from '../components/Tela';
+import PixelsDecorativos from '../components/PixelsDecorativos';
 import CabecalhoTela from '../components/CabecalhoTela';
-import BarraInferior from '../components/BarraInferior';
 import MolduraPixel from '../components/MolduraPixel';
-import { cores } from '../styles/tema';
+import CartaoEstatistica from '../components/CartaoEstatistica';
+import BarraProgresso from '../components/BarraProgresso';
+import BarraInferior from '../components/BarraInferior';
+import { habitos } from '../data/habitos';
+import { cores, fontes } from '../styles/tema';
 
-const periodos = ['sem', 'mes', 'ano'];
+const ALTURA_GRAFICO = 130;
 
-const barras = [
-  { dia: 'SEG', altura: 100 },
-  { dia: 'TER', altura: 60 },
-  { dia: 'QUA', altura: 100 },
-  { dia: 'QUI', altura: 60 },
-  { dia: 'SEX', altura: 100 },
-  { dia: 'SAB', altura: 75 },
-  { dia: 'DOM', altura: 50 },
-];
+const graficos = {
+  sem: [
+    { rotulo: 'SEG', valor: 8 },
+    { rotulo: 'TER', valor: 5 },
+    { rotulo: 'QUA', valor: 8 },
+    { rotulo: 'QUI', valor: 5 },
+    { rotulo: 'SEX', valor: 8 },
+    { rotulo: 'SAB', valor: 6 },
+    { rotulo: 'DOM', valor: 4 },
+  ],
+  mes: [
+    { rotulo: 'S1', valor: 38 },
+    { rotulo: 'S2', valor: 44 },
+    { rotulo: 'S3', valor: 31 },
+    { rotulo: 'S4', valor: 47 },
+  ],
+  ano: [
+    { rotulo: 'J', valor: 120 },
+    { rotulo: 'F', valor: 98 },
+    { rotulo: 'M', valor: 135 },
+    { rotulo: 'A', valor: 110 },
+    { rotulo: 'M', valor: 150 },
+    { rotulo: 'J', valor: 142 },
+    { rotulo: 'J', valor: 160 },
+    { rotulo: 'A', valor: 128 },
+    { rotulo: 'S', valor: 155 },
+    { rotulo: 'O', valor: 170 },
+    { rotulo: 'N', valor: 90 },
+    { rotulo: 'D', valor: 0 },
+  ],
+};
+
+const periodos = Object.keys(graficos);
 
 export default function Progresso() {
-  const periodoSelecionado = 'sem';
+  const [periodo, setPeriodo] = useState('sem');
+
+  const dados = graficos[periodo];
+  const maiorValor = Math.max(...dados.map(({ valor }) => valor));
+  const larguraBarra = periodo === 'ano' ? 16 : 24;
 
   return (
     <Tela bordas={['top']}>
-      <ScrollView contentContainerStyle={styles.conteudo}>
+      <PixelsDecorativos />
+      <ScrollView contentContainerStyle={styles.conteudo} showsVerticalScrollIndicator={false}>
         <CabecalhoTela titulo="Seu progresso" />
 
         <MolduraPixel corFundo={cores.cartao} pixel={3} style={styles.molduraPeriodos}>
           <View style={styles.periodos}>
-            {periodos.map((periodo) => (
-              <MolduraPixel
-                key={periodo}
-                corFundo={periodo === periodoSelecionado ? cores.cartaoDestaque : 'transparent'}
-                pixel={3}
-                style={styles.periodo}
-              >
-                <Text style={styles.textoPeriodo}>{periodo}</Text>
-              </MolduraPixel>
+            {periodos.map((item) => (
+              <TouchableOpacity key={item} style={styles.periodo} onPress={() => setPeriodo(item)}>
+                <MolduraPixel
+                  corFundo={item === periodo ? cores.cartaoDestaque : 'transparent'}
+                  pixel={3}
+                  style={styles.opcaoPeriodo}
+                >
+                  <Text style={styles.textoPeriodo}>{item}</Text>
+                </MolduraPixel>
+              </TouchableOpacity>
             ))}
           </View>
         </MolduraPixel>
 
         <View style={styles.grafico}>
-          {barras.map(({ dia, altura }) => (
-            <View key={dia} style={styles.colunaGrafico}>
-              <View style={styles.topoBarra} />
-              <View style={[styles.barra, { height: altura }]} />
-              <Text style={styles.diaGrafico}>{dia}</Text>
-            </View>
-          ))}
+          {dados.map(({ rotulo, valor }, indice) => {
+            const altura = maiorValor > 0 ? (valor / maiorValor) * ALTURA_GRAFICO : 0;
+
+            return (
+              <View key={`${rotulo}-${indice}`} style={styles.colunaGrafico}>
+                {altura > 0 ? (
+                  <>
+                    <View style={[styles.topoBarra, { width: larguraBarra - 6 }]} />
+                    <View style={[styles.barra, { height: altura, width: larguraBarra }]} />
+                  </>
+                ) : (
+                  <View style={[styles.barraVazia, { width: larguraBarra }]} />
+                )}
+                <Text style={styles.rotuloGrafico}>{rotulo}</Text>
+              </View>
+            );
+          })}
         </View>
 
-        <Text style={styles.secao}>Sequencia atual</Text>
+        <Text style={styles.secao}>Sequência atual</Text>
         <View style={styles.sequencia}>
           <Image source={require('../assets/icones/fogo.png')} style={styles.fogo} />
-          <Text style={styles.numero}>5</Text>
-          <Text style={styles.dias}>dias</Text>
+          <View>
+            <Text style={styles.numero}>
+              5 <Text style={styles.dias}>dias</Text>
+            </Text>
+            <Text style={styles.recorde}>Recorde: 12 dias</Text>
+          </View>
         </View>
+
+        <View style={styles.estatisticas}>
+          <CartaoEstatistica icone="check" valor="85%" rotulo="Taxa de conclusão" cor={cores.arcoIris[3]} />
+          <CartaoEstatistica icone="trophy" valor="42" rotulo="Hábitos feitos" cor={cores.amarelo} />
+          <CartaoEstatistica icone="zap" valor="12" rotulo="Melhor sequência" cor={cores.arcoIris[1]} />
+        </View>
+
+        <Text style={styles.secao}>Por hábito</Text>
+        {habitos.map(({ id, nome, icone, feitosNaSemana }) => (
+          <MolduraPixel key={id} corFundo={cores.cartao} pixel={3} style={styles.molduraHabito}>
+            <View style={styles.habito}>
+              <View style={styles.linhaHabito}>
+                <Image source={icone} style={styles.iconeHabito} />
+                <Text style={styles.nomeHabito}>{nome}</Text>
+                <Text style={styles.contagemHabito}>{`${feitosNaSemana}/7`}</Text>
+              </View>
+              <BarraProgresso feitos={feitosNaSemana} total={7} />
+            </View>
+          </MolduraPixel>
+        ))}
       </ScrollView>
       <BarraInferior abaAtiva="Progresso" />
     </Tela>
@@ -69,7 +138,7 @@ const styles = StyleSheet.create({
   },
   molduraPeriodos: {
     marginHorizontal: 12,
-    marginBottom: 40,
+    marginBottom: 32,
   },
   periodos: {
     flexDirection: 'row',
@@ -77,62 +146,110 @@ const styles = StyleSheet.create({
   },
   periodo: {
     flex: 1,
+  },
+  opcaoPeriodo: {
     alignItems: 'center',
     paddingVertical: 8,
   },
   textoPeriodo: {
     color: cores.branco,
-    fontSize: 22,
+    fontFamily: fontes.regular,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 28,
   },
   grafico: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
-    height: 140,
-    marginBottom: 40,
+    marginBottom: 36,
   },
   colunaGrafico: {
     alignItems: 'center',
   },
   topoBarra: {
-    width: 18,
     height: 6,
     backgroundColor: cores.roxo,
   },
   barra: {
-    width: 24,
     backgroundColor: cores.roxo,
   },
-  diaGrafico: {
+  barraVazia: {
+    height: 4,
+    backgroundColor: cores.cartaoDestaque,
+  },
+  rotuloGrafico: {
     color: cores.branco,
-    fontSize: 13,
+    fontFamily: fontes.regular,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 16,
     marginTop: 6,
   },
   secao: {
     color: cores.branco,
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 28,
+    fontFamily: fontes.negrito,
+    fontVariant: fontes.semLigaduras,
     marginBottom: 16,
   },
   sequencia: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 28,
   },
   fogo: {
     width: 72,
     height: 72,
     tintColor: cores.arcoIris[1],
+    marginRight: 24,
   },
   numero: {
     color: cores.branco,
-    fontSize: 36,
-    fontWeight: 'bold',
-    marginLeft: 24,
+    fontSize: 44,
+    fontFamily: fontes.negrito,
+    fontVariant: fontes.semLigaduras,
   },
   dias: {
+    fontSize: 28,
+  },
+  recorde: {
+    color: cores.cinza,
+    fontFamily: fontes.regular,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 15,
+  },
+  estatisticas: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 32,
+  },
+  molduraHabito: {
+    marginBottom: 10,
+  },
+  habito: {
+    padding: 14,
+  },
+  linhaHabito: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  iconeHabito: {
+    width: 20,
+    height: 20,
+    tintColor: cores.branco,
+  },
+  nomeHabito: {
+    flex: 1,
     color: cores.branco,
-    fontSize: 26,
-    fontWeight: 'bold',
-    marginLeft: 12,
+    fontFamily: fontes.regular,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 18,
+    marginLeft: 10,
+  },
+  contagemHabito: {
+    color: cores.roxo,
+    fontFamily: fontes.negrito,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 17,
   },
 });

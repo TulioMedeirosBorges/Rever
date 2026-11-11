@@ -1,7 +1,7 @@
 import { Image, StyleSheet, Text } from 'react-native';
 import Tela from '../components/Tela';
 import Botao from '../components/Botao';
-import { cores } from '../styles/tema';
+import { cores, fontes } from '../styles/tema';
 
 export default function VerificarEmail({ navigation }) {
   return (
@@ -17,7 +17,7 @@ export default function VerificarEmail({ navigation }) {
 const styles = StyleSheet.create({
   tela: {
     justifyContent: 'center',
-    paddingHorizontal: 66,
+    paddingHorizontal: 40,
   },
   imagem: {
     width: 265,
@@ -26,14 +26,17 @@ const styles = StyleSheet.create({
   },
   titulo: {
     color: cores.branco,
-    fontSize: 32,
-    fontWeight: 'bold',
+    fontSize: 38,
+    fontFamily: fontes.negrito,
+    fontVariant: fontes.semLigaduras,
     textAlign: 'center',
     marginTop: 64,
   },
   texto: {
     color: cores.branco,
-    fontSize: 18,
+    fontFamily: fontes.regular,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 22,
     textAlign: 'center',
     marginVertical: 32,
   },

@@ -6,14 +6,14 @@ import CampoTexto from '../components/CampoTexto';
 import Botao from '../components/Botao';
 import LinkTexto from '../components/LinkTexto';
 import Divisor from '../components/Divisor';
-import { cores } from '../styles/tema';
+import { cores, fontes } from '../styles/tema';
 
 export default function Cadastro({ navigation }) {
   const entrar = () => navigation.replace('Inicio');
 
   return (
     <Tela>
-      <ScrollView contentContainerStyle={styles.conteudo}>
+      <ScrollView contentContainerStyle={styles.conteudo} showsVerticalScrollIndicator={false}>
         <FaixaArcoIris altura={6} />
         <View style={styles.topo}>
           <Logo />
@@ -41,23 +41,28 @@ export default function Cadastro({ navigation }) {
 
 const styles = StyleSheet.create({
   conteudo: {
+    flexGrow: 1,
+    justifyContent: 'center',
     paddingHorizontal: 56,
-    paddingVertical: 48,
+    paddingVertical: 32,
   },
   topo: {
     alignItems: 'center',
-    marginTop: 24,
-    marginBottom: 24,
+    marginTop: 32,
+    marginBottom: 28,
   },
   titulo: {
     color: cores.branco,
-    fontSize: 22,
-    fontWeight: 'bold',
+    fontSize: 25,
+    fontFamily: fontes.negrito,
+    fontVariant: fontes.semLigaduras,
     marginTop: 8,
   },
   subtitulo: {
     color: cores.branco,
-    fontSize: 16,
+    fontFamily: fontes.regular,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 19,
     marginTop: 4,
   },
   rodape: {
@@ -68,7 +73,8 @@ const styles = StyleSheet.create({
   },
   textoRodape: {
     color: cores.branco,
-    fontSize: 14,
-    fontWeight: 'bold',
+    fontSize: 16,
+    fontFamily: fontes.negrito,
+    fontVariant: fontes.semLigaduras,
   },
 });

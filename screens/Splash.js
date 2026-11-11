@@ -3,7 +3,7 @@ import Tela from '../components/Tela';
 import Logo from '../components/Logo';
 import Botao from '../components/Botao';
 import LinkTexto from '../components/LinkTexto';
-import { cores } from '../styles/tema';
+import { cores, fontes } from '../styles/tema';
 
 export default function Splash({ navigation }) {
   return (
@@ -16,7 +16,11 @@ export default function Splash({ navigation }) {
           texto="Começar"
           aoPressionar={() => navigation.navigate('Onboarding', { passo: 0 })}
         />
-        <LinkTexto texto="Entrar" aoPressionar={() => navigation.navigate('Login')} />
+        <LinkTexto
+          texto="Entrar"
+          tamanho={20}
+          aoPressionar={() => navigation.navigate('Login')}
+        />
       </View>
     </Tela>
   );
@@ -33,11 +37,14 @@ const styles = StyleSheet.create({
   },
   conteudo: {
     paddingHorizontal: 76,
-    marginTop: 56,
+    marginTop: 60,
+    marginBottom: 60,
   },
   frase: {
     color: cores.branco,
-    fontSize: 20,
+    fontFamily: fontes.regular,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 24,
     textAlign: 'center',
     marginVertical: 24,
   },

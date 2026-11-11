@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { cores } from '../styles/tema';
+import { cores, fontes } from '../styles/tema';
 
 export default function Divisor({ texto }) {
   return (
@@ -25,6 +25,8 @@ const styles = StyleSheet.create({
   texto: {
     color: cores.amarelo,
     marginHorizontal: 10,
-    fontSize: 13,
+    fontFamily: fontes.regular,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 15,
   },
 });

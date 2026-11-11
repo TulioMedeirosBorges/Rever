@@ -16,6 +16,13 @@ export const cores = {
   arcoIris: ['#df3d32', '#eb8232', '#e0ab2f', '#36a3a0', '#126d80'],
 };
 
+export const fontes = {
+  regular: 'PixelifySans_400Regular',
+  media: 'PixelifySans_500Medium',
+  negrito: 'PixelifySans_700Bold',
+  semLigaduras: ['no-common-ligatures'],
+};
+
 export const espacos = {
   pequeno: 8,
   medio: 16,

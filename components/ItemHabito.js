@@ -1,6 +1,6 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MolduraPixel from './MolduraPixel';
-import { cores } from '../styles/tema';
+import { cores, fontes } from '../styles/tema';
 
 export default function ItemHabito({ nome, icone, concluido, mostrarSeta, aoPressionar }) {
   return (
@@ -58,7 +58,10 @@ const styles = StyleSheet.create({
   nome: {
     flex: 1,
     color: cores.branco,
-    fontSize: 18,
+    fontFamily: fontes.regular,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 21,
+    letterSpacing: 1,
     marginLeft: 12,
   },
   seta: {
