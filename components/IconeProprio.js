@@ -4,7 +4,6 @@ import Calendario from '../assets/Icon Propio/Calendario.svg';
 import Casa from '../assets/Icon Propio/Casa.svg';
 import Google from '../assets/Icon Propio/Google pixelArt.svg';
 import Mais from '../assets/Icon Propio/botao com mais da barra.svg';
-import Roda from '../assets/Icon Propio/Roda da porcentagem.svg';
 import Trofeu from '../assets/Icon Propio/trofeu.svg';
 import Usuario from '../assets/Icon Propio/Usuario.svg';
 
@@ -14,7 +13,6 @@ const icones = {
   casa: Casa,
   google: Google,
   mais: Mais,
-  roda: Roda,
   trofeu: Trofeu,
   usuario: Usuario,
 };

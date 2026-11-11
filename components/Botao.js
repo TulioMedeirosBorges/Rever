@@ -18,7 +18,11 @@ export default function Botao({ texto, aoPressionar, variante = 'escuro', icone 
       <MolduraPixel corFundo={fundo} corTopo={topo}>
         <View style={[styles.conteudo, claro && styles.conteudoClaro]}>
           {icone ? <IconeProprio nome={icone} cor={cores.preto} style={styles.icone} /> : null}
-          <Text style={[styles.texto, claro && styles.textoClaro, { color: corTexto }]}>
+          <Text
+            style={[styles.texto, claro && styles.textoClaro, { color: corTexto }]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+          >
             {texto}
           </Text>
         </View>
@@ -33,18 +37,19 @@ const styles = StyleSheet.create({
   },
   conteudo: {
     flexDirection: 'row',
-    minHeight: 56,
+    minHeight: 58,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
   },
   conteudoClaro: {
-    minHeight: 48,
+    minHeight: 50,
   },
   icone: {
     marginRight: 12,
   },
   texto: {
+    flexShrink: 1,
     fontSize: 24,
     fontFamily: fontes.negrito,
     fontVariant: fontes.semLigaduras,

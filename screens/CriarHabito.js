@@ -28,6 +28,6 @@ export default function CriarHabito({ navigation }) {
 const styles = StyleSheet.create({
   cabecalho: {
     paddingHorizontal: 20,
-    paddingTop: 44,
+    paddingTop: 48,
   },
 });

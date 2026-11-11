@@ -1,10 +1,11 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MolduraPixel from './MolduraPixel';
+import IconePixel from './IconePixel';
 import { cores, fontes } from '../styles/tema';
 
 export default function ItemHabito({ nome, icone, concluido, mostrarSeta, aoPressionar }) {
   return (
-    <TouchableOpacity style={styles.toque} onPress={aoPressionar}>
+    <TouchableOpacity style={styles.toque} onPress={aoPressionar} activeOpacity={0.7}>
       <MolduraPixel corFundo={concluido ? cores.cartaoDestaque : cores.cartao} pixel={3}>
         <View style={styles.item}>
           <MolduraPixel
@@ -13,14 +14,14 @@ export default function ItemHabito({ nome, icone, concluido, mostrarSeta, aoPres
             degraus={1}
             style={styles.caixa}
           >
-            {concluido ? (
-              <Image source={require('../assets/icones/check.png')} style={styles.check} />
-            ) : null}
+            {concluido ? <IconePixel nome="check" tamanho={22} cor={cores.branco} /> : null}
           </MolduraPixel>
-          <Image source={icone} style={styles.icone} />
-          <Text style={styles.nome}>{nome}</Text>
+          <IconePixel nome={icone} tamanho={24} cor={cores.branco} style={styles.icone} />
+          <Text style={styles.nome} numberOfLines={1}>
+            {nome}
+          </Text>
           {mostrarSeta ? (
-            <Image source={require('../assets/icones/seta-direita.png')} style={styles.seta} />
+            <IconePixel nome="chevron-right-2" tamanho={34} cor={cores.branco} style={styles.seta} />
           ) : null}
         </View>
       </MolduraPixel>
@@ -44,16 +45,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  check: {
-    width: 18,
-    height: 18,
-    tintColor: cores.branco,
-  },
   icone: {
-    width: 24,
-    height: 24,
     marginLeft: 14,
-    tintColor: cores.branco,
+  },
+  seta: {
+    marginRight: -4,
   },
   nome: {
     flex: 1,
@@ -63,10 +59,5 @@ const styles = StyleSheet.create({
     fontSize: 21,
     letterSpacing: 1,
     marginLeft: 12,
-  },
-  seta: {
-    width: 24,
-    height: 24,
-    tintColor: cores.branco,
   },
 });

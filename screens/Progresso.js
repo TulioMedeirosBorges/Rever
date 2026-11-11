@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Tela from '../components/Tela';
 import PixelsDecorativos from '../components/PixelsDecorativos';
 import CabecalhoTela from '../components/CabecalhoTela';
 import MolduraPixel from '../components/MolduraPixel';
+import IconePixel from '../components/IconePixel';
 import CartaoEstatistica from '../components/CartaoEstatistica';
 import BarraProgresso from '../components/BarraProgresso';
 import BarraInferior from '../components/BarraInferior';
@@ -22,7 +23,7 @@ const graficos = {
     { rotulo: 'SAB', valor: 6 },
     { rotulo: 'DOM', valor: 4 },
   ],
-  mes: [
+  mês: [
     { rotulo: 'S1', valor: 38 },
     { rotulo: 'S2', valor: 44 },
     { rotulo: 'S3', valor: 31 },
@@ -97,7 +98,7 @@ export default function Progresso() {
 
         <Text style={styles.secao}>Sequência atual</Text>
         <View style={styles.sequencia}>
-          <Image source={require('../assets/icones/fogo.png')} style={styles.fogo} />
+          <IconePixel nome="fire" tamanho={72} cor={cores.arcoIris[1]} style={styles.fogo} />
           <View>
             <Text style={styles.numero}>
               5 <Text style={styles.dias}>dias</Text>
@@ -117,7 +118,7 @@ export default function Progresso() {
           <MolduraPixel key={id} corFundo={cores.cartao} pixel={3} style={styles.molduraHabito}>
             <View style={styles.habito}>
               <View style={styles.linhaHabito}>
-                <Image source={icone} style={styles.iconeHabito} />
+                <IconePixel nome={icone} tamanho={20} cor={cores.branco} />
                 <Text style={styles.nomeHabito}>{nome}</Text>
                 <Text style={styles.contagemHabito}>{`${feitosNaSemana}/7`}</Text>
               </View>
@@ -161,6 +162,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
+    paddingHorizontal: 16,
     marginBottom: 36,
   },
   colunaGrafico: {
@@ -197,9 +199,6 @@ const styles = StyleSheet.create({
     marginBottom: 28,
   },
   fogo: {
-    width: 72,
-    height: 72,
-    tintColor: cores.arcoIris[1],
     marginRight: 24,
   },
   numero: {
@@ -232,11 +231,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 10,
-  },
-  iconeHabito: {
-    width: 20,
-    height: 20,
-    tintColor: cores.branco,
   },
   nomeHabito: {
     flex: 1,

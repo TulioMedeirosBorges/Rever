@@ -1,12 +1,12 @@
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import IconePixel from './IconePixel';
 import CampoTexto from './CampoTexto';
 import MolduraPixel from './MolduraPixel';
+import { diasSemana } from '../data/semana';
 import { cores, fontes } from '../styles/tema';
 
-const diasSemana = ['s', 't', 'q', 'q', 's', 's', 'd'];
-
 export default function FormularioHabito({
+  icone = 'fire',
   nome,
   categoria,
   frequencia = [],
@@ -14,16 +14,23 @@ export default function FormularioHabito({
   children,
 }) {
   return (
-    <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-      <Image source={require('../assets/imagens/habito-badge.png')} style={styles.badge} />
+    <ScrollView
+      contentContainerStyle={styles.container}
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+      automaticallyAdjustKeyboardInsets
+    >
+      <MolduraPixel corFundo={cores.cartaoDestaque} pixel={18} style={styles.selo}>
+        <IconePixel nome={icone} tamanho={96} cor={cores.branco} />
+      </MolduraPixel>
 
       <Text style={styles.rotulo}>Nome do hábito</Text>
-      <CampoTexto placeholder="Ex.: Beber água" value={nome} />
+      <CampoTexto placeholder="Ex.: Beber água" defaultValue={nome} />
 
       <Text style={styles.rotulo}>Categoria</Text>
       <MolduraPixel corFundo={cores.branco} corTopo={cores.cinzaClaro} style={styles.moldura}>
         <View style={styles.seletor}>
-          <Image source={require('../assets/icones/fogo.png')} style={styles.iconeCategoria} />
+          <IconePixel nome={icone} tamanho={22} cor={cores.preto} />
           <Text style={styles.textoSeletor}>{categoria}</Text>
           <IconePixel nome="chevron-down" tamanho={24} cor={cores.preto} />
         </View>
@@ -65,34 +72,32 @@ export default function FormularioHabito({
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 48,
-    paddingBottom: 24,
+    paddingBottom: 12,
   },
-  badge: {
-    width: 180,
-    height: 160,
+  selo: {
+    width: 154,
+    height: 148,
     alignSelf: 'center',
-    marginBottom: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
   },
   rotulo: {
     color: cores.branco,
     fontSize: 21,
     fontFamily: fontes.negrito,
     fontVariant: fontes.semLigaduras,
-    marginTop: 8,
+    marginTop: 4,
   },
   moldura: {
-    marginVertical: 10,
+    marginVertical: 12,
   },
   seletor: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
     paddingTop: 4,
-    height: 46,
-  },
-  iconeCategoria: {
-    width: 22,
-    height: 22,
+    height: 50,
   },
   textoSeletor: {
     flex: 1,
@@ -105,7 +110,7 @@ const styles = StyleSheet.create({
   dias: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginVertical: 10,
+    marginVertical: 12,
   },
   dia: {
     width: 32,

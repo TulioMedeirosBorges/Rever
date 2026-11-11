@@ -10,7 +10,7 @@ import { habitos } from '../data/habitos';
 
 export default function EditarHabito({ navigation, route }) {
   const { id } = route.params;
-  const { nome, categoria, frequencia, lembrete } = habitos.find((item) => item.id === id);
+  const { icone, nome, categoria, frequencia, lembrete } = habitos.find((item) => item.id === id);
 
   return (
     <Tela bordas={['top']}>
@@ -19,6 +19,7 @@ export default function EditarHabito({ navigation, route }) {
         <CabecalhoTela titulo="Editar Hábito" mostrarVoltar aoVoltar={() => navigation.goBack()} />
       </View>
       <FormularioHabito
+        icone={icone}
         nome={nome}
         categoria={categoria}
         frequencia={frequencia}
@@ -38,6 +39,6 @@ export default function EditarHabito({ navigation, route }) {
 const styles = StyleSheet.create({
   cabecalho: {
     paddingHorizontal: 20,
-    paddingTop: 44,
+    paddingTop: 48,
   },
 });

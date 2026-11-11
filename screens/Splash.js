@@ -5,10 +5,20 @@ import Botao from '../components/Botao';
 import LinkTexto from '../components/LinkTexto';
 import { cores, fontes } from '../styles/tema';
 
+const faixas = [...cores.arcoIris].reverse();
+
 export default function Splash({ navigation }) {
   return (
     <Tela bordas={['bottom']} style={styles.tela}>
-      <Image source={require('../assets/imagens/splash-r.png')} style={styles.imagem} />
+      <View style={styles.arte}>
+        <View style={styles.faixas}>
+          {faixas.map((cor) => (
+            <View key={cor} style={[styles.faixa, { backgroundColor: cor }]} />
+          ))}
+        </View>
+        <Image source={require('../assets/imagens/splash-r.png')} style={styles.imagem} />
+      </View>
+
       <View style={styles.conteudo}>
         <Logo />
         <Text style={styles.frase}>Pequenos hábitos,{'\n'}grandes mudanças.</Text>
@@ -30,13 +40,27 @@ const styles = StyleSheet.create({
   tela: {
     justifyContent: 'center',
   },
-  imagem: {
-    width: '100%',
+  arte: {
     height: 275,
-    resizeMode: 'cover',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  faixas: {
+    position: 'absolute',
+    top: 125,
+    left: 0,
+    right: 0,
+  },
+  faixa: {
+    height: 20,
+  },
+  imagem: {
+    width: 390,
+    height: 275,
   },
   conteudo: {
-    paddingHorizontal: 76,
+    width: 238,
+    alignSelf: 'center',
     marginTop: 60,
     marginBottom: 60,
   },
@@ -45,6 +69,7 @@ const styles = StyleSheet.create({
     fontFamily: fontes.regular,
     fontVariant: fontes.semLigaduras,
     fontSize: 24,
+    lineHeight: 29,
     textAlign: 'center',
     marginVertical: 24,
   },

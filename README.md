@@ -18,10 +18,10 @@ Nome e RGM.
 - **Perfil**: dados do usuário, estatísticas, conquistas e configurações.
 
 ## Fonte de dados
-Dados locais em `data/habitos.js`.
+Dados locais em `data/habitos.js` e `data/semana.js`.
 
 ## Onde estão os requisitos
-- Componentes: `components/` (Botao, CampoTexto, ItemHabito, BarraInferior, CabecalhoTela, FormularioHabito, MolduraPixel, CartaoEstatistica, ...)
+- Componentes: `components/` (Botao, CampoTexto, ItemHabito, BarraInferior, CabecalhoTela, TelaAuth, FormularioHabito, MolduraPixel, AnelProgresso, CartaoEstatistica, ...)
 - Props com callback: `aoPressionar` em `components/Botao.js`, `components/ItemHabito.js` e `components/LinkTexto.js`; `aoVoltar` em `components/CabecalhoTela.js`
 - useState: período selecionado em `screens/Progresso.js`
 - useEffect: esconde a splash quando as fontes carregam, em `App.js`

@@ -1,30 +1,36 @@
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Tela from '../components/Tela';
 import PixelsDecorativos from '../components/PixelsDecorativos';
-import IconeProprio from '../components/IconeProprio';
+import IconePixel from '../components/IconePixel';
+import AnelProgresso from '../components/AnelProgresso';
 import MolduraPixel from '../components/MolduraPixel';
 import FaixaArcoIris from '../components/FaixaArcoIris';
 import ItemHabito from '../components/ItemHabito';
 import BarraInferior from '../components/BarraInferior';
 import { habitos } from '../data/habitos';
+import { diasSemana } from '../data/semana';
 import { cores, fontes } from '../styles/tema';
-
-const diasSemana = ['s', 't', 'q', 'q', 's', 's', 'd'];
 
 export default function Inicio({ navigation }) {
   const concluidos = habitos.filter((habito) => habito.concluido).length;
-  const porcentagem = Math.round((concluidos / habitos.length) * 100);
+  const progresso = concluidos / habitos.length;
 
   return (
     <Tela bordas={['top']}>
       <PixelsDecorativos />
-      <ScrollView contentContainerStyle={styles.conteudo}>
+      <ScrollView contentContainerStyle={styles.conteudo} showsVerticalScrollIndicator={false}>
         <View style={styles.topo}>
           <View>
             <Text style={styles.ola}>Olá, Usuário</Text>
             <Text style={styles.subtitulo}>Que tal manter o foco hoje?</Text>
           </View>
-          <Image source={require('../assets/icones/configuracoes.png')} style={styles.engrenagem} />
+          <TouchableOpacity
+            style={styles.engrenagem}
+            onPress={() => navigation.replace('Perfil')}
+            activeOpacity={0.6}
+          >
+            <IconePixel nome="settings-cog" tamanho={30} cor={cores.branco} />
+          </TouchableOpacity>
         </View>
         <FaixaArcoIris />
 
@@ -35,19 +41,19 @@ export default function Inicio({ navigation }) {
           style={styles.molduraCartao}
         >
           <View style={styles.cartao}>
-            <View style={styles.anel}>
-              <IconeProprio nome="roda" tamanho={121} style={StyleSheet.absoluteFill} />
-              <Text style={styles.porcentagem}>{`${porcentagem}%`}</Text>
-            </View>
+            <AnelProgresso progresso={progresso}>
+              <Text style={styles.porcentagem}>{`${Math.round(progresso * 100)}%`}</Text>
+            </AnelProgresso>
             <View style={styles.resumo}>
               <Text style={styles.contagem}>{`${concluidos} de ${habitos.length}`}</Text>
               <Text style={styles.textoResumo}>Hábitos{'\n'}concluídos</Text>
               <View style={styles.sequencia}>
                 {diasSemana.map((dia, indice) => (
                   <View key={`${dia}-${indice}`} style={styles.diaSequencia}>
-                    <Image
-                      source={require('../assets/icones/fogo-2.png')}
-                      style={[styles.fogo, { tintColor: indice < 3 ? cores.arcoIris[0] : cores.cinza }]}
+                    <IconePixel
+                      nome="fire"
+                      tamanho={18}
+                      cor={indice < 3 ? cores.arcoIris[0] : cores.cinza}
                     />
                     <Text style={styles.letraDia}>{dia}</Text>
                   </View>
@@ -82,8 +88,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 24,
-    marginBottom: 16,
+    marginTop: 28,
+    marginBottom: 14,
   },
   ola: {
     color: cores.branco,
@@ -98,9 +104,8 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   engrenagem: {
-    width: 32,
-    height: 32,
-    tintColor: cores.branco,
+    padding: 8,
+    marginRight: -8,
   },
   molduraCartao: {
     marginTop: 20,
@@ -109,14 +114,10 @@ const styles = StyleSheet.create({
   cartao: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
     paddingTop: 22,
-  },
-  anel: {
-    width: 121,
-    height: 121,
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingBottom: 16,
+    paddingLeft: 30,
+    paddingRight: 12,
   },
   porcentagem: {
     color: cores.branco,
@@ -126,7 +127,7 @@ const styles = StyleSheet.create({
   },
   resumo: {
     flex: 1,
-    marginLeft: 20,
+    marginLeft: 32,
   },
   contagem: {
     color: cores.branco,
@@ -139,18 +140,15 @@ const styles = StyleSheet.create({
     fontFamily: fontes.regular,
     fontVariant: fontes.semLigaduras,
     fontSize: 22,
-    marginBottom: 6,
+    lineHeight: 24,
+    marginBottom: 10,
   },
   sequencia: {
     flexDirection: 'row',
   },
   diaSequencia: {
     alignItems: 'center',
-    marginRight: 4,
-  },
-  fogo: {
-    width: 16,
-    height: 16,
+    marginRight: 1,
   },
   letraDia: {
     color: cores.cinza,

@@ -1,8 +1,10 @@
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import Tela from '../components/Tela';
 import Botao from '../components/Botao';
 import MolduraPixel from '../components/MolduraPixel';
 import { cores, fontes } from '../styles/tema';
+
+const ALTURA_ARTE = 390;
 
 const passos = [
   {
@@ -16,7 +18,7 @@ const passos = [
   {
     imagem: require('../assets/imagens/onboarding-2.png'),
     largura: 300,
-    titulo: 'Alcance seus objetivos',
+    titulo: 'Alcance seus objetivos.',
     texto: 'Pequenos hábitos,\ngrandes mudanças.',
     botao: 'Próximo',
     cor: cores.arcoIris[3],
@@ -24,8 +26,8 @@ const passos = [
   {
     imagem: require('../assets/imagens/onboarding-3.png'),
     largura: 280,
-    titulo: 'Evolua todos os dias',
-    texto: 'veja seu progresso e\nconquiste recompensas',
+    titulo: 'Evolua todos os dias.',
+    texto: 'Veja seu progresso e\nconquiste recompensas.',
     botao: 'Cadastrar',
     cor: cores.arcoIris[4],
   },
@@ -35,6 +37,10 @@ export default function Onboarding({ navigation, route }) {
   const indice = route.params?.passo ?? 0;
   const { imagem, largura, titulo, texto, botao, cor } = passos[indice];
   const ultimoPasso = indice === passos.length - 1;
+
+  const { height: alturaTela } = useWindowDimensions();
+  const alturaArte = Math.min(ALTURA_ARTE, alturaTela * 0.47);
+  const larguraArte = (largura / ALTURA_ARTE) * alturaArte;
 
   const avancar = () => {
     if (ultimoPasso) {
@@ -46,7 +52,10 @@ export default function Onboarding({ navigation, route }) {
 
   return (
     <Tela bordas={['bottom']}>
-      <Image source={imagem} style={[styles.imagem, { width: largura }]} />
+      <Image
+        source={imagem}
+        style={[styles.imagem, { width: larguraArte, height: alturaArte }]}
+      />
       <View style={styles.conteudo}>
         <Text style={styles.titulo}>{titulo}</Text>
         <Text style={styles.texto}>{texto}</Text>
@@ -71,12 +80,14 @@ export default function Onboarding({ navigation, route }) {
 
 const styles = StyleSheet.create({
   imagem: {
-    height: 370,
     alignSelf: 'center',
-    resizeMode: 'contain',
   },
   conteudo: {
+    flexGrow: 1,
+    justifyContent: 'center',
     paddingHorizontal: 28,
+    paddingTop: 8,
+    paddingBottom: 48,
   },
   botao: {
     paddingHorizontal: 48,
@@ -86,14 +97,15 @@ const styles = StyleSheet.create({
     fontSize: 38,
     fontFamily: fontes.negrito,
     fontVariant: fontes.semLigaduras,
+    lineHeight: 44,
     textAlign: 'center',
-    marginTop: 40,
   },
   texto: {
     color: cores.branco,
     fontFamily: fontes.regular,
     fontVariant: fontes.semLigaduras,
     fontSize: 23,
+    lineHeight: 29,
     textAlign: 'center',
     marginVertical: 24,
   },

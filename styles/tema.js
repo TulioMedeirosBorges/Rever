@@ -13,6 +13,7 @@ export const cores = {
   preto: '#000000',
   cinza: '#717186',
   cinzaClaro: '#c0c0c0',
+  placeholder: '#5c5c70',
   arcoIris: ['#df3d32', '#eb8232', '#e0ab2f', '#36a3a0', '#126d80'],
 };
 

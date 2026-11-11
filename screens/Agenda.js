@@ -20,11 +20,14 @@ const semana = [
 
 export default function Agenda() {
   const diaSelecionado = 13;
+  const indiceDia = semana.findIndex(({ dia }) => dia === diaSelecionado);
+  const habitosDoDia = habitos.filter(({ frequencia }) => frequencia.includes(indiceDia));
+  const concluidos = habitosDoDia.filter(({ concluido }) => concluido).length;
 
   return (
     <Tela bordas={['top']}>
       <PixelsDecorativos />
-      <ScrollView contentContainerStyle={styles.conteudo}>
+      <ScrollView contentContainerStyle={styles.conteudo} showsVerticalScrollIndicator={false}>
         <CabecalhoTela titulo="Agenda" />
         <Text style={styles.mes}>novembro 2026</Text>
 
@@ -44,7 +47,11 @@ export default function Agenda() {
           ))}
         </View>
 
-        {habitos.slice(0, 3).map(({ id, nome, icone, concluido }) => (
+        <View style={styles.cabecalhoLista}>
+          <Text style={styles.secao}>Hábitos do dia</Text>
+          <Text style={styles.contagem}>{`${concluidos} de ${habitosDoDia.length}`}</Text>
+        </View>
+        {habitosDoDia.map(({ id, nome, icone, concluido }) => (
           <ItemHabito key={id} nome={nome} icone={icone} concluido={concluido} />
         ))}
       </ScrollView>
@@ -69,11 +76,29 @@ const styles = StyleSheet.create({
   },
   semana: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 72,
+    marginBottom: 40,
   },
   coluna: {
+    flex: 1,
     alignItems: 'center',
+  },
+  cabecalhoLista: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  secao: {
+    color: cores.branco,
+    fontFamily: fontes.negrito,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 24,
+  },
+  contagem: {
+    color: cores.roxo,
+    fontFamily: fontes.negrito,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 17,
   },
   sigla: {
     color: cores.roxo,

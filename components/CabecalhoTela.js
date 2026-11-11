@@ -8,8 +8,8 @@ export default function CabecalhoTela({ titulo, mostrarVoltar, aoVoltar }) {
     <View style={styles.container}>
       <View style={styles.linha}>
         {mostrarVoltar ? (
-          <TouchableOpacity onPress={aoVoltar} style={styles.voltar}>
-            <IconePixel nome="chevron-left" tamanho={32} cor={cores.branco} />
+          <TouchableOpacity onPress={aoVoltar} style={styles.voltar} activeOpacity={0.6}>
+            <IconePixel nome="chevron-left-2" tamanho={46} cor={cores.branco} />
           </TouchableOpacity>
         ) : null}
         <Text style={[styles.titulo, mostrarVoltar && styles.tituloCentro]}>{titulo}</Text>
@@ -30,7 +30,8 @@ const styles = StyleSheet.create({
   },
   voltar: {
     position: 'absolute',
-    left: -8,
+    left: -22,
+    padding: 4,
     zIndex: 1,
   },
   titulo: {

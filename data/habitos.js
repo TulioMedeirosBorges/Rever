@@ -2,7 +2,7 @@ export const habitos = [
   {
     id: 1,
     nome: 'Beber Água',
-    icone: require('../assets/icones/garrafa.png'),
+    icone: 'bottle-wine',
     categoria: 'Saúde',
     frequencia: [0, 1, 2, 3, 4, 5, 6],
     lembrete: '08:00',
@@ -12,7 +12,7 @@ export const habitos = [
   {
     id: 2,
     nome: 'Ler um Livro',
-    icone: require('../assets/icones/livro.png'),
+    icone: 'book-open',
     categoria: 'Estudos',
     frequencia: [0, 2, 4],
     lembrete: '21:00',
@@ -22,7 +22,7 @@ export const habitos = [
   {
     id: 3,
     nome: 'Exercitar',
-    icone: require('../assets/icones/fogo.png'),
+    icone: 'fire',
     categoria: 'Saúde',
     frequencia: [0, 2, 4],
     lembrete: '19:00',
@@ -32,7 +32,7 @@ export const habitos = [
   {
     id: 4,
     nome: 'Meditar',
-    icone: require('../assets/icones/brilho.png'),
+    icone: 'sparkle',
     categoria: 'Bem-estar',
     frequencia: [0, 1, 2, 3, 4],
     lembrete: '07:00',
@@ -42,7 +42,7 @@ export const habitos = [
   {
     id: 5,
     nome: 'Estudar',
-    icone: require('../assets/icones/caderno.png'),
+    icone: 'notebook',
     categoria: 'Estudos',
     frequencia: [0, 1, 2, 3, 4],
     lembrete: '14:00',
@@ -52,7 +52,7 @@ export const habitos = [
   {
     id: 6,
     nome: 'Escutar Música',
-    icone: require('../assets/icones/fone.png'),
+    icone: 'headphone',
     categoria: 'Lazer',
     frequencia: [5, 6],
     lembrete: '18:00',
