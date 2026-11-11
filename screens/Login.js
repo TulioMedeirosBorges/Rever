@@ -21,8 +21,8 @@ export default function Login({ navigation }) {
           <Text style={styles.subtitulo}>Entre na sua conta</Text>
         </View>
 
-        <CampoTexto icone="email-outline" placeholder="E-mail" />
-        <CampoTexto icone="lock-outline" placeholder="Senha" secureTextEntry />
+        <CampoTexto icone="mail" placeholder="E-mail" />
+        <CampoTexto icone="lock" placeholder="Senha" secureTextEntry />
         <Botao texto="Entrar" aoPressionar={entrar} />
         <LinkTexto
           texto="Esqueceu sua senha ?"

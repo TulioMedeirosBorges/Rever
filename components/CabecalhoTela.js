@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import IconePixel from './IconePixel';
 import FaixaArcoIris from './FaixaArcoIris';
 import { cores } from '../styles/tema';
 
@@ -9,7 +9,7 @@ export default function CabecalhoTela({ titulo, mostrarVoltar, aoVoltar }) {
       <View style={styles.linha}>
         {mostrarVoltar ? (
           <TouchableOpacity onPress={aoVoltar} style={styles.voltar}>
-            <MaterialCommunityIcons name="chevron-left" size={32} color={cores.branco} />
+            <IconePixel nome="chevron-left" tamanho={32} cor={cores.branco} />
           </TouchableOpacity>
         ) : null}
         <Text style={[styles.titulo, mostrarVoltar && styles.tituloCentro]}>{titulo}</Text>

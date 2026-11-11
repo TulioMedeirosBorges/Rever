@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import IconePixel from './IconePixel';
 import { cores } from '../styles/tema';
 
 export default function Botao({ texto, aoPressionar, variante = 'escuro', icone }) {
@@ -11,7 +11,7 @@ export default function Botao({ texto, aoPressionar, variante = 'escuro', icone 
       onPress={aoPressionar}
     >
       {icone ? (
-        <MaterialCommunityIcons name={icone} size={24} color={cores.preto} style={styles.icone} />
+        <IconePixel nome={icone} cor={cores.preto} style={styles.icone} />
       ) : null}
       <Text style={[styles.texto, claro && styles.textoClaro]}>{texto}</Text>
     </TouchableOpacity>

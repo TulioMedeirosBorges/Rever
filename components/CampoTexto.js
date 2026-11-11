@@ -1,11 +1,11 @@
 import { StyleSheet, TextInput, View } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import IconePixel from './IconePixel';
 import { cores } from '../styles/tema';
 
 export default function CampoTexto({ icone, placeholder, value, onChangeText, secureTextEntry }) {
   return (
     <View style={styles.campo}>
-      {icone ? <MaterialCommunityIcons name={icone} size={22} color={cores.preto} /> : null}
+      {icone ? <IconePixel nome={icone} tamanho={22} cor={cores.preto} /> : null}
       <TextInput
         style={styles.input}
         placeholder={placeholder}

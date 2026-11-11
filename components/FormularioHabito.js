@@ -1,5 +1,5 @@
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import IconePixel from './IconePixel';
 import CampoTexto from './CampoTexto';
 import { cores } from '../styles/tema';
 
@@ -17,7 +17,7 @@ export default function FormularioHabito({ nome, categoria, frequencia = [], lem
       <View style={styles.seletor}>
         <Image source={require('../assets/icones/fogo.png')} style={styles.iconeCategoria} />
         <Text style={styles.textoSeletor}>{categoria}</Text>
-        <MaterialCommunityIcons name="menu-down" size={28} color={cores.preto} />
+        <IconePixel nome="chevron-down" tamanho={24} cor={cores.preto} />
       </View>
 
       <Text style={styles.rotulo}>Frequência</Text>
@@ -34,7 +34,7 @@ export default function FormularioHabito({ nome, categoria, frequencia = [], lem
 
       <Text style={styles.rotulo}>Lembrete</Text>
       <View style={styles.seletor}>
-        <MaterialCommunityIcons name="calendar-blank-outline" size={22} color={cores.preto} />
+        <IconePixel nome="calendar" tamanho={22} cor={cores.preto} />
         <Text style={styles.textoSeletor}>{lembrete}</Text>
       </View>
     </ScrollView>

@@ -17,7 +17,7 @@ export default function EsqueceuSenha({ navigation }) {
         <Text style={styles.subtitulo}>Forneça seu e-mail para{'\n'}redefinir sua senha</Text>
       </View>
 
-      <CampoTexto icone="email-outline" placeholder="E-mail" />
+      <CampoTexto icone="mail" placeholder="E-mail" />
       <Botao texto="Alterar Senha" aoPressionar={() => navigation.navigate('VerificarEmail')} />
       <LinkTexto texto="Entrar" aoPressionar={() => navigation.popTo('Login')} />
     </Tela>

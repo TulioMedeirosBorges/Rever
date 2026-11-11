@@ -21,9 +21,9 @@ export default function Cadastro({ navigation }) {
           <Text style={styles.subtitulo}>Comece sua jornada agora</Text>
         </View>
 
-        <CampoTexto icone="account-outline" placeholder="Nome" />
-        <CampoTexto icone="email-outline" placeholder="E-mail" />
-        <CampoTexto icone="lock-outline" placeholder="Senha" secureTextEntry />
+        <CampoTexto icone="user" placeholder="Nome" />
+        <CampoTexto icone="mail" placeholder="E-mail" />
+        <CampoTexto icone="lock" placeholder="Senha" secureTextEntry />
         <Botao texto="Criar conta" aoPressionar={entrar} />
 
         <Divisor texto="ou" />
