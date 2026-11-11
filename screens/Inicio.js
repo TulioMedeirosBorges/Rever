@@ -11,6 +11,7 @@ import BarraInferior from '../components/BarraInferior';
 import { useHabitos } from '../contexto/HabitosContexto';
 import { diasSemana } from '../data/semana';
 import { cores, fontes } from '../styles/tema';
+import { toqueLeve } from '../utils/tato';
 
 const nomesDias = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
 const nomesMeses = [
@@ -82,7 +83,10 @@ export default function Inicio({ navigation }) {
           </View>
           <TouchableOpacity
             style={styles.engrenagem}
-            onPress={() => navigation.replace('Perfil')}
+            onPress={() => {
+              toqueLeve();
+              navigation.replace('Perfil');
+            }}
             activeOpacity={0.6}
             accessibilityLabel="Configurações"
           >

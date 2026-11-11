@@ -2,13 +2,21 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import IconePixel from './IconePixel';
 import FaixaArcoIris from './FaixaArcoIris';
 import { cores, fontes } from '../styles/tema';
+import { toqueLeve } from '../utils/tato';
 
 export default function CabecalhoTela({ titulo, mostrarVoltar, aoVoltar }) {
   return (
     <View style={styles.container}>
       <View style={styles.linha}>
         {mostrarVoltar ? (
-          <TouchableOpacity onPress={aoVoltar} style={styles.voltar} activeOpacity={0.6}>
+          <TouchableOpacity
+            onPress={() => {
+              toqueLeve();
+              aoVoltar();
+            }}
+            style={styles.voltar}
+            activeOpacity={0.6}
+          >
             <IconePixel nome="chevron-left-2" tamanho={46} cor={cores.branco} />
           </TouchableOpacity>
         ) : null}

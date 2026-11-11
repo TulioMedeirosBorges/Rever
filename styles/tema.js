@@ -3,7 +3,8 @@ export const cores = {
   cartao: '#21202e',
   cartaoDestaque: '#31314f',
   sombra: '#0e0e14',
-  botao: '#323232',
+  botao: '#26253a',
+  caixa: '#3b3a5c',
   roxo: '#8f8fff',
   roxoClaro: '#b2b2ff',
   roxoEscuro: '#484875',
@@ -18,9 +19,9 @@ export const cores = {
 };
 
 export const fontes = {
-  regular: 'PixelifySans_400Regular',
-  media: 'PixelifySans_500Medium',
-  negrito: 'PixelifySans_700Bold',
+  regular: 'Tiny5_400Regular',
+  media: 'Tiny5_500Medium',
+  negrito: 'Tiny5_700Bold',
   semLigaduras: ['no-common-ligatures'],
 };
 

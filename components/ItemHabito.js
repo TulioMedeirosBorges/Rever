@@ -2,6 +2,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MolduraPixel from './MolduraPixel';
 import IconePixel from './IconePixel';
 import { cores, fontes } from '../styles/tema';
+import { sucesso, toqueLeve } from '../utils/tato';
 
 export default function ItemHabito({
   nome,
@@ -13,11 +14,25 @@ export default function ItemHabito({
   aoMarcar,
 }) {
   return (
-    <TouchableOpacity style={styles.toque} onPress={aoPressionar} activeOpacity={0.7}>
+    <TouchableOpacity
+      style={styles.toque}
+      onPress={() => {
+        toqueLeve();
+        aoPressionar?.();
+      }}
+      activeOpacity={0.7}
+    >
       <MolduraPixel corFundo={concluido ? cores.cartaoDestaque : cores.cartao} pixel={3}>
         <View style={styles.item}>
           <TouchableOpacity
-            onPress={aoMarcar}
+            onPress={() => {
+              if (concluido) {
+                toqueLeve();
+              } else {
+                sucesso();
+              }
+              aoMarcar();
+            }}
             disabled={!aoMarcar}
             activeOpacity={0.6}
             hitSlop={10}
@@ -26,12 +41,12 @@ export default function ItemHabito({
             accessibilityLabel={`Marcar ${nome} como feito`}
           >
             <MolduraPixel
-              corFundo={concluido ? cores.roxoEscuro : cores.branco}
+              corFundo={concluido ? cores.roxo : cores.caixa}
               pixel={3}
               degraus={1}
               style={styles.caixa}
             >
-              {concluido ? <IconePixel nome="check" tamanho={22} cor={cores.branco} /> : null}
+              {concluido ? <IconePixel nome="check" tamanho={22} cor={cores.fundo} /> : null}
             </MolduraPixel>
           </TouchableOpacity>
           <IconePixel nome={icone} tamanho={24} cor={cores.branco} style={styles.icone} />
@@ -46,7 +61,12 @@ export default function ItemHabito({
             ) : null}
           </View>
           {mostrarSeta ? (
-            <IconePixel nome="chevron-right-2" tamanho={34} cor={cores.branco} style={styles.seta} />
+            <IconePixel
+              nome="chevron-right-2"
+              tamanho={34}
+              cor={cores.cinzaClaro}
+              style={styles.seta}
+            />
           ) : null}
         </View>
       </MolduraPixel>

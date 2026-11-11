@@ -10,6 +10,7 @@ import BarraProgresso from '../components/BarraProgresso';
 import BarraInferior from '../components/BarraInferior';
 import { useHabitos } from '../contexto/HabitosContexto';
 import { cores, fontes } from '../styles/tema';
+import { selecao } from '../utils/tato';
 
 const ALTURA_GRAFICO = 130;
 
@@ -64,7 +65,14 @@ export default function Progresso() {
         <MolduraPixel corFundo={cores.cartao} pixel={3} style={styles.molduraPeriodos}>
           <View style={styles.periodos}>
             {periodos.map((item) => (
-              <TouchableOpacity key={item} style={styles.periodo} onPress={() => setPeriodo(item)}>
+              <TouchableOpacity
+                key={item}
+                style={styles.periodo}
+                onPress={() => {
+                  selecao();
+                  setPeriodo(item);
+                }}
+              >
                 <MolduraPixel
                   corFundo={item === periodo ? cores.cartaoDestaque : 'transparent'}
                   pixel={3}
@@ -109,9 +117,24 @@ export default function Progresso() {
         </View>
 
         <View style={styles.estatisticas}>
-          <CartaoEstatistica icone="check" valor="85%" rotulo="Taxa de conclusão" cor={cores.arcoIris[3]} />
-          <CartaoEstatistica icone="trophy" valor="42" rotulo="Hábitos feitos" cor={cores.amarelo} />
-          <CartaoEstatistica icone="zap" valor="12" rotulo="Melhor sequência" cor={cores.arcoIris[1]} />
+          <CartaoEstatistica
+            icone="check"
+            valor="85%"
+            rotulo="Taxa de conclusão"
+            cor={cores.arcoIris[3]}
+          />
+          <CartaoEstatistica
+            icone="trophy"
+            valor="42"
+            rotulo="Hábitos feitos"
+            cor={cores.amarelo}
+          />
+          <CartaoEstatistica
+            icone="zap"
+            valor="12"
+            rotulo="Melhor sequência"
+            cor={cores.arcoIris[1]}
+          />
         </View>
 
         <Text style={styles.secao}>Por hábito</Text>

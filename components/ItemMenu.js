@@ -2,10 +2,18 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MolduraPixel from './MolduraPixel';
 import IconePixel from './IconePixel';
 import { cores, fontes } from '../styles/tema';
+import { toqueLeve } from '../utils/tato';
 
 export default function ItemMenu({ icone, texto, detalhe, aoPressionar }) {
   return (
-    <TouchableOpacity style={styles.toque} onPress={aoPressionar} activeOpacity={0.7}>
+    <TouchableOpacity
+      style={styles.toque}
+      onPress={() => {
+        toqueLeve();
+        aoPressionar?.();
+      }}
+      activeOpacity={0.7}
+    >
       <MolduraPixel corFundo={cores.cartao} pixel={3}>
         <View style={styles.item}>
           <IconePixel nome={icone} tamanho={22} cor={cores.roxo} />

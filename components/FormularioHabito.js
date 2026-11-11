@@ -6,6 +6,7 @@ import MolduraPixel from './MolduraPixel';
 import Botao from './Botao';
 import { diasSemana } from '../data/semana';
 import { cores, fontes } from '../styles/tema';
+import { erro as vibrarErro, selecao, toqueLeve } from '../utils/tato';
 
 const icones = [
   'bottle-wine',
@@ -55,6 +56,7 @@ export default function FormularioHabito({ valoresIniciais = {}, textoBotao, aoS
   const [erro, setErro] = useState('');
 
   const alternarDia = (indice) => {
+    selecao();
     setErro('');
     setFrequencia((atual) =>
       atual.includes(indice)
@@ -64,6 +66,7 @@ export default function FormularioHabito({ valoresIniciais = {}, textoBotao, aoS
   };
 
   const escolherCategoria = (opcao) => {
+    selecao();
     setCategoria(opcao);
     setCategoriasAbertas(false);
   };
@@ -73,6 +76,7 @@ export default function FormularioHabito({ valoresIniciais = {}, textoBotao, aoS
     const mensagem = validar(dados);
 
     if (mensagem !== '') {
+      vibrarErro();
       setErro(mensagem);
       return;
     }
@@ -97,7 +101,10 @@ export default function FormularioHabito({ valoresIniciais = {}, textoBotao, aoS
           return (
             <TouchableOpacity
               key={opcao}
-              onPress={() => setIcone(opcao)}
+              onPress={() => {
+                selecao();
+                setIcone(opcao);
+              }}
               activeOpacity={0.6}
               accessibilityRole="button"
               accessibilityState={{ selected: selecionado }}
@@ -128,7 +135,13 @@ export default function FormularioHabito({ valoresIniciais = {}, textoBotao, aoS
       />
 
       <Text style={styles.rotulo}>Categoria</Text>
-      <TouchableOpacity onPress={() => setCategoriasAbertas((aberto) => !aberto)} activeOpacity={0.7}>
+      <TouchableOpacity
+        onPress={() => {
+          toqueLeve();
+          setCategoriasAbertas((aberto) => !aberto);
+        }}
+        activeOpacity={0.7}
+      >
         <MolduraPixel corFundo={cores.branco} corTopo={cores.cinzaClaro} style={styles.moldura}>
           <View style={styles.seletor}>
             <IconePixel nome={icone} tamanho={22} cor={cores.preto} />
@@ -150,9 +163,7 @@ export default function FormularioHabito({ valoresIniciais = {}, textoBotao, aoS
               onPress={() => escolherCategoria(opcao)}
               activeOpacity={0.6}
             >
-              <Text
-                style={[styles.textoSeletor, opcao === categoria && styles.categoriaAtual]}
-              >
+              <Text style={[styles.textoSeletor, opcao === categoria && styles.categoriaAtual]}>
                 {opcao}
               </Text>
               {opcao === categoria ? (

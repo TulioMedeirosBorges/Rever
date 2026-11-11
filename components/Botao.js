@@ -2,19 +2,27 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import IconeProprio from './IconeProprio';
 import MolduraPixel from './MolduraPixel';
 import { cores, fontes } from '../styles/tema';
+import { toqueMedio } from '../utils/tato';
 
 const variantes = {
-  escuro: { fundo: cores.botao, texto: cores.branco },
+  principal: { fundo: cores.roxo, texto: cores.fundo },
   claro: { fundo: cores.branco, topo: cores.cinzaClaro, texto: cores.preto },
   perigo: { fundo: cores.arcoIris[0], texto: cores.branco },
 };
 
-export default function Botao({ texto, aoPressionar, variante = 'escuro', icone }) {
+export default function Botao({ texto, aoPressionar, variante = 'principal', icone }) {
   const { fundo, topo, texto: corTexto } = variantes[variante];
   const claro = variante === 'claro';
 
   return (
-    <TouchableOpacity style={styles.toque} onPress={aoPressionar} activeOpacity={0.7}>
+    <TouchableOpacity
+      style={styles.toque}
+      onPress={() => {
+        toqueMedio();
+        aoPressionar?.();
+      }}
+      activeOpacity={0.7}
+    >
       <MolduraPixel corFundo={fundo} corTopo={topo}>
         <View style={[styles.conteudo, claro && styles.conteudoClaro]}>
           {icone ? <IconeProprio nome={icone} cor={cores.preto} style={styles.icone} /> : null}

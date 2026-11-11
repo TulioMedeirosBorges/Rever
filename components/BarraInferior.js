@@ -5,6 +5,7 @@ import IconeProprio from './IconeProprio';
 import FaixaArcoIris from './FaixaArcoIris';
 import CantosPixel from './CantosPixel';
 import { cores, fontes } from '../styles/tema';
+import { selecao, toqueMedio } from '../utils/tato';
 
 const abas = [
   { nome: 'Inicio', rotulo: 'Início', icone: 'casa', cor: cores.arcoIris[0] },
@@ -23,8 +24,10 @@ export default function BarraInferior({ abaAtiva }) {
       return;
     }
     if (nome === 'CriarHabito') {
+      toqueMedio();
       navigation.navigate('CriarHabito');
     } else {
+      selecao();
       navigation.replace(nome);
     }
   };
