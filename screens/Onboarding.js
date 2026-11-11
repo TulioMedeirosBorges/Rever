@@ -30,9 +30,18 @@ const passos = [
   },
 ];
 
-export default function Onboarding({ route }) {
+export default function Onboarding({ navigation, route }) {
   const indice = route.params?.passo ?? 0;
   const { imagem, largura, titulo, texto, botao, cor } = passos[indice];
+  const ultimoPasso = indice === passos.length - 1;
+
+  const avancar = () => {
+    if (ultimoPasso) {
+      navigation.navigate('Cadastro');
+    } else {
+      navigation.push('Onboarding', { passo: indice + 1 });
+    }
+  };
 
   return (
     <Tela>
@@ -40,7 +49,7 @@ export default function Onboarding({ route }) {
       <View style={styles.conteudo}>
         <Text style={styles.titulo}>{titulo}</Text>
         <Text style={styles.texto}>{texto}</Text>
-        <Botao texto={botao} />
+        <Botao texto={botao} aoPressionar={avancar} />
         <View style={styles.pontos}>
           {passos.map((passo, i) => (
             <View

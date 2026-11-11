@@ -5,15 +5,18 @@ import Botao from '../components/Botao';
 import LinkTexto from '../components/LinkTexto';
 import { cores } from '../styles/tema';
 
-export default function Splash() {
+export default function Splash({ navigation }) {
   return (
     <Tela style={styles.tela}>
       <Image source={require('../assets/imagens/splash-r.png')} style={styles.imagem} />
       <View style={styles.conteudo}>
         <Logo />
         <Text style={styles.frase}>Pequenos hábitos,{'\n'}grandes mudanças.</Text>
-        <Botao texto="Começar" />
-        <LinkTexto texto="Entrar" />
+        <Botao
+          texto="Começar"
+          aoPressionar={() => navigation.navigate('Onboarding', { passo: 0 })}
+        />
+        <LinkTexto texto="Entrar" aoPressionar={() => navigation.navigate('Login')} />
       </View>
     </Tela>
   );

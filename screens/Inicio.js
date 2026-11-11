@@ -8,7 +8,7 @@ import { cores } from '../styles/tema';
 
 const diasSemana = ['s', 't', 'q', 'q', 's', 's', 'd'];
 
-export default function Inicio() {
+export default function Inicio({ navigation }) {
   const concluidos = habitos.filter((habito) => habito.concluido).length;
 
   return (
@@ -46,7 +46,14 @@ export default function Inicio() {
 
         <Text style={styles.secao}>Seus hábitos</Text>
         {habitos.map(({ id, nome, icone, concluido }) => (
-          <ItemHabito key={id} nome={nome} icone={icone} concluido={concluido} mostrarSeta />
+          <ItemHabito
+            key={id}
+            nome={nome}
+            icone={icone}
+            concluido={concluido}
+            mostrarSeta
+            aoPressionar={() => navigation.navigate('EditarHabito', { id })}
+          />
         ))}
       </ScrollView>
       <BarraInferior abaAtiva="Inicio" />

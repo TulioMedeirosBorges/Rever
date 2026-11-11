@@ -7,7 +7,7 @@ import Botao from '../components/Botao';
 import LinkTexto from '../components/LinkTexto';
 import { cores } from '../styles/tema';
 
-export default function EsqueceuSenha() {
+export default function EsqueceuSenha({ navigation }) {
   return (
     <Tela style={styles.tela}>
       <FaixaArcoIris altura={6} />
@@ -18,8 +18,8 @@ export default function EsqueceuSenha() {
       </View>
 
       <CampoTexto icone="email-outline" placeholder="E-mail" />
-      <Botao texto="Alterar Senha" />
-      <LinkTexto texto="Entrar" />
+      <Botao texto="Alterar Senha" aoPressionar={() => navigation.navigate('VerificarEmail')} />
+      <LinkTexto texto="Entrar" aoPressionar={() => navigation.popTo('Login')} />
     </Tela>
   );
 }

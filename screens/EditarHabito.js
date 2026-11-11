@@ -3,14 +3,18 @@ import Tela from '../components/Tela';
 import CabecalhoTela from '../components/CabecalhoTela';
 import FormularioHabito from '../components/FormularioHabito';
 import FaixaArcoIris from '../components/FaixaArcoIris';
+import { habitos } from '../data/habitos';
 
-export default function EditarHabito() {
+export default function EditarHabito({ navigation, route }) {
+  const { id } = route.params;
+  const habito = habitos.find((item) => item.id === id);
+
   return (
     <Tela>
       <View style={styles.cabecalho}>
-        <CabecalhoTela titulo="Editar Hábito" mostrarVoltar />
+        <CabecalhoTela titulo="Editar Hábito" mostrarVoltar aoVoltar={() => navigation.goBack()} />
       </View>
-      <FormularioHabito nome="Exercitar" categoria="Saúde" frequencia={[0, 2]} lembrete="19:00" />
+      <FormularioHabito nome={habito.nome} categoria="Saúde" frequencia={[0, 2]} lembrete="19:00" />
       <FaixaArcoIris altura={70} />
     </Tela>
   );

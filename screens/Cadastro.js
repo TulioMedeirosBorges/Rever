@@ -8,7 +8,9 @@ import LinkTexto from '../components/LinkTexto';
 import Divisor from '../components/Divisor';
 import { cores } from '../styles/tema';
 
-export default function Cadastro() {
+export default function Cadastro({ navigation }) {
+  const entrar = () => navigation.replace('Inicio');
+
   return (
     <Tela>
       <ScrollView contentContainerStyle={styles.conteudo}>
@@ -22,15 +24,15 @@ export default function Cadastro() {
         <CampoTexto icone="account-outline" placeholder="Nome" />
         <CampoTexto icone="email-outline" placeholder="E-mail" />
         <CampoTexto icone="lock-outline" placeholder="Senha" secureTextEntry />
-        <Botao texto="Criar conta" />
+        <Botao texto="Criar conta" aoPressionar={entrar} />
 
         <Divisor texto="ou" />
-        <Botao texto="Entrar com Google" variante="claro" icone="google" />
-        <Botao texto="Entrar com Apple" variante="claro" icone="apple" />
+        <Botao texto="Entrar com Google" variante="claro" icone="google" aoPressionar={entrar} />
+        <Botao texto="Entrar com Apple" variante="claro" icone="apple" aoPressionar={entrar} />
 
         <View style={styles.rodape}>
           <Text style={styles.textoRodape}>Já tem conta ? </Text>
-          <LinkTexto texto="Entrar" />
+          <LinkTexto texto="Entrar" aoPressionar={() => navigation.popTo('Login')} />
         </View>
       </ScrollView>
     </Tela>
