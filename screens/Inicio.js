@@ -14,7 +14,7 @@ export default function Inicio({ navigation }) {
   const concluidos = habitos.filter((habito) => habito.concluido).length;
 
   return (
-    <Tela>
+    <Tela bordas={['top']}>
       <ScrollView contentContainerStyle={styles.conteudo}>
         <View style={styles.topo}>
           <View>

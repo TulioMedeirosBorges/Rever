@@ -7,7 +7,7 @@ import CantosPixel from '../components/CantosPixel';
 
 export default function CriarHabito({ navigation }) {
   return (
-    <Tela>
+    <Tela bordas={['top']}>
       <View style={styles.cabecalho}>
         <CabecalhoTela titulo="Criar Hábito" mostrarVoltar aoVoltar={() => navigation.goBack()} />
       </View>

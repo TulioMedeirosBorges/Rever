@@ -21,7 +21,7 @@ export default function Progresso() {
   const periodoSelecionado = 'sem';
 
   return (
-    <Tela>
+    <Tela bordas={['top']}>
       <ScrollView contentContainerStyle={styles.conteudo}>
         <CabecalhoTela titulo="Seu progresso" />
 

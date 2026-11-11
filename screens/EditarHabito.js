@@ -11,7 +11,7 @@ export default function EditarHabito({ navigation, route }) {
   const habito = habitos.find((item) => item.id === id);
 
   return (
-    <Tela>
+    <Tela bordas={['top']}>
       <View style={styles.cabecalho}>
         <CabecalhoTela titulo="Editar Hábito" mostrarVoltar aoVoltar={() => navigation.goBack()} />
       </View>

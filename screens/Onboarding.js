@@ -45,7 +45,7 @@ export default function Onboarding({ navigation, route }) {
   };
 
   return (
-    <Tela>
+    <Tela bordas={['bottom']}>
       <Image source={imagem} style={[styles.imagem, { width: largura }]} />
       <View style={styles.conteudo}>
         <Text style={styles.titulo}>{titulo}</Text>

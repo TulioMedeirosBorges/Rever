@@ -21,7 +21,7 @@ export default function Agenda() {
   const diaSelecionado = 13;
 
   return (
-    <Tela>
+    <Tela bordas={['top']}>
       <ScrollView contentContainerStyle={styles.conteudo}>
         <CabecalhoTela titulo="Agenda" />
         <Text style={styles.mes}>novembro 2026</Text>

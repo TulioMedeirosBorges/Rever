@@ -1,5 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import IconeProprio from './IconeProprio';
 import FaixaArcoIris from './FaixaArcoIris';
 import CantosPixel from './CantosPixel';
@@ -15,6 +16,7 @@ const abas = [
 
 export default function BarraInferior({ abaAtiva }) {
   const navigation = useNavigation();
+  const { bottom } = useSafeAreaInsets();
 
   const selecionar = (nome) => {
     if (nome === abaAtiva) {
@@ -30,7 +32,7 @@ export default function BarraInferior({ abaAtiva }) {
   return (
     <View>
       <FaixaArcoIris altura={8} />
-      <View style={styles.barra}>
+      <View style={[styles.barra, { paddingBottom: 12 + bottom }]}>
         {abas.map(({ nome, rotulo, icone, cor, desativada }) => {
           const ativa = nome === abaAtiva;
           const corAtual = ativa ? cor : cores.branco;
@@ -58,7 +60,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: cores.botao,
     paddingTop: 14,
-    paddingBottom: 18,
   },
   aba: {
     flex: 1,

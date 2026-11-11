@@ -7,7 +7,7 @@ import { cores } from '../styles/tema';
 
 export default function Splash({ navigation }) {
   return (
-    <Tela style={styles.tela}>
+    <Tela bordas={['bottom']} style={styles.tela}>
       <Image source={require('../assets/imagens/splash-r.png')} style={styles.imagem} />
       <View style={styles.conteudo}>
         <Logo />
