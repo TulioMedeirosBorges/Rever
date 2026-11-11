@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
     backgroundColor: cores.branco,
   },
   texto: {
-    color: cores.amarelo,
+    color: cores.link,
     marginHorizontal: 10,
     fontFamily: fontes.regular,
     fontVariant: fontes.semLigaduras,

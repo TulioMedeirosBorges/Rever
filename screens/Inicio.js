@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Tela from '../components/Tela';
 import PixelsDecorativos from '../components/PixelsDecorativos';
 import IconePixel from '../components/IconePixel';
@@ -11,7 +11,7 @@ import BarraInferior from '../components/BarraInferior';
 import { useHabitos } from '../contexto/HabitosContexto';
 import { diasSemana } from '../data/semana';
 import { cores, fontes } from '../styles/tema';
-import { toqueLeve } from '../utils/tato';
+import Pressionavel from '../components/Pressionavel';
 
 const nomesDias = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
 const nomesMeses = [
@@ -61,10 +61,10 @@ export default function Inicio({ navigation }) {
 
   const corDoFogo = (indice) => {
     if (indice < hoje) {
-      return cores.arcoIris[0];
+      return cores.vermelho;
     }
     if (indice === hoje && concluidos > 0) {
-      return cores.arcoIris[1];
+      return cores.hoje;
     }
     return cores.cinza;
   };
@@ -81,17 +81,14 @@ export default function Inicio({ navigation }) {
             </Text>
             <Text style={styles.subtitulo}>{mensagem(concluidos, total)}</Text>
           </View>
-          <TouchableOpacity
+          <Pressionavel
             style={styles.engrenagem}
-            onPress={() => {
-              toqueLeve();
-              navigation.replace('Perfil');
-            }}
-            activeOpacity={0.6}
+            aoPressionar={() => navigation.replace('Perfil')}
+            escala={0.8}
             accessibilityLabel="Configurações"
           >
             <IconePixel nome="settings-cog" tamanho={30} cor={cores.branco} />
-          </TouchableOpacity>
+          </Pressionavel>
         </View>
         <FaixaArcoIris />
 
@@ -102,7 +99,7 @@ export default function Inicio({ navigation }) {
           style={styles.molduraCartao}
         >
           <View style={styles.cartao}>
-            <AnelProgresso progresso={progresso} cor={completo ? cores.amarelo : cores.branco} />
+            <AnelProgresso progresso={progresso} cor={completo ? cores.amarelo : cores.principal} />
             <View style={styles.resumo}>
               <Text style={styles.contagem}>
                 <Text style={completo ? styles.contagemCompleta : null}>{concluidos}</Text>
@@ -126,7 +123,7 @@ export default function Inicio({ navigation }) {
 
         <View style={styles.cabecalhoLista}>
           <Text style={styles.secao}>Seus hábitos</Text>
-          <MolduraPixel corFundo={cores.roxoEscuro} pixel={2} degraus={1} style={styles.selo}>
+          <MolduraPixel corFundo={cores.trilha} pixel={2} degraus={1} style={styles.selo}>
             <Text style={styles.textoSelo}>{`${concluidos}/${total}`}</Text>
           </MolduraPixel>
         </View>
@@ -146,7 +143,7 @@ export default function Inicio({ navigation }) {
 
         {total === 0 ? (
           <MolduraPixel corFundo={cores.cartao} pixel={3} style={styles.vazio}>
-            <IconePixel nome="sparkle" tamanho={40} cor={cores.roxo} />
+            <IconePixel nome="sparkle" tamanho={40} cor={cores.amarelo} />
             <Text style={styles.textoVazio}>Nenhum hábito ainda.</Text>
             <Text style={styles.dicaVazio}>Toque no + lá embaixo para criar o primeiro.</Text>
           </MolduraPixel>
@@ -174,7 +171,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   data: {
-    color: cores.roxo,
+    color: cores.turquesa,
     fontFamily: fontes.media,
     fontVariant: fontes.semLigaduras,
     fontSize: 14,

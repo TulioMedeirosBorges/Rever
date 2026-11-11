@@ -1,7 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 import { cores } from '../styles/tema';
 
-export default function BarraProgresso({ feitos, total, cor = cores.roxo }) {
+export default function BarraProgresso({ feitos, total, cor = cores.sucesso }) {
   const blocos = Array.from({ length: total }, (_, indice) => indice < feitos);
 
   return (
@@ -9,7 +9,7 @@ export default function BarraProgresso({ feitos, total, cor = cores.roxo }) {
       {blocos.map((preenchido, indice) => (
         <View
           key={indice}
-          style={[styles.bloco, { backgroundColor: preenchido ? cor : cores.cartaoDestaque }]}
+          style={[styles.bloco, { backgroundColor: preenchido ? cor : cores.trilha }]}
         />
       ))}
     </View>

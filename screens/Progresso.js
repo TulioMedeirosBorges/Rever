@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Tela from '../components/Tela';
 import PixelsDecorativos from '../components/PixelsDecorativos';
 import CabecalhoTela from '../components/CabecalhoTela';
@@ -10,9 +10,11 @@ import BarraProgresso from '../components/BarraProgresso';
 import BarraInferior from '../components/BarraInferior';
 import { useHabitos } from '../contexto/HabitosContexto';
 import { cores, fontes } from '../styles/tema';
-import { selecao } from '../utils/tato';
+import Pressionavel from '../components/Pressionavel';
 
 const ALTURA_GRAFICO = 130;
+
+const corDaBarra = (indice) => cores.arcoIris[indice % (cores.arcoIris.length - 1)];
 
 const graficos = {
   sem: [
@@ -65,13 +67,12 @@ export default function Progresso() {
         <MolduraPixel corFundo={cores.cartao} pixel={3} style={styles.molduraPeriodos}>
           <View style={styles.periodos}>
             {periodos.map((item) => (
-              <TouchableOpacity
+              <Pressionavel
                 key={item}
                 style={styles.periodo}
-                onPress={() => {
-                  selecao();
-                  setPeriodo(item);
-                }}
+                aoPressionar={() => setPeriodo(item)}
+                escala={0.92}
+                vibracaoSoltar="selecao"
               >
                 <MolduraPixel
                   corFundo={item === periodo ? cores.cartaoDestaque : 'transparent'}
@@ -80,7 +81,7 @@ export default function Progresso() {
                 >
                   <Text style={styles.textoPeriodo}>{item}</Text>
                 </MolduraPixel>
-              </TouchableOpacity>
+              </Pressionavel>
             ))}
           </View>
         </MolduraPixel>
@@ -93,8 +94,22 @@ export default function Progresso() {
               <View key={`${rotulo}-${indice}`} style={styles.colunaGrafico}>
                 {altura > 0 ? (
                   <>
-                    <View style={[styles.topoBarra, { width: larguraBarra - 6 }]} />
-                    <View style={[styles.barra, { height: altura, width: larguraBarra }]} />
+                    <View
+                      style={[
+                        styles.topoBarra,
+                        { width: larguraBarra - 6, backgroundColor: corDaBarra(indice) },
+                      ]}
+                    />
+                    <View
+                      style={[
+                        styles.barra,
+                        {
+                          height: altura,
+                          width: larguraBarra,
+                          backgroundColor: corDaBarra(indice),
+                        },
+                      ]}
+                    />
                   </>
                 ) : (
                   <View style={[styles.barraVazia, { width: larguraBarra }]} />
@@ -107,7 +122,7 @@ export default function Progresso() {
 
         <Text style={styles.secao}>Sequência atual</Text>
         <View style={styles.sequencia}>
-          <IconePixel nome="fire" tamanho={72} cor={cores.arcoIris[1]} style={styles.fogo} />
+          <IconePixel nome="fire" tamanho={72} cor={cores.laranja} style={styles.fogo} />
           <View>
             <Text style={styles.numero}>
               5 <Text style={styles.dias}>dias</Text>
@@ -121,7 +136,7 @@ export default function Progresso() {
             icone="check"
             valor="85%"
             rotulo="Taxa de conclusão"
-            cor={cores.arcoIris[3]}
+            cor={cores.turquesa}
           />
           <CartaoEstatistica
             icone="trophy"
@@ -129,12 +144,7 @@ export default function Progresso() {
             rotulo="Hábitos feitos"
             cor={cores.amarelo}
           />
-          <CartaoEstatistica
-            icone="zap"
-            valor="12"
-            rotulo="Melhor sequência"
-            cor={cores.arcoIris[1]}
-          />
+          <CartaoEstatistica icone="zap" valor="12" rotulo="Melhor sequência" cor={cores.laranja} />
         </View>
 
         <Text style={styles.secao}>Por hábito</Text>
@@ -194,11 +204,8 @@ const styles = StyleSheet.create({
   },
   topoBarra: {
     height: 6,
-    backgroundColor: cores.roxo,
   },
-  barra: {
-    backgroundColor: cores.roxo,
-  },
+  barra: {},
   barraVazia: {
     height: 4,
     backgroundColor: cores.cartaoDestaque,
@@ -265,7 +272,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   contagemHabito: {
-    color: cores.roxo,
+    color: cores.turquesa,
     fontFamily: fontes.negrito,
     fontVariant: fontes.semLigaduras,
     fontSize: 17,

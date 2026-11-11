@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import IconePixel from './IconePixel';
 import CampoTexto from './CampoTexto';
 import MolduraPixel from './MolduraPixel';
 import Botao from './Botao';
 import { diasSemana } from '../data/semana';
 import { cores, fontes } from '../styles/tema';
-import { erro as vibrarErro, selecao, toqueLeve } from '../utils/tato';
+import Pressionavel from './Pressionavel';
+import { erro as vibrarErro } from '../utils/tato';
 
 const icones = [
   'bottle-wine',
@@ -56,7 +57,6 @@ export default function FormularioHabito({ valoresIniciais = {}, textoBotao, aoS
   const [erro, setErro] = useState('');
 
   const alternarDia = (indice) => {
-    selecao();
     setErro('');
     setFrequencia((atual) =>
       atual.includes(indice)
@@ -66,7 +66,6 @@ export default function FormularioHabito({ valoresIniciais = {}, textoBotao, aoS
   };
 
   const escolherCategoria = (opcao) => {
-    selecao();
     setCategoria(opcao);
     setCategoriasAbertas(false);
   };
@@ -99,25 +98,23 @@ export default function FormularioHabito({ valoresIniciais = {}, textoBotao, aoS
           const selecionado = opcao === icone;
 
           return (
-            <TouchableOpacity
+            <Pressionavel
               key={opcao}
-              onPress={() => {
-                selecao();
-                setIcone(opcao);
-              }}
-              activeOpacity={0.6}
+              aoPressionar={() => setIcone(opcao)}
+              escala={0.85}
+              vibracaoSoltar="selecao"
               accessibilityRole="button"
               accessibilityState={{ selected: selecionado }}
             >
               <MolduraPixel
-                corFundo={selecionado ? cores.roxo : cores.cartao}
+                corFundo={selecionado ? cores.sucesso : cores.cartao}
                 pixel={3}
                 degraus={1}
                 style={styles.opcaoIcone}
               >
                 <IconePixel nome={opcao} tamanho={26} cor={cores.branco} />
               </MolduraPixel>
-            </TouchableOpacity>
+            </Pressionavel>
           );
         })}
       </View>
@@ -135,13 +132,7 @@ export default function FormularioHabito({ valoresIniciais = {}, textoBotao, aoS
       />
 
       <Text style={styles.rotulo}>Categoria</Text>
-      <TouchableOpacity
-        onPress={() => {
-          toqueLeve();
-          setCategoriasAbertas((aberto) => !aberto);
-        }}
-        activeOpacity={0.7}
-      >
+      <Pressionavel aoPressionar={() => setCategoriasAbertas((aberto) => !aberto)} escala={0.97}>
         <MolduraPixel corFundo={cores.branco} corTopo={cores.cinzaClaro} style={styles.moldura}>
           <View style={styles.seletor}>
             <IconePixel nome={icone} tamanho={22} cor={cores.preto} />
@@ -153,23 +144,24 @@ export default function FormularioHabito({ valoresIniciais = {}, textoBotao, aoS
             />
           </View>
         </MolduraPixel>
-      </TouchableOpacity>
+      </Pressionavel>
       {categoriasAbertas ? (
         <MolduraPixel corFundo={cores.branco} corTopo={cores.cinzaClaro} style={styles.lista}>
           {categorias.map((opcao) => (
-            <TouchableOpacity
+            <Pressionavel
               key={opcao}
               style={styles.opcaoCategoria}
-              onPress={() => escolherCategoria(opcao)}
-              activeOpacity={0.6}
+              aoPressionar={() => escolherCategoria(opcao)}
+              escala={0.96}
+              vibracaoSoltar="selecao"
             >
               <Text style={[styles.textoSeletor, opcao === categoria && styles.categoriaAtual]}>
                 {opcao}
               </Text>
               {opcao === categoria ? (
-                <IconePixel nome="check" tamanho={22} cor={cores.roxo} />
+                <IconePixel nome="check" tamanho={22} cor={cores.petroleo} />
               ) : null}
-            </TouchableOpacity>
+            </Pressionavel>
           ))}
         </MolduraPixel>
       ) : null}
@@ -180,16 +172,17 @@ export default function FormularioHabito({ valoresIniciais = {}, textoBotao, aoS
           const selecionado = frequencia.includes(indice);
 
           return (
-            <TouchableOpacity
+            <Pressionavel
               key={`${dia}-${indice}`}
-              onPress={() => alternarDia(indice)}
-              activeOpacity={0.6}
+              aoPressionar={() => alternarDia(indice)}
+              escala={0.8}
+              vibracaoSoltar="selecao"
               hitSlop={4}
               accessibilityRole="checkbox"
               accessibilityState={{ checked: selecionado }}
             >
               <MolduraPixel
-                corFundo={selecionado ? cores.roxoClaro : cores.branco}
+                corFundo={selecionado ? cores.sucesso : cores.branco}
                 corTopo={selecionado ? undefined : cores.cinzaClaro}
                 pixel={3}
                 degraus={1}
@@ -197,7 +190,7 @@ export default function FormularioHabito({ valoresIniciais = {}, textoBotao, aoS
               >
                 <Text style={styles.textoDia}>{dia}</Text>
               </MolduraPixel>
-            </TouchableOpacity>
+            </Pressionavel>
           );
         })}
       </View>
@@ -287,7 +280,7 @@ const styles = StyleSheet.create({
     height: 42,
   },
   categoriaAtual: {
-    color: cores.roxo,
+    color: cores.petroleo,
     fontFamily: fontes.negrito,
   },
   dias: {
@@ -311,7 +304,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   erro: {
-    color: cores.arcoIris[0],
+    color: cores.perigo,
     fontFamily: fontes.media,
     fontVariant: fontes.semLigaduras,
     fontSize: 17,

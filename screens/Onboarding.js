@@ -18,7 +18,7 @@ const passos = [
     titulo: 'Alcance seus objetivos.',
     texto: 'Pequenos hábitos,\ngrandes mudanças.',
     botao: 'Próximo',
-    cor: cores.arcoIris[3],
+    cor: cores.turquesa,
   },
   {
     imagem: require('../assets/imagens/onboarding-3.png'),
@@ -26,7 +26,7 @@ const passos = [
     titulo: 'Evolua todos os dias.',
     texto: 'Veja seu progresso e\nconquiste recompensas.',
     botao: 'Cadastrar',
-    cor: cores.arcoIris[4],
+    cor: cores.laranja,
   },
 ];
 
@@ -46,10 +46,7 @@ export default function Onboarding({ navigation, route }) {
   return (
     <TelaApresentacao
       arte={(escala) => (
-        <Image
-          source={imagem}
-          style={{ width: largura * escala, height: ALTURA_ARTE * escala }}
-        />
+        <Image source={imagem} style={{ width: largura * escala, height: ALTURA_ARTE * escala }} />
       )}
       titulo={titulo}
       texto={texto}

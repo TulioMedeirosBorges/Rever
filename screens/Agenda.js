@@ -37,7 +37,7 @@ export default function Agenda() {
             <View key={sigla} style={styles.coluna}>
               <Text style={styles.sigla}>{sigla}</Text>
               <MolduraPixel
-                corFundo={dia === diaSelecionado ? cores.roxo : 'transparent'}
+                corFundo={dia === diaSelecionado ? cores.sucesso : 'transparent'}
                 pixel={3}
                 degraus={1}
                 style={styles.dia}
@@ -102,13 +102,13 @@ const styles = StyleSheet.create({
     fontSize: 24,
   },
   contagem: {
-    color: cores.roxo,
+    color: cores.turquesa,
     fontFamily: fontes.negrito,
     fontVariant: fontes.semLigaduras,
     fontSize: 17,
   },
   sigla: {
-    color: cores.roxo,
+    color: cores.turquesa,
     fontFamily: fontes.regular,
     fontVariant: fontes.semLigaduras,
     fontSize: 19,

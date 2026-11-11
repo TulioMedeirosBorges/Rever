@@ -1,8 +1,8 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import MolduraPixel from './MolduraPixel';
 import IconePixel from './IconePixel';
 import { cores, fontes } from '../styles/tema';
-import { sucesso, toqueLeve } from '../utils/tato';
+import Pressionavel from './Pressionavel';
 
 export default function ItemHabito({
   nome,
@@ -14,41 +14,28 @@ export default function ItemHabito({
   aoMarcar,
 }) {
   return (
-    <TouchableOpacity
-      style={styles.toque}
-      onPress={() => {
-        toqueLeve();
-        aoPressionar?.();
-      }}
-      activeOpacity={0.7}
-    >
+    <Pressionavel style={styles.toque} aoPressionar={aoPressionar} escala={0.97}>
       <MolduraPixel corFundo={concluido ? cores.cartaoDestaque : cores.cartao} pixel={3}>
         <View style={styles.item}>
-          <TouchableOpacity
-            onPress={() => {
-              if (concluido) {
-                toqueLeve();
-              } else {
-                sucesso();
-              }
-              aoMarcar();
-            }}
+          <Pressionavel
+            aoPressionar={aoMarcar}
             disabled={!aoMarcar}
-            activeOpacity={0.6}
+            escala={0.75}
+            vibracaoSoltar={concluido ? 'soltar' : 'sucesso'}
             hitSlop={10}
             accessibilityRole="checkbox"
             accessibilityState={{ checked: Boolean(concluido) }}
             accessibilityLabel={`Marcar ${nome} como feito`}
           >
             <MolduraPixel
-              corFundo={concluido ? cores.roxo : cores.caixa}
+              corFundo={concluido ? cores.sucesso : cores.trilha}
               pixel={3}
               degraus={1}
               style={styles.caixa}
             >
               {concluido ? <IconePixel nome="check" tamanho={22} cor={cores.fundo} /> : null}
             </MolduraPixel>
-          </TouchableOpacity>
+          </Pressionavel>
           <IconePixel nome={icone} tamanho={24} cor={cores.branco} style={styles.icone} />
           <View style={styles.textos}>
             <Text style={styles.nome} numberOfLines={1}>
@@ -70,7 +57,7 @@ export default function ItemHabito({
           ) : null}
         </View>
       </MolduraPixel>
-    </TouchableOpacity>
+    </Pressionavel>
   );
 }
 

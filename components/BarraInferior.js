@@ -1,55 +1,77 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import IconeProprio from './IconeProprio';
+import IconePixel from './IconePixel';
+import MolduraPixel from './MolduraPixel';
+import Pressionavel from './Pressionavel';
 import FaixaArcoIris from './FaixaArcoIris';
 import CantosPixel from './CantosPixel';
 import { cores, fontes } from '../styles/tema';
-import { selecao, toqueMedio } from '../utils/tato';
 
 const abas = [
-  { nome: 'Inicio', rotulo: 'Início', icone: 'casa', cor: cores.arcoIris[0] },
-  { nome: 'Agenda', rotulo: 'Agenda', icone: 'calendario', cor: cores.arcoIris[1] },
-  { nome: 'CriarHabito', rotulo: '', icone: 'mais', cor: cores.branco },
-  { nome: 'Progresso', rotulo: 'Progresso', icone: 'trofeu', cor: cores.arcoIris[3] },
-  { nome: 'Perfil', rotulo: 'Perfil', icone: 'usuario', cor: cores.roxo },
+  { nome: 'Inicio', rotulo: 'Início', icone: 'home', cor: cores.vermelho },
+  { nome: 'Agenda', rotulo: 'Agenda', icone: 'calendar-2', cor: cores.laranja },
+  { nome: 'CriarHabito' },
+  { nome: 'Progresso', rotulo: 'Progresso', icone: 'chart', cor: cores.amarelo },
+  { nome: 'Perfil', rotulo: 'Perfil', icone: 'user', cor: cores.turquesa },
 ];
+
+const ALTURA_BASE = 4;
 
 export default function BarraInferior({ abaAtiva }) {
   const navigation = useNavigation();
   const { bottom } = useSafeAreaInsets();
 
   const selecionar = (nome) => {
-    if (nome === abaAtiva) {
-      return;
-    }
-    if (nome === 'CriarHabito') {
-      toqueMedio();
-      navigation.navigate('CriarHabito');
-    } else {
-      selecao();
+    if (nome !== abaAtiva) {
       navigation.replace(nome);
     }
   };
 
   return (
     <View>
-      <FaixaArcoIris altura={8} />
-      <View style={[styles.barra, { paddingBottom: 10 + bottom }]}>
+      <FaixaArcoIris altura={6} />
+      <View style={[styles.barra, { paddingBottom: 8 + bottom }]}>
         {abas.map(({ nome, rotulo, icone, cor }) => {
+          if (nome === 'CriarHabito') {
+            return (
+              <View key={nome} style={styles.aba}>
+                <View style={styles.mais}>
+                  <MolduraPixel corFundo="#a8916a" pixel={3} style={styles.baseMais} />
+                  <Pressionavel
+                    aoPressionar={() => navigation.navigate('CriarHabito')}
+                    vibracaoApertar="apertar"
+                    escala={1}
+                    afundar={ALTURA_BASE}
+                    accessibilityRole="button"
+                    accessibilityLabel="Criar hábito"
+                  >
+                    <MolduraPixel corFundo={cores.principal} pixel={3} style={styles.botaoMais}>
+                      <IconePixel nome="plus" tamanho={30} cor={cores.preto} />
+                    </MolduraPixel>
+                  </Pressionavel>
+                </View>
+              </View>
+            );
+          }
+
           const ativa = nome === abaAtiva;
-          const corAtual = ativa ? cor : cores.branco;
+          const corAtual = ativa ? cor : cores.cinza;
 
           return (
-            <TouchableOpacity
+            <Pressionavel
               key={nome}
               style={styles.aba}
-              onPress={() => selecionar(nome)}
-              activeOpacity={0.7}
+              aoPressionar={() => selecionar(nome)}
+              escala={0.86}
+              vibracaoSoltar="selecao"
+              accessibilityRole="tab"
+              accessibilityState={{ selected: ativa }}
             >
-              <IconeProprio nome={icone} tamanho={rotulo ? 30 : 44} cor={corAtual} />
-              {rotulo ? <Text style={[styles.rotulo, { color: corAtual }]}>{rotulo}</Text> : null}
-            </TouchableOpacity>
+              <View style={[styles.indicador, ativa && { backgroundColor: cor }]} />
+              <IconePixel nome={icone} tamanho={28} cor={corAtual} />
+              <Text style={[styles.rotulo, { color: corAtual }]}>{rotulo}</Text>
+            </Pressionavel>
           );
         })}
       </View>
@@ -61,18 +83,40 @@ export default function BarraInferior({ abaAtiva }) {
 const styles = StyleSheet.create({
   barra: {
     flexDirection: 'row',
-    backgroundColor: cores.botao,
-    paddingTop: 14,
+    backgroundColor: cores.barra,
+    paddingTop: 6,
   },
   aba: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  indicador: {
+    width: 22,
+    height: 4,
+    marginBottom: 6,
+  },
   rotulo: {
-    fontFamily: fontes.regular,
+    fontFamily: fontes.media,
     fontVariant: fontes.semLigaduras,
-    fontSize: 13,
+    fontSize: 12,
+    marginTop: 3,
+  },
+  mais: {
+    paddingBottom: ALTURA_BASE,
     marginTop: 4,
+  },
+  baseMais: {
+    position: 'absolute',
+    top: ALTURA_BASE,
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  botaoMais: {
+    width: 52,
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

@@ -1,5 +1,6 @@
 {
   "replaceAttrValues": {
-    "white": "currentColor"
+    "white": "currentColor",
+    "black": "currentColor"
   }
 }

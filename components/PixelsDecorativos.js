@@ -2,11 +2,11 @@ import { StyleSheet, View } from 'react-native';
 import { cores } from '../styles/tema';
 
 const pixels = [
-  { x: 94, y: 16, cor: cores.roxoEscuro },
-  { x: 272, y: 32, cor: cores.roxoEscuro },
+  { x: 94, y: 16, cor: cores.trilha },
+  { x: 272, y: 32, cor: cores.trilha },
   { x: 70, y: 37, cor: cores.cartao },
   { x: 120, y: 40, cor: cores.cartao },
-  { x: 130, y: 40, cor: cores.roxoEscuro },
+  { x: 130, y: 40, cor: cores.trilha },
   { x: 262, y: 42, cor: cores.cartao },
 ];
 

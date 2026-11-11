@@ -2,7 +2,11 @@ import { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
-import { Tiny5_400Regular, Tiny5_500Medium, Tiny5_700Bold } from '@expo-google-fonts/tiny5';
+import {
+  BitcountPropSingle_500Medium,
+  BitcountPropSingle_600SemiBold,
+  BitcountPropSingle_800ExtraBold,
+} from '@expo-google-fonts/bitcount-prop-single';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -28,9 +32,9 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [fontesCarregadas, erroFontes] = useFonts({
-    Tiny5_400Regular,
-    Tiny5_500Medium,
-    Tiny5_700Bold,
+    BitcountPropSingle_500Medium,
+    BitcountPropSingle_600SemiBold,
+    BitcountPropSingle_800ExtraBold,
   });
 
   const pronto = fontesCarregadas || erroFontes;

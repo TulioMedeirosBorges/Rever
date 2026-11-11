@@ -3,7 +3,6 @@ import Tela from '../components/Tela';
 import PixelsDecorativos from '../components/PixelsDecorativos';
 import CabecalhoTela from '../components/CabecalhoTela';
 import MolduraPixel from '../components/MolduraPixel';
-import IconeProprio from '../components/IconeProprio';
 import IconePixel from '../components/IconePixel';
 import FaixaArcoIris from '../components/FaixaArcoIris';
 import CartaoEstatistica from '../components/CartaoEstatistica';
@@ -14,10 +13,10 @@ import { useHabitos } from '../contexto/HabitosContexto';
 import { cores, fontes } from '../styles/tema';
 
 const conquistas = [
-  { id: 1, icone: 'fire', nome: '7 dias', cor: cores.arcoIris[1], desbloqueada: true },
+  { id: 1, icone: 'fire', nome: '7 dias', cor: cores.laranja, desbloqueada: true },
   { id: 2, icone: 'trophy', nome: '1º hábito', cor: cores.amarelo, desbloqueada: true },
-  { id: 3, icone: 'star', nome: '50 feitos', cor: cores.arcoIris[3], desbloqueada: true },
-  { id: 4, icone: 'crown', nome: '30 dias', cor: cores.roxo, desbloqueada: false },
+  { id: 3, icone: 'star', nome: '50 feitos', cor: cores.turquesa, desbloqueada: true },
+  { id: 4, icone: 'crown', nome: '30 dias', cor: cores.petroleo, desbloqueada: false },
 ];
 
 const opcoes = [
@@ -39,7 +38,7 @@ export default function Perfil({ navigation }) {
 
         <View style={styles.topo}>
           <MolduraPixel corFundo={cores.cartaoDestaque} pixel={6} style={styles.avatar}>
-            <IconeProprio nome="usuario" tamanho={56} cor={cores.branco} />
+            <IconePixel nome="user" tamanho={64} cor={cores.branco} />
           </MolduraPixel>
           <Text style={styles.nome}>Usuário</Text>
           <Text style={styles.email}>usuario@email.com</Text>
@@ -50,8 +49,13 @@ export default function Perfil({ navigation }) {
         </View>
 
         <View style={styles.estatisticas}>
-          <CartaoEstatistica icone="check" valor={habitos.length} rotulo="Hábitos ativos" cor={cores.roxo} />
-          <CartaoEstatistica icone="zap" valor="5" rotulo="Dias seguidos" cor={cores.arcoIris[1]} />
+          <CartaoEstatistica
+            icone="check"
+            valor={habitos.length}
+            rotulo="Hábitos ativos"
+            cor={cores.turquesa}
+          />
+          <CartaoEstatistica icone="zap" valor="5" rotulo="Dias seguidos" cor={cores.laranja} />
           <CartaoEstatistica icone="trophy" valor="3" rotulo="Conquistas" cor={cores.amarelo} />
         </View>
 

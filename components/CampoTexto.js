@@ -11,7 +11,7 @@ export default function CampoTexto({ icone, ...propsDoInput }) {
         <TextInput
           style={styles.input}
           placeholderTextColor={cores.placeholder}
-          selectionColor={cores.roxo}
+          selectionColor={cores.petroleo}
           {...propsDoInput}
         />
       </View>

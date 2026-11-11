@@ -42,7 +42,7 @@ const blocos = DESENHO.flatMap((linha, indiceLinha) =>
     .filter(({ preenchido }) => preenchido),
 );
 
-export default function AnelProgresso({ progresso, cor = cores.branco }) {
+export default function AnelProgresso({ progresso, cor = cores.principal }) {
   return (
     <View style={styles.anel}>
       {blocos.map(({ chave, left, top, fracao }) => (
@@ -50,7 +50,7 @@ export default function AnelProgresso({ progresso, cor = cores.branco }) {
           key={chave}
           style={[
             styles.bloco,
-            { left, top, backgroundColor: fracao < progresso ? cor : cores.roxoEscuro },
+            { left, top, backgroundColor: fracao < progresso ? cor : cores.trilha },
           ]}
         />
       ))}
