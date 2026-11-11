@@ -1,6 +1,7 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
 import Tela from '../components/Tela';
 import Botao from '../components/Botao';
+import MolduraPixel from '../components/MolduraPixel';
 import { cores } from '../styles/tema';
 
 const passos = [
@@ -52,9 +53,12 @@ export default function Onboarding({ navigation, route }) {
         <Botao texto={botao} aoPressionar={avancar} />
         <View style={styles.pontos}>
           {passos.map((passo, i) => (
-            <View
+            <MolduraPixel
               key={passo.titulo}
-              style={[styles.ponto, i === indice && { backgroundColor: cor }]}
+              corFundo={i === indice ? cor : cores.branco}
+              pixel={2}
+              degraus={1}
+              style={styles.ponto}
             />
           ))}
         </View>
@@ -93,8 +97,6 @@ const styles = StyleSheet.create({
   ponto: {
     width: 16,
     height: 16,
-    borderRadius: 3,
-    backgroundColor: cores.branco,
     marginHorizontal: 8,
   },
 });

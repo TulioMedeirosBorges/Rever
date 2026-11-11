@@ -1,36 +1,38 @@
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import IconeProprio from './IconeProprio';
+import MolduraPixel from './MolduraPixel';
 import { cores } from '../styles/tema';
 
 export default function Botao({ texto, aoPressionar, variante = 'escuro', icone }) {
   const claro = variante === 'claro';
 
   return (
-    <TouchableOpacity
-      style={[styles.botao, claro && styles.botaoClaro]}
-      onPress={aoPressionar}
-    >
-      {icone ? (
-        <IconeProprio nome={icone} cor={cores.preto} style={styles.icone} />
-      ) : null}
-      <Text style={[styles.texto, claro && styles.textoClaro]}>{texto}</Text>
+    <TouchableOpacity style={styles.toque} onPress={aoPressionar}>
+      <MolduraPixel
+        corFundo={claro ? cores.branco : cores.botao}
+        corTopo={claro ? cores.cinzaClaro : undefined}
+      >
+        <View style={[styles.conteudo, claro && styles.conteudoClaro]}>
+          {icone ? <IconeProprio nome={icone} cor={cores.preto} style={styles.icone} /> : null}
+          <Text style={[styles.texto, claro && styles.textoClaro]}>{texto}</Text>
+        </View>
+      </MolduraPixel>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  botao: {
+  toque: {
+    marginVertical: 8,
+  },
+  conteudo: {
     flexDirection: 'row',
-    backgroundColor: cores.botao,
     minHeight: 56,
-    borderRadius: 6,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 20,
-    marginVertical: 8,
   },
-  botaoClaro: {
-    backgroundColor: cores.branco,
+  conteudoClaro: {
     minHeight: 48,
   },
   icone: {

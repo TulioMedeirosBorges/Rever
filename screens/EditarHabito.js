@@ -3,6 +3,7 @@ import Tela from '../components/Tela';
 import CabecalhoTela from '../components/CabecalhoTela';
 import FormularioHabito from '../components/FormularioHabito';
 import FaixaArcoIris from '../components/FaixaArcoIris';
+import CantosPixel from '../components/CantosPixel';
 import { habitos } from '../data/habitos';
 
 export default function EditarHabito({ navigation, route }) {
@@ -15,7 +16,10 @@ export default function EditarHabito({ navigation, route }) {
         <CabecalhoTela titulo="Editar Hábito" mostrarVoltar aoVoltar={() => navigation.goBack()} />
       </View>
       <FormularioHabito nome={habito.nome} categoria="Saúde" frequencia={[0, 2]} lembrete="19:00" />
-      <FaixaArcoIris altura={70} />
+      <View>
+        <FaixaArcoIris altura={70} />
+        <CantosPixel />
+      </View>
     </Tela>
   );
 }

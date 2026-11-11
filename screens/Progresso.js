@@ -2,6 +2,7 @@ import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Tela from '../components/Tela';
 import CabecalhoTela from '../components/CabecalhoTela';
 import BarraInferior from '../components/BarraInferior';
+import MolduraPixel from '../components/MolduraPixel';
 import { cores } from '../styles/tema';
 
 const periodos = ['sem', 'mes', 'ano'];
@@ -24,20 +25,25 @@ export default function Progresso() {
       <ScrollView contentContainerStyle={styles.conteudo}>
         <CabecalhoTela titulo="Seu progresso" />
 
-        <View style={styles.periodos}>
-          {periodos.map((periodo) => (
-            <View
-              key={periodo}
-              style={[styles.periodo, periodo === periodoSelecionado && styles.periodoSelecionado]}
-            >
-              <Text style={styles.textoPeriodo}>{periodo}</Text>
-            </View>
-          ))}
-        </View>
+        <MolduraPixel corFundo={cores.cartao} pixel={3} style={styles.molduraPeriodos}>
+          <View style={styles.periodos}>
+            {periodos.map((periodo) => (
+              <MolduraPixel
+                key={periodo}
+                corFundo={periodo === periodoSelecionado ? cores.cartaoDestaque : 'transparent'}
+                pixel={3}
+                style={styles.periodo}
+              >
+                <Text style={styles.textoPeriodo}>{periodo}</Text>
+              </MolduraPixel>
+            ))}
+          </View>
+        </MolduraPixel>
 
         <View style={styles.grafico}>
           {barras.map(({ dia, altura }) => (
             <View key={dia} style={styles.colunaGrafico}>
+              <View style={styles.topoBarra} />
               <View style={[styles.barra, { height: altura }]} />
               <Text style={styles.diaGrafico}>{dia}</Text>
             </View>
@@ -61,22 +67,18 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 48,
   },
-  periodos: {
-    flexDirection: 'row',
-    backgroundColor: cores.cartao,
-    borderRadius: 8,
-    padding: 4,
+  molduraPeriodos: {
     marginHorizontal: 12,
     marginBottom: 40,
+  },
+  periodos: {
+    flexDirection: 'row',
+    padding: 4,
   },
   periodo: {
     flex: 1,
     alignItems: 'center',
     paddingVertical: 8,
-    borderRadius: 6,
-  },
-  periodoSelecionado: {
-    backgroundColor: cores.cartaoDestaque,
   },
   textoPeriodo: {
     color: cores.branco,
@@ -92,11 +94,14 @@ const styles = StyleSheet.create({
   colunaGrafico: {
     alignItems: 'center',
   },
+  topoBarra: {
+    width: 18,
+    height: 6,
+    backgroundColor: cores.roxo,
+  },
   barra: {
     width: 24,
     backgroundColor: cores.roxo,
-    borderTopLeftRadius: 4,
-    borderTopRightRadius: 4,
   },
   diaGrafico: {
     color: cores.branco,

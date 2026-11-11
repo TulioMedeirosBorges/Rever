@@ -3,6 +3,7 @@ import Tela from '../components/Tela';
 import CabecalhoTela from '../components/CabecalhoTela';
 import FormularioHabito from '../components/FormularioHabito';
 import FaixaArcoIris from '../components/FaixaArcoIris';
+import CantosPixel from '../components/CantosPixel';
 
 export default function CriarHabito({ navigation }) {
   return (
@@ -11,7 +12,10 @@ export default function CriarHabito({ navigation }) {
         <CabecalhoTela titulo="Criar Hábito" mostrarVoltar aoVoltar={() => navigation.goBack()} />
       </View>
       <FormularioHabito nome="" categoria="Saúde" frequencia={[0, 2]} lembrete="19:00" />
-      <FaixaArcoIris altura={70} />
+      <View>
+        <FaixaArcoIris altura={70} />
+        <CantosPixel />
+      </View>
     </Tela>
   );
 }

@@ -2,6 +2,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Tela from '../components/Tela';
 import CabecalhoTela from '../components/CabecalhoTela';
 import ItemHabito from '../components/ItemHabito';
+import MolduraPixel from '../components/MolduraPixel';
 import BarraInferior from '../components/BarraInferior';
 import { habitos } from '../data/habitos';
 import { cores } from '../styles/tema';
@@ -29,9 +30,14 @@ export default function Agenda() {
           {semana.map(({ sigla, dia }) => (
             <View key={sigla} style={styles.coluna}>
               <Text style={styles.sigla}>{sigla}</Text>
-              <View style={[styles.dia, dia === diaSelecionado && styles.diaSelecionado]}>
+              <MolduraPixel
+                corFundo={dia === diaSelecionado ? cores.roxo : 'transparent'}
+                pixel={3}
+                degraus={1}
+                style={styles.dia}
+              >
                 <Text style={styles.numeroDia}>{dia}</Text>
-              </View>
+              </MolduraPixel>
             </View>
           ))}
         </View>
@@ -74,12 +80,8 @@ const styles = StyleSheet.create({
   dia: {
     width: 32,
     height: 28,
-    borderRadius: 6,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  diaSelecionado: {
-    backgroundColor: cores.roxo,
   },
   numeroDia: {
     color: cores.branco,

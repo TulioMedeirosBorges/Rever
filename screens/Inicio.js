@@ -1,6 +1,7 @@
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Tela from '../components/Tela';
 import IconeProprio from '../components/IconeProprio';
+import MolduraPixel from '../components/MolduraPixel';
 import FaixaArcoIris from '../components/FaixaArcoIris';
 import ItemHabito from '../components/ItemHabito';
 import BarraInferior from '../components/BarraInferior';
@@ -24,27 +25,34 @@ export default function Inicio({ navigation }) {
         </View>
         <FaixaArcoIris />
 
-        <View style={styles.cartao}>
-          <View style={styles.anel}>
-            <IconeProprio nome="roda" tamanho={121} style={StyleSheet.absoluteFill} />
-            <Text style={styles.porcentagem}>50%</Text>
-          </View>
-          <View style={styles.resumo}>
-            <Text style={styles.contagem}>{`${concluidos} de ${habitos.length}`}</Text>
-            <Text style={styles.textoResumo}>Hábitos{'\n'}concluídos</Text>
-            <View style={styles.sequencia}>
-              {diasSemana.map((dia, indice) => (
-                <View key={`${dia}-${indice}`} style={styles.diaSequencia}>
-                  <Image
-                    source={require('../assets/icones/fogo-2.png')}
-                    style={[styles.fogo, { tintColor: indice < 3 ? cores.arcoIris[0] : cores.cinza }]}
-                  />
-                  <Text style={styles.letraDia}>{dia}</Text>
-                </View>
-              ))}
+        <MolduraPixel
+          corFundo={cores.cartao}
+          corTopo={cores.sombra}
+          pixel={6}
+          style={styles.molduraCartao}
+        >
+          <View style={styles.cartao}>
+            <View style={styles.anel}>
+              <IconeProprio nome="roda" tamanho={121} style={StyleSheet.absoluteFill} />
+              <Text style={styles.porcentagem}>50%</Text>
+            </View>
+            <View style={styles.resumo}>
+              <Text style={styles.contagem}>{`${concluidos} de ${habitos.length}`}</Text>
+              <Text style={styles.textoResumo}>Hábitos{'\n'}concluídos</Text>
+              <View style={styles.sequencia}>
+                {diasSemana.map((dia, indice) => (
+                  <View key={`${dia}-${indice}`} style={styles.diaSequencia}>
+                    <Image
+                      source={require('../assets/icones/fogo-2.png')}
+                      style={[styles.fogo, { tintColor: indice < 3 ? cores.arcoIris[0] : cores.cinza }]}
+                    />
+                    <Text style={styles.letraDia}>{dia}</Text>
+                  </View>
+                ))}
+              </View>
             </View>
           </View>
-        </View>
+        </MolduraPixel>
 
         <Text style={styles.secao}>Seus hábitos</Text>
         {habitos.map(({ id, nome, icone, concluido }) => (
@@ -88,14 +96,15 @@ const styles = StyleSheet.create({
     height: 32,
     tintColor: cores.branco,
   },
+  molduraCartao: {
+    marginTop: 20,
+    marginBottom: 20,
+  },
   cartao: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: cores.cartao,
-    borderRadius: 10,
     padding: 16,
-    marginTop: 20,
-    marginBottom: 20,
+    paddingTop: 22,
   },
   anel: {
     width: 121,

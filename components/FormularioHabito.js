@@ -1,6 +1,7 @@
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import IconePixel from './IconePixel';
 import CampoTexto from './CampoTexto';
+import MolduraPixel from './MolduraPixel';
 import { cores } from '../styles/tema';
 
 const diasSemana = ['s', 't', 'q', 'q', 's', 's', 'd'];
@@ -14,29 +15,41 @@ export default function FormularioHabito({ nome, categoria, frequencia = [], lem
       <CampoTexto placeholder="Nome do hábito" value={nome} />
 
       <Text style={styles.rotulo}>Categoria</Text>
-      <View style={styles.seletor}>
-        <Image source={require('../assets/icones/fogo.png')} style={styles.iconeCategoria} />
-        <Text style={styles.textoSeletor}>{categoria}</Text>
-        <IconePixel nome="chevron-down" tamanho={24} cor={cores.preto} />
-      </View>
+      <MolduraPixel corFundo={cores.branco} corTopo={cores.cinzaClaro} style={styles.moldura}>
+        <View style={styles.seletor}>
+          <Image source={require('../assets/icones/fogo.png')} style={styles.iconeCategoria} />
+          <Text style={styles.textoSeletor}>{categoria}</Text>
+          <IconePixel nome="chevron-down" tamanho={24} cor={cores.preto} />
+        </View>
+      </MolduraPixel>
 
       <Text style={styles.rotulo}>Frequência</Text>
       <View style={styles.dias}>
-        {diasSemana.map((dia, indice) => (
-          <View
-            key={`${dia}-${indice}`}
-            style={[styles.dia, frequencia.includes(indice) && styles.diaSelecionado]}
-          >
-            <Text style={styles.textoDia}>{dia}</Text>
-          </View>
-        ))}
+        {diasSemana.map((dia, indice) => {
+          const selecionado = frequencia.includes(indice);
+
+          return (
+            <MolduraPixel
+              key={`${dia}-${indice}`}
+              corFundo={selecionado ? cores.roxoClaro : cores.branco}
+              corTopo={selecionado ? undefined : cores.cinzaClaro}
+              pixel={3}
+              degraus={1}
+              style={styles.dia}
+            >
+              <Text style={styles.textoDia}>{dia}</Text>
+            </MolduraPixel>
+          );
+        })}
       </View>
 
       <Text style={styles.rotulo}>Lembrete</Text>
-      <View style={styles.seletor}>
-        <IconePixel nome="calendar" tamanho={22} cor={cores.preto} />
-        <Text style={styles.textoSeletor}>{lembrete}</Text>
-      </View>
+      <MolduraPixel corFundo={cores.branco} corTopo={cores.cinzaClaro} style={styles.moldura}>
+        <View style={styles.seletor}>
+          <IconePixel nome="calendar" tamanho={22} cor={cores.preto} />
+          <Text style={styles.textoSeletor}>{lembrete}</Text>
+        </View>
+      </MolduraPixel>
     </ScrollView>
   );
 }
@@ -58,16 +71,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 8,
   },
+  moldura: {
+    marginVertical: 10,
+  },
   seletor: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: cores.branco,
-    borderTopWidth: 4,
-    borderTopColor: '#c8c8d0',
-    borderRadius: 4,
     paddingHorizontal: 12,
+    paddingTop: 4,
     height: 46,
-    marginVertical: 10,
   },
   iconeCategoria: {
     width: 22,
@@ -87,13 +99,8 @@ const styles = StyleSheet.create({
   dia: {
     width: 32,
     height: 32,
-    borderRadius: 6,
-    backgroundColor: cores.branco,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  diaSelecionado: {
-    backgroundColor: cores.roxo,
   },
   textoDia: {
     fontSize: 18,

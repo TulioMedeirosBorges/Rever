@@ -2,6 +2,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import IconeProprio from './IconeProprio';
 import FaixaArcoIris from './FaixaArcoIris';
+import CantosPixel from './CantosPixel';
 import { cores } from '../styles/tema';
 
 const abas = [
@@ -28,7 +29,7 @@ export default function BarraInferior({ abaAtiva }) {
 
   return (
     <View>
-      <FaixaArcoIris altura={6} />
+      <FaixaArcoIris altura={8} />
       <View style={styles.barra}>
         {abas.map(({ nome, rotulo, icone, cor, desativada }) => {
           const ativa = nome === abaAtiva;
@@ -47,6 +48,7 @@ export default function BarraInferior({ abaAtiva }) {
           );
         })}
       </View>
+      <CantosPixel />
     </View>
   );
 }
@@ -55,7 +57,7 @@ const styles = StyleSheet.create({
   barra: {
     flexDirection: 'row',
     backgroundColor: cores.botao,
-    paddingTop: 10,
+    paddingTop: 14,
     paddingBottom: 18,
   },
   aba: {

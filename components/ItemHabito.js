@@ -1,49 +1,48 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import MolduraPixel from './MolduraPixel';
 import { cores } from '../styles/tema';
 
 export default function ItemHabito({ nome, icone, concluido, mostrarSeta, aoPressionar }) {
   return (
-    <TouchableOpacity
-      style={[styles.item, concluido && styles.itemConcluido]}
-      onPress={aoPressionar}
-    >
-      <View style={[styles.caixa, concluido && styles.caixaMarcada]}>
-        {concluido ? (
-          <Image source={require('../assets/icones/check.png')} style={styles.check} />
-        ) : null}
-      </View>
-      <Image source={icone} style={styles.icone} />
-      <Text style={styles.nome}>{nome}</Text>
-      {mostrarSeta ? (
-        <Image source={require('../assets/icones/seta-direita.png')} style={styles.seta} />
-      ) : null}
+    <TouchableOpacity style={styles.toque} onPress={aoPressionar}>
+      <MolduraPixel corFundo={concluido ? cores.cartaoDestaque : cores.cartao} pixel={3}>
+        <View style={styles.item}>
+          <MolduraPixel
+            corFundo={concluido ? cores.roxoEscuro : cores.branco}
+            pixel={3}
+            degraus={1}
+            style={styles.caixa}
+          >
+            {concluido ? (
+              <Image source={require('../assets/icones/check.png')} style={styles.check} />
+            ) : null}
+          </MolduraPixel>
+          <Image source={icone} style={styles.icone} />
+          <Text style={styles.nome}>{nome}</Text>
+          {mostrarSeta ? (
+            <Image source={require('../assets/icones/seta-direita.png')} style={styles.seta} />
+          ) : null}
+        </View>
+      </MolduraPixel>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
+  toque: {
+    marginBottom: 12,
+  },
   item: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: cores.cartao,
-    borderRadius: 8,
     paddingHorizontal: 10,
     height: 50,
-    marginBottom: 12,
-  },
-  itemConcluido: {
-    backgroundColor: cores.cartaoDestaque,
   },
   caixa: {
     width: 28,
     height: 28,
-    backgroundColor: cores.branco,
-    borderRadius: 4,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  caixaMarcada: {
-    backgroundColor: cores.roxoEscuro,
   },
   check: {
     width: 18,
