@@ -11,8 +11,8 @@ Nome e RGM.
 ## Telas
 - **Splash**: abertura do app, com acesso ao cadastro ou ao login.
 - **Onboarding**: três passos de apresentação (a mesma tela, trocando o passo por parâmetro).
-- **Login** e **Cadastro**: entrada e criação de conta.
-- **Esqueceu a senha** e **Verificar e-mail**: recuperação de senha.
+- **Login** e **Cadastro**: contas locais. Cada conta começa do zero e tem os seus próprios hábitos, projetos e conversas, salvos só no celular (sem servidor nem banco de dados). A senha é guardada só como hash SHA-256 com sal (`expo-crypto`).
+- **Esqueceu a senha**: como não há servidor, não existe e-mail de recuperação; a tela permite apagar a conta do celular e criar outra.
 - **Início**: resumo do dia, Revi com nível e XP, hábitos de hoje e de outros dias.
 - **Criar Hábito** e **Editar Hábito**: formulário do hábito.
 - **Agenda**: semana atual; escolha um dia para ver e marcar os hábitos dele.

@@ -113,3 +113,10 @@ export async function sincronizarLembretes(habitos, projetos = []) {
     ),
   );
 }
+
+// Ao sair da conta, os lembretes dela não podem continuar tocando para a próxima pessoa.
+export async function cancelarLembretes() {
+  if (Platform.OS !== 'web') {
+    await Notifications.cancelAllScheduledNotificationsAsync();
+  }
+}

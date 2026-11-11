@@ -29,6 +29,7 @@ import NovoProjeto from './screens/NovoProjeto';
 import ProjetoDetalhe from './screens/ProjetoDetalhe';
 import AvisoConquista from './components/AvisoConquista';
 import { HabitosProvider, useHabitos } from './contexto/HabitosContexto';
+import { ContaProvider, useConta } from './contexto/ContaContexto';
 import { cores, fontes } from './styles/tema';
 
 SplashScreen.preventAutoHideAsync();
@@ -51,18 +52,49 @@ const transicaoDeAba = ({ route }) => {
   return { animation: 'fade_from_bottom' };
 };
 
-// Só mostra o app quando as fontes e os dados salvos estiverem prontos.
-function Conteudo({ fontesProntas }) {
-  const { carregado } = useHabitos();
-  const pronto = fontesProntas && carregado;
+const opcoesPadrao = {
+  headerShown: false,
+  animation: 'slide_from_right',
+  contentStyle: { backgroundColor: cores.fundo },
+};
 
+function useEsconderSplash(pronto) {
   useEffect(() => {
     if (pronto) {
       SplashScreen.hideAsync();
     }
   }, [pronto]);
+}
 
-  if (!pronto) {
+// Sem conta logada: só as telas de entrada.
+function NavegacaoEntrada() {
+  const { temContas } = useConta();
+  useEsconderSplash(true);
+
+  return (
+    <NavigationContainer>
+      {/* Quem já tem conta neste celular cai direto no login; quem é novo vê a abertura. */}
+      <Stack.Navigator
+        initialRouteName={temContas ? 'Login' : 'Splash'}
+        screenOptions={opcoesPadrao}
+      >
+        <Stack.Screen name="Splash" component={Splash} options={{ animation: 'fade' }} />
+        <Stack.Screen name="Onboarding" component={Onboarding} />
+        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="Cadastro" component={Cadastro} />
+        <Stack.Screen name="EsqueceuSenha" component={EsqueceuSenha} />
+        <Stack.Screen name="VerificarEmail" component={VerificarEmail} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
+// Com conta logada: o app inteiro, com os dados daquela conta.
+function NavegacaoApp() {
+  const { carregado } = useHabitos();
+  useEsconderSplash(carregado);
+
+  if (!carregado) {
     return null;
   }
 
@@ -70,19 +102,13 @@ function Conteudo({ fontesProntas }) {
     <>
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="Splash"
+          initialRouteName="Inicio"
           screenOptions={{
             headerShown: false,
             animation: 'slide_from_right',
             contentStyle: { backgroundColor: cores.fundo },
           }}
         >
-          <Stack.Screen name="Splash" component={Splash} options={{ animation: 'fade' }} />
-          <Stack.Screen name="Onboarding" component={Onboarding} />
-          <Stack.Screen name="Login" component={Login} />
-          <Stack.Screen name="Cadastro" component={Cadastro} />
-          <Stack.Screen name="EsqueceuSenha" component={EsqueceuSenha} />
-          <Stack.Screen name="VerificarEmail" component={VerificarEmail} />
           <Stack.Screen name="Inicio" component={Inicio} options={transicaoDeAba} />
           <Stack.Screen
             name="CriarHabito"
@@ -140,6 +166,24 @@ function Conteudo({ fontesProntas }) {
   );
 }
 
+// Entrar ou sair troca de "mundo" sozinho (padrão de autenticação do React Navigation).
+function Raiz({ fontesProntas }) {
+  const { carregada, conta } = useConta();
+
+  if (!fontesProntas || !carregada) {
+    return null;
+  }
+  if (!conta) {
+    return <NavegacaoEntrada />;
+  }
+  // A chave pela conta recria o estado do zero ao trocar de conta.
+  return (
+    <HabitosProvider key={conta.id} conta={conta}>
+      <NavegacaoApp />
+    </HabitosProvider>
+  );
+}
+
 export default function App() {
   const [fontesCarregadas, erroFontes] = useFonts({
     // Cópia local da Bitcount com a altura das letras corrigida (os acentos não são cortados no Android).
@@ -150,9 +194,9 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <HabitosProvider>
-        <Conteudo fontesProntas={Boolean(fontesCarregadas || erroFontes)} />
-      </HabitosProvider>
+      <ContaProvider>
+        <Raiz fontesProntas={Boolean(fontesCarregadas || erroFontes)} />
+      </ContaProvider>
       <StatusBar style="light" />
     </SafeAreaProvider>
   );

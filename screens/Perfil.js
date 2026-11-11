@@ -16,12 +16,30 @@ import { useHabitos } from '../contexto/HabitosContexto';
 import { cores, fontes } from '../styles/tema';
 import { nomesMeses } from '../utils/datas';
 import { chaveDoAmbiente } from '../utils/gemini';
+import { useConta } from '../contexto/ContaContexto';
 
 export default function Perfil({ navigation }) {
   const { habitos, usuario, estatisticas, conquistas, config, alternarSons, definirChaveGemini } =
     useHabitos();
   const iaConectada = Boolean(config.chaveGemini || chaveDoAmbiente);
-  const sair = () => navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+  const { conta, sair, apagarConta } = useConta();
+
+  // Ao sair, o app troca sozinho para a tela de login (a conta continua salva no celular).
+  const confirmarSaida = () =>
+    Alert.alert('Sair da conta', 'Seus dados continuam salvos neste celular.', [
+      { text: 'Cancelar', style: 'cancel' },
+      { text: 'Sair', onPress: sair },
+    ]);
+
+  const confirmarApagar = () =>
+    Alert.alert(
+      'Apagar minha conta',
+      'Apaga a conta e todos os hábitos, projetos e conversas dela deste celular. Não dá para desfazer.',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Apagar tudo', style: 'destructive', onPress: () => apagarConta(conta.id) },
+      ],
+    );
 
   const [ano, mes] = usuario.membroDesde.split('-').map(Number);
   const abertas = conquistas.filter(({ desbloqueada }) => desbloqueada);
@@ -177,7 +195,8 @@ export default function Perfil({ navigation }) {
         ))}
 
         <View style={styles.sair}>
-          <Botao texto="Sair da conta" variante="perigo" aoPressionar={sair} />
+          <Botao texto="Sair da conta" variante="claro" aoPressionar={confirmarSaida} />
+          <Botao texto="Apagar minha conta" variante="perigo" aoPressionar={confirmarApagar} />
         </View>
       </ScrollView>
       <BarraInferior abaAtiva="Perfil" />

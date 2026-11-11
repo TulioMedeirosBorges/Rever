@@ -8,7 +8,8 @@ import {
   useState,
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { criarHistoricoInicial, habitos as habitosIniciais, usuarioInicial } from '../data/habitos';
+import { usuarioInicial } from '../data/habitos';
+import { chaveDadosDaConta } from './ContaContexto';
 import { avaliarConquistas } from '../data/conquistas';
 import { reviInicial } from '../data/revi';
 import { calcularEstatisticas } from '../utils/estatisticas';
@@ -17,14 +18,19 @@ import { chaveDia } from '../utils/datas';
 import { definirSonsLigados } from '../utils/sons';
 import { cores } from '../styles/tema';
 
-const CHAVE = 'rever:dados:v1';
-
 const HabitosContexto = createContext(null);
 
-export function HabitosProvider({ children }) {
-  const [habitos, setHabitos] = useState(habitosIniciais);
-  const [historico, setHistorico] = useState(() => criarHistoricoInicial());
-  const [usuario, setUsuario] = useState(usuarioInicial);
+// Cada conta tem os seus dados, guardados só neste celular. Conta nova começa do zero.
+export function HabitosProvider({ conta, children }) {
+  const CHAVE = chaveDadosDaConta(conta.id);
+  const [habitos, setHabitos] = useState([]);
+  const [historico, setHistorico] = useState({});
+  const [usuario, setUsuario] = useState(() => ({
+    ...usuarioInicial,
+    nome: conta.nome,
+    email: conta.email,
+    membroDesde: conta.criadaEm.slice(0, 10),
+  }));
   const [revi, setRevi] = useState(reviInicial);
   const [foco, setFoco] = useState({ sessoes: 0, minutos: 0 });
   const [config, setConfig] = useState({ sons: true, chaveGemini: '' });
@@ -66,7 +72,7 @@ export function HabitosProvider({ children }) {
     return () => {
       ativo = false;
     };
-  }, []);
+  }, [CHAVE]);
 
   // Salva a cada mudança.
   useEffect(() => {
@@ -88,7 +94,7 @@ export function HabitosProvider({ children }) {
         }),
       ).catch(() => {});
     }
-  }, [carregado, habitos, historico, usuario, revi, foco, config, conversas, projetos]);
+  }, [CHAVE, carregado, habitos, historico, usuario, revi, foco, config, conversas, projetos]);
 
   useEffect(() => {
     definirSonsLigados(config.sons);
