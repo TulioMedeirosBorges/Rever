@@ -7,7 +7,6 @@ import MolduraPixel from '../components/MolduraPixel';
 import IconePixel from '../components/IconePixel';
 import CartaoEstatistica from '../components/CartaoEstatistica';
 import BarraProgresso from '../components/BarraProgresso';
-import BarraInferior from '../components/BarraInferior';
 import { useHabitos } from '../contexto/HabitosContexto';
 import { cores, fontes } from '../styles/tema';
 import { dadosDoGrafico } from '../utils/estatisticas';
@@ -147,7 +146,6 @@ export default function Progresso() {
           </MolduraPixel>
         ))}
       </ScrollView>
-      <BarraInferior abaAtiva="Progresso" />
     </Tela>
   );
 }

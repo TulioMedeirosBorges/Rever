@@ -11,7 +11,6 @@ import LinkTexto from '../components/LinkTexto';
 import Pressionavel from '../components/Pressionavel';
 import Entrada from '../components/Entrada';
 import ChatRevi from '../components/ChatRevi';
-import BarraInferior from '../components/BarraInferior';
 import { BotaoHoje, JanelaHoje } from '../components/HojeNoProjeto';
 import { useHabitos } from '../contexto/HabitosContexto';
 import { cores, fontes } from '../styles/tema';
@@ -152,7 +151,6 @@ export default function Projetos({ navigation, route }) {
         aoFechar={() => setAbertoId(null)}
         aoFocar={(sessao) => focar(aberto, sessao)}
       />
-      <BarraInferior abaAtiva="Projetos" />
     </Tela>
   );
 }

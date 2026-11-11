@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Animated } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
 import { molas, naBatida } from '../utils/movimento';
 
 // Cada tipo chega de um jeito; a opacidade só acompanha o movimento (nada entra só com fade).
@@ -22,8 +23,15 @@ export default function Entrada({
   style,
 }) {
   const progresso = useRef(new Animated.Value(0)).current;
+  // Com a barra fixa, a transição entre abas é dos elementos: toda vez que a tela
+  // volta a ficar em foco, eles entram de novo (sem recarregar a tela nem perder estado).
+  const emFoco = useIsFocused();
 
   useEffect(() => {
+    if (!emFoco) {
+      return undefined;
+    }
+    progresso.setValue(0);
     const animacao = Animated.spring(progresso, {
       toValue: 1,
       delay: atraso + naBatida(ordem),
@@ -32,7 +40,7 @@ export default function Entrada({
     });
     animacao.start();
     return () => animacao.stop();
-  }, [progresso, ordem, atraso, mola]);
+  }, [emFoco, progresso, ordem, atraso, mola]);
 
   const opacity = progresso.interpolate({
     inputRange: [0, 0.35, 1],

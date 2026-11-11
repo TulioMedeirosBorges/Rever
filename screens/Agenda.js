@@ -5,7 +5,6 @@ import PixelsDecorativos from '../components/PixelsDecorativos';
 import CabecalhoTela from '../components/CabecalhoTela';
 import ItemHabito from '../components/ItemHabito';
 import MolduraPixel from '../components/MolduraPixel';
-import BarraInferior from '../components/BarraInferior';
 import Pressionavel from '../components/Pressionavel';
 import Entrada from '../components/Entrada';
 import { useHabitos } from '../contexto/HabitosContexto';
@@ -117,7 +116,6 @@ export default function Agenda() {
           </>
         ) : null}
       </ScrollView>
-      <BarraInferior abaAtiva="Agenda" />
     </Tela>
   );
 }

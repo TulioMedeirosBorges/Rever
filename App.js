@@ -5,6 +5,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import Splash from './screens/Splash';
@@ -28,6 +29,7 @@ import Projetos from './screens/Projetos';
 import NovoProjeto from './screens/NovoProjeto';
 import ProjetoDetalhe from './screens/ProjetoDetalhe';
 import AvisoConquista from './components/AvisoConquista';
+import BarraInferior from './components/BarraInferior';
 import { HabitosProvider, useHabitos } from './contexto/HabitosContexto';
 import { ContaProvider, useConta } from './contexto/ContaContexto';
 import { cores, fontes } from './styles/tema';
@@ -39,18 +41,30 @@ SplashScreen.preventAutoHideAsync();
 LogBox.ignoreLogs([/expo-notifications/]);
 
 const Stack = createNativeStackNavigator();
+const Abas = createBottomTabNavigator();
 
-// Abas deslizam conforme a direção na barra; chegando de fora (login), a tela sobe de baixo.
-const transicaoDeAba = ({ route }) => {
-  const direcao = route.params?.direcao;
-  if (direcao === 'direita') {
-    return { animation: 'slide_from_right' };
-  }
-  if (direcao === 'esquerda') {
-    return { animation: 'slide_from_left' };
-  }
-  return { animation: 'fade_from_bottom' };
-};
+// As 6 abas com a barra fixa. A troca de aba só faz um fade rápido no fundo;
+// quem anima são os elementos de cada tela (componente Entrada).
+function NavegacaoAbas() {
+  return (
+    <Abas.Navigator
+      initialRouteName="Inicio"
+      tabBar={(props) => <BarraInferior {...props} />}
+      screenOptions={{
+        headerShown: false,
+        animation: 'fade',
+        sceneStyle: { backgroundColor: cores.fundo },
+      }}
+    >
+      <Abas.Screen name="Inicio" component={Inicio} />
+      <Abas.Screen name="Agenda" component={Agenda} />
+      <Abas.Screen name="Conversar" component={Conversar} />
+      <Abas.Screen name="Projetos" component={Projetos} />
+      <Abas.Screen name="Progresso" component={Progresso} />
+      <Abas.Screen name="Perfil" component={Perfil} />
+    </Abas.Navigator>
+  );
+}
 
 const opcoesPadrao = {
   headerShown: false,
@@ -102,14 +116,14 @@ function NavegacaoApp() {
     <>
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="Inicio"
+          initialRouteName="Abas"
           screenOptions={{
             headerShown: false,
             animation: 'slide_from_right',
             contentStyle: { backgroundColor: cores.fundo },
           }}
         >
-          <Stack.Screen name="Inicio" component={Inicio} options={transicaoDeAba} />
+          <Stack.Screen name="Abas" component={NavegacaoAbas} options={{ animation: 'fade' }} />
           <Stack.Screen
             name="CriarHabito"
             component={CriarHabito}
@@ -120,17 +134,12 @@ function NavegacaoApp() {
             component={EditarHabito}
             options={{ animation: 'slide_from_right' }}
           />
-          <Stack.Screen name="Agenda" component={Agenda} options={transicaoDeAba} />
-          <Stack.Screen name="Conversar" component={Conversar} options={transicaoDeAba} />
-          <Stack.Screen name="Projetos" component={Projetos} options={transicaoDeAba} />
           <Stack.Screen
             name="NovoProjeto"
             component={NovoProjeto}
             options={{ animation: 'slide_from_bottom' }}
           />
           <Stack.Screen name="ProjetoDetalhe" component={ProjetoDetalhe} />
-          <Stack.Screen name="Progresso" component={Progresso} options={transicaoDeAba} />
-          <Stack.Screen name="Perfil" component={Perfil} options={transicaoDeAba} />
           <Stack.Screen
             name="EditarPerfil"
             component={EditarPerfil}

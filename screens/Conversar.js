@@ -1,6 +1,5 @@
 import Tela from '../components/Tela';
 import ChatRevi from '../components/ChatRevi';
-import BarraInferior from '../components/BarraInferior';
 import { useHabitos } from '../contexto/HabitosContexto';
 import { instrucoesConversa } from '../utils/reviIA';
 
@@ -19,7 +18,6 @@ export default function Conversar({ navigation }) {
         atalhos={atalhos}
         mostrarCabecalho
       />
-      <BarraInferior abaAtiva="Conversar" />
     </Tela>
   );
 }

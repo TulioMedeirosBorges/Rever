@@ -12,10 +12,16 @@ export default function ItemHabito({
   mostrarSeta,
   aoPressionar,
   aoMarcar,
+  cor,
+  etiqueta,
 }) {
   return (
     <Pressionavel style={styles.toque} aoPressionar={aoPressionar} escala={0.97}>
-      <MolduraPixel corFundo={concluido ? cores.cartaoDestaque : cores.cartao} pixel={3}>
+      <MolduraPixel
+        corFundo={concluido ? cores.cartaoDestaque : cores.cartao}
+        corTopo={cor}
+        pixel={3}
+      >
         <View style={styles.item}>
           <Pressionavel
             aoPressionar={aoMarcar}
@@ -37,11 +43,18 @@ export default function ItemHabito({
               {concluido ? <IconePixel nome="check" tamanho={22} cor={cores.fundo} /> : null}
             </MolduraPixel>
           </Pressionavel>
-          <IconePixel nome={icone} tamanho={24} cor={cores.branco} style={styles.icone} />
+          <IconePixel nome={icone} tamanho={24} cor={cor ?? cores.branco} style={styles.icone} />
           <View style={styles.textos}>
-            <Text style={styles.nome} numberOfLines={1}>
-              {nome}
-            </Text>
+            <View style={styles.linhaNome}>
+              {etiqueta ? (
+                <Text style={[styles.etiqueta, { backgroundColor: cor ?? cores.trilha }]}>
+                  {etiqueta}
+                </Text>
+              ) : null}
+              <Text style={styles.nome} numberOfLines={1}>
+                {nome}
+              </Text>
+            </View>
             {detalhe ? (
               <Text style={styles.detalhe} numberOfLines={1}>
                 {detalhe}
@@ -89,7 +102,23 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 12,
   },
+  linhaNome: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  etiqueta: {
+    color: cores.preto,
+    fontFamily: fontes.negrito,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 9,
+    letterSpacing: 0.5,
+    paddingHorizontal: 4,
+    paddingTop: 2,
+    paddingBottom: 1,
+    marginRight: 6,
+  },
   nome: {
+    flexShrink: 1,
     color: cores.branco,
     fontFamily: fontes.regular,
     fontVariant: fontes.semLigaduras,

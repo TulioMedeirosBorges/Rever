@@ -8,7 +8,6 @@ import FaixaArcoIris from '../components/FaixaArcoIris';
 import CartaoEstatistica from '../components/CartaoEstatistica';
 import ItemMenu from '../components/ItemMenu';
 import Botao from '../components/Botao';
-import BarraInferior from '../components/BarraInferior';
 import LinkTexto from '../components/LinkTexto';
 import Pressionavel from '../components/Pressionavel';
 import Entrada from '../components/Entrada';
@@ -75,7 +74,7 @@ export default function Perfil({ navigation }) {
               { text: 'Cancelar', style: 'cancel' },
               { text: 'Desconectar', style: 'destructive', onPress: () => definirChaveGemini('') },
             ])
-          : navigation.replace('Conversar', { direcao: 'esquerda' }),
+          : navigation.navigate('Conversar'),
     },
     {
       id: 'sons',
@@ -199,7 +198,6 @@ export default function Perfil({ navigation }) {
           <Botao texto="Apagar minha conta" variante="perigo" aoPressionar={confirmarApagar} />
         </View>
       </ScrollView>
-      <BarraInferior abaAtiva="Perfil" />
     </Tela>
   );
 }
