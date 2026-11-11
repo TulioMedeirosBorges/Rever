@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Tela from '../components/Tela';
 import PixelsDecorativos from '../components/PixelsDecorativos';
@@ -11,10 +12,13 @@ import Entrada from '../components/Entrada';
 import { useHabitos } from '../contexto/HabitosContexto';
 import { cores, fontes } from '../styles/tema';
 import { chaveDia, rotuloData } from '../utils/datas';
+import { formatarDuracao } from '../utils/reviIA';
+import { BotaoHoje, JanelaHoje } from '../components/HojeNoProjeto';
 
 export default function ProjetoDetalhe({ navigation, route }) {
   const { id } = route.params;
   const { projetos, alternarSessao, excluirProjeto } = useHabitos();
+  const [janelaAberta, setJanelaAberta] = useState(false);
   const projeto = projetos.find((item) => item.id === id);
 
   if (!projeto) {
@@ -77,14 +81,7 @@ export default function ProjetoDetalhe({ navigation, route }) {
 
         {proxima ? (
           <Entrada ordem={1}>
-            <Botao
-              texto={
-                proxima.data === hoje
-                  ? `Focar agora · ${proxima.minutos} min`
-                  : `Adiantar a próxima (${rotuloData(proxima.data)})`
-              }
-              aoPressionar={() => focar(proxima)}
-            />
+            <BotaoHoje projeto={projeto} aoPressionar={() => setJanelaAberta(true)} />
           </Entrada>
         ) : null}
 
@@ -142,10 +139,22 @@ export default function ProjetoDetalhe({ navigation, route }) {
                       {sessao.titulo}
                     </Text>
                     <Text style={[styles.dataSessao, atrasada && styles.atrasada]}>
-                      {`${ehHoje ? 'hoje' : rotuloData(sessao.data)} · ${sessao.minutos} min${
-                        atrasada ? ' · atrasada' : ''
-                      }`}
+                      {`${ehHoje ? 'hoje' : rotuloData(sessao.data)} · ${formatarDuracao(
+                        sessao.minutos,
+                      )}${atrasada ? ' · atrasada' : ''}`}
                     </Text>
+                    {(sessao.tarefas ?? []).map((tarefa, posicao) => (
+                      <Text
+                        key={tarefa}
+                        style={[
+                          styles.tarefa,
+                          (sessao.tarefasFeitas ?? []).includes(posicao) && styles.feita,
+                        ]}
+                        numberOfLines={2}
+                      >
+                        {`▪ ${tarefa}`}
+                      </Text>
+                    ))}
                   </View>
                   {!sessao.feita ? (
                     <Pressionavel
@@ -166,6 +175,15 @@ export default function ProjetoDetalhe({ navigation, route }) {
           <Botao texto="Excluir projeto" variante="perigo" aoPressionar={excluir} />
         </View>
       </ScrollView>
+      <JanelaHoje
+        projeto={projeto}
+        visivel={janelaAberta}
+        aoFechar={() => setJanelaAberta(false)}
+        aoFocar={(sessao) => {
+          setJanelaAberta(false);
+          focar(sessao);
+        }}
+      />
     </Tela>
   );
 }
@@ -276,6 +294,14 @@ const styles = StyleSheet.create({
   },
   atrasada: {
     color: cores.vermelho,
+  },
+  tarefa: {
+    color: cores.cinzaClaro,
+    fontFamily: fontes.regular,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 12,
+    lineHeight: 17,
+    marginTop: 2,
   },
   excluir: {
     marginTop: 18,

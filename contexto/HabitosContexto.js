@@ -28,7 +28,7 @@ export function HabitosProvider({ children }) {
   const [revi, setRevi] = useState(reviInicial);
   const [foco, setFoco] = useState({ sessoes: 0, minutos: 0 });
   const [config, setConfig] = useState({ sons: true, chaveGemini: '' });
-  const [conversa, setConversa] = useState([]);
+  const [conversas, setConversas] = useState({ rotina: [], projeto: [] });
   const [projetos, setProjetos] = useState([]);
   const nivelAntes = useRef(null);
   const [carregado, setCarregado] = useState(false);
@@ -49,7 +49,10 @@ export function HabitosProvider({ children }) {
           setRevi(salvo.revi ?? reviInicial);
           setFoco(salvo.foco ?? { sessoes: 0, minutos: 0 });
           setConfig({ sons: true, chaveGemini: '', ...salvo.config });
-          setConversa(salvo.conversa ?? []);
+          setConversas({
+            rotina: salvo.conversas?.rotina ?? salvo.conversa ?? [],
+            projeto: salvo.conversas?.projeto ?? [],
+          });
           setProjetos(salvo.projetos ?? []);
         }
       })
@@ -77,12 +80,15 @@ export function HabitosProvider({ children }) {
           revi,
           foco,
           config,
-          conversa: conversa.slice(-60),
+          conversas: {
+            rotina: conversas.rotina.slice(-60),
+            projeto: conversas.projeto.slice(-60),
+          },
           projetos,
         }),
       ).catch(() => {});
     }
-  }, [carregado, habitos, historico, usuario, revi, foco, config, conversa, projetos]);
+  }, [carregado, habitos, historico, usuario, revi, foco, config, conversas, projetos]);
 
   useEffect(() => {
     definirSonsLigados(config.sons);
@@ -203,12 +209,20 @@ export function HabitosProvider({ children }) {
   const definirChaveGemini = (chave) =>
     setConfig((atual) => ({ ...atual, chaveGemini: chave.trim() }));
 
-  // ----- Conversa com o Revi -----
-  const adicionarMensagem = (mensagem) =>
-    setConversa((atual) => [...atual, { id: `${Date.now()}-${atual.length}`, ...mensagem }]);
+  // ----- Conversas com o Revi: uma para a rotina (aba Revi) e outra para projetos -----
+  const mudarCanal = (canal, mudar) =>
+    setConversas((atuais) => ({ ...atuais, [canal]: mudar(atuais[canal] ?? []) }));
 
-  const marcarSugestaoAdicionada = (mensagemId, indice) =>
-    setConversa((atual) =>
+  const adicionarMensagem = (canal, mensagem) =>
+    mudarCanal(canal, (atual) => [...atual, { id: `${novoId()}`, ...mensagem }]);
+
+  const atualizarMensagem = (canal, mensagemId, dados) =>
+    mudarCanal(canal, (atual) =>
+      atual.map((mensagem) => (mensagem.id === mensagemId ? { ...mensagem, ...dados } : mensagem)),
+    );
+
+  const marcarSugestaoAdicionada = (canal, mensagemId, indice) =>
+    mudarCanal(canal, (atual) =>
       atual.map((mensagem) =>
         mensagem.id === mensagemId
           ? { ...mensagem, adicionadas: [...(mensagem.adicionadas ?? []), indice] }
@@ -216,16 +230,11 @@ export function HabitosProvider({ children }) {
       ),
     );
 
-  const atualizarMensagem = (mensagemId, dados) =>
-    setConversa((atual) =>
-      atual.map((mensagem) => (mensagem.id === mensagemId ? { ...mensagem, ...dados } : mensagem)),
-    );
-
-  const limparConversa = () => setConversa([]);
+  const limparConversa = (canal) => mudarCanal(canal, () => []);
 
   // Quando a cota gratuita do Gemini acaba, o Revi avisa no chat (no máximo uma vez por hora).
-  const avisarLimite = () =>
-    setConversa((atual) => {
+  const avisarLimite = (canal = 'rotina') =>
+    mudarCanal(canal, (atual) => {
       const ultimo = [...atual].reverse().find(({ tipo }) => tipo === 'limite');
       if (ultimo && Date.now() - ultimo.criadaEm < 60 * 60 * 1000) {
         return atual;
@@ -233,20 +242,31 @@ export function HabitosProvider({ children }) {
       return [
         ...atual,
         {
-          id: `${Date.now()}-limite`,
+          id: `${novoId()}-limite`,
           papel: 'revi',
           tipo: 'limite',
           criadaEm: Date.now(),
           texto:
-            'Atingi o limite gratuito do Gemini por agora. Ele volta sozinho: espera uns minutos, ou até amanhã se for o limite do dia. Enquanto isso, planejo seus projetos aqui mesmo, sem IA.',
+            'Atingi o limite gratuito do Gemini por agora. Ele volta sozinho: espera uns minutos, ou até amanhã se for o limite do dia. Enquanto isso, dá para criar projetos pelo formulário, que eu planejo aqui mesmo, sem IA.',
         },
       ];
     });
 
   // ----- Projetos -----
+  const coresProjeto = [cores.turquesa, cores.laranja, cores.amarelo, cores.vermelho, cores.creme];
+
   const adicionarProjeto = (projeto) => {
     const id = `p${novoId()}`;
-    setProjetos((atuais) => [...atuais, { ...projeto, id, criadoEm: chaveDia(new Date()) }]);
+    setProjetos((atuais) => [
+      ...atuais,
+      {
+        icone: 'clipboard-note',
+        cor: coresProjeto[atuais.length % coresProjeto.length],
+        ...projeto,
+        id,
+        criadoEm: chaveDia(new Date()),
+      },
+    ]);
     return id;
   };
 
@@ -257,7 +277,7 @@ export function HabitosProvider({ children }) {
           ? {
               ...projeto,
               sessoes: projeto.sessoes.map((sessao) =>
-                sessao.id === sessaoId ? { ...sessao, feita: mudar(sessao.feita) } : sessao,
+                sessao.id === sessaoId ? { ...sessao, ...mudar(sessao) } : sessao,
               ),
             }
           : projeto,
@@ -265,9 +285,22 @@ export function HabitosProvider({ children }) {
     );
 
   const alternarSessao = (projetoId, sessaoId) =>
-    mudarSessao(projetoId, sessaoId, (feita) => !feita);
+    mudarSessao(projetoId, sessaoId, (sessao) => ({ feita: !sessao.feita }));
 
-  const concluirSessao = (projetoId, sessaoId) => mudarSessao(projetoId, sessaoId, () => true);
+  const concluirSessao = (projetoId, sessaoId) =>
+    mudarSessao(projetoId, sessaoId, () => ({ feita: true }));
+
+  // Marca uma tarefa do dia; com todas feitas, a sessão inteira conta como feita.
+  const alternarTarefa = (projetoId, sessaoId, indice) =>
+    mudarSessao(projetoId, sessaoId, (sessao) => {
+      const atuais = sessao.tarefasFeitas ?? [];
+      const tarefasFeitas = atuais.includes(indice)
+        ? atuais.filter((item) => item !== indice)
+        : [...atuais, indice];
+      const todas =
+        (sessao.tarefas ?? []).length > 0 && tarefasFeitas.length === sessao.tarefas.length;
+      return { tarefasFeitas, feita: todas };
+    });
 
   const excluirProjeto = (id) =>
     setProjetos((atuais) => atuais.filter((projeto) => projeto.id !== id));
@@ -281,7 +314,7 @@ export function HabitosProvider({ children }) {
         usuario,
         revi,
         config,
-        conversa,
+        conversas,
         projetos,
         estatisticas,
         conquistas,
@@ -305,6 +338,7 @@ export function HabitosProvider({ children }) {
         alternarSessao,
         concluirSessao,
         excluirProjeto,
+        alternarTarefa,
       }}
     >
       {children}

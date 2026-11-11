@@ -17,7 +17,7 @@ Nome e RGM.
 - **Criar Hábito** e **Editar Hábito**: formulário do hábito.
 - **Agenda**: semana atual; escolha um dia para ver e marcar os hábitos dele.
 - **Revi (conversa com IA)**: chat com o Revi usando o Gemini; ele faz perguntas e sugere hábitos, que entram na rotina com um toque.
-- **Projetos**: o Revi divide um projeto em etapas e separa as sessões de foco nos dias mais leves da sua semana, até o prazo. Detalhe do projeto recebe `{ id }` por parâmetro.
+- **Projetos**: chat "Planejar com o Revi": você conta a ideia, ele pergunta o que falta (prazo, dias, tempo por dia) com opções prontas, mostra o plano dia a dia (o que fazer e quanto tempo) e cria o projeto com lembretes. Cada projeto tem um botão "Hoje" com o tempo de dedicação e as tarefas do dia. Detalhe do projeto recebe `{ id }` por parâmetro.
 - **Progresso**: gráfico por semana/mês/ano, sequência atual, estatísticas e progresso por hábito.
 - **Perfil**: dados do usuário, estatísticas, vitrine de conquistas e configurações.
 - **Editar perfil**: nome, e-mail, avatar e cor.

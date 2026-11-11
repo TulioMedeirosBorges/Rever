@@ -170,7 +170,12 @@ export const validarSessoes = (lista, { prazo, dias, porSemana, minutos }, hoje 
         String(item.titulo ?? '')
           .trim()
           .slice(0, 40) || `Sessão ${indice + 1}`,
-      minutos: Math.max(15, Math.min(180, Math.round(Number(item.minutos) || minutos))),
+      minutos: Math.max(15, Math.min(240, Math.round(Number(item.minutos) || minutos))),
+      tarefas: (Array.isArray(item.tarefas) ? item.tarefas : [])
+        .map((tarefa) => String(tarefa).trim().slice(0, 60))
+        .filter(Boolean)
+        .slice(0, 5),
+      tarefasFeitas: [],
       feita: false,
     }));
 };
@@ -210,12 +215,23 @@ export const planoLocal = (
   const total = Math.min(datas.length, 60);
   const sessoes = datas.slice(0, total).map((data, indice) => {
     let titulo = `Avançar em ${nome}`;
+    let tarefas = [
+      'Revisar o que fez da última vez',
+      'Avançar na próxima parte',
+      'Anotar o próximo passo',
+    ];
     if (indice === 0) {
       titulo = 'Planejar e organizar';
+      tarefas = [
+        'Listar tudo que precisa ser feito',
+        'Separar em partes pequenas',
+        'Juntar materiais',
+      ];
     } else if (indice === total - 1 && total > 1) {
       titulo = 'Revisão final';
+      tarefas = ['Revisar tudo do começo ao fim', 'Corrigir o que faltou', 'Comemorar!'];
     }
-    return { data: chaveDia(data), titulo, minutos };
+    return { data: chaveDia(data), titulo, minutos, tarefas };
   });
 
   return {
@@ -226,6 +242,19 @@ export const planoLocal = (
 };
 
 const DIAS_TODOS = [0, 1, 2, 3, 4, 5, 6];
+
+export const ICONES_PROJETO = [
+  'clipboard-note',
+  'book-open',
+  'notebook',
+  'briefcase',
+  'code',
+  'music',
+  'heart',
+  'target',
+  'zap',
+  'trophy',
+];
 
 // Confere o projeto que a IA quer criar; sessões inválidas são trocadas pelo plano local.
 export const validarProjeto = (projeto, habitos, hoje = new Date()) => {
@@ -264,7 +293,13 @@ export const validarProjeto = (projeto, habitos, hoje = new Date()) => {
     .map((etapa) => String(etapa).slice(0, 40))
     .filter(Boolean)
     .slice(0, 6);
-  return { ...pedido, etapas, sessoes, resumo: '' };
+  return {
+    ...pedido,
+    icone: ICONES_PROJETO.includes(projeto.icone) ? projeto.icone : 'clipboard-note',
+    etapas,
+    sessoes,
+    resumo: '',
+  };
 };
 
 export const validarOpcoes = (lista) =>
@@ -272,3 +307,48 @@ export const validarOpcoes = (lista) =>
     .map((opcao) => String(opcao).trim().slice(0, 32))
     .filter(Boolean)
     .slice(0, 3);
+
+export const instrucoesPlanejarProjeto = ({
+  nomeRevi,
+  nomeUsuario,
+  habitos,
+  projetos = [],
+  hoje = new Date(),
+}) => `
+Você é ${nomeRevi}, mascote do app de hábitos Rever, e agora é o parceiro de planejamento de projetos de ${nomeUsuario}.
+Fale em português do Brasil, curto e animado (no máximo 3 frases).
+O fluxo é uma conversa para montar o projeto JUNTO com a pessoa:
+1. Ela conta a ideia. Você descobre, UMA pergunta por vez, só o que faltar entre:
+   o resultado final (o que precisa estar pronto), o prazo, os dias e o horário em que ela pode se dedicar,
+   e quanto tempo por dia. Deduza o que der da mensagem dela; não pergunte o que ela já disse. No máximo 4 perguntas.
+2. Em toda pergunta, mande em "opcoes" de 2 a 4 respostas prontas que façam sentido
+   (ex.: prazo → "2 semanas", "1 mês"; dias → "Seg a sex", "Fins de semana", "Todo dia"; tempo → "30 min", "1 hora", "2 horas").
+3. Quando souber o suficiente, monte o plano em "plano": divida o projeto em etapas e distribua sessões até o dia
+   ANTERIOR ao prazo, só nos dias livres, preferindo os dias com menos hábitos. Cada sessão diz o que fazer
+   naquele dia: um título e de 2 a 4 tarefas concretas e pequenas, na ordem certa (do começo do projeto até a revisão final).
+   Na "resposta", resuma o plano e pergunte se pode criar. Mande "opcoes" como "Pode criar", "Mais leve", "Mudar os dias".
+4. Quando a pessoa confirmar ("pode criar", "sim", "cria"), coloque o MESMO plano (com os ajustes pedidos) em
+   "acoes.projeto" e diga que criou. Se ela pedir ajuste, mande um novo "plano".
+
+Hoje é ${hojeTexto(hoje)}. Próximos dias: ${calendario(hoje, 70)}.
+Hábitos da pessoa: ${descreverHabitos(habitos)}. Carga por dia (seg..dom): ${cargaPorDia(habitos).join(', ')}.
+Projetos atuais: ${projetos.map(({ nome, prazo }) => `${nome} (até ${prazo})`).join('; ') || 'nenhum'}.
+Dias da semana: 0 = segunda ... 6 = domingo.
+
+Responda SEMPRE só com JSON neste formato ("plano" e "acoes.projeto" podem ser null):
+{"resposta": "sua fala", "opcoes": ["opção"], "plano": PROJETO, "acoes": {"projeto": PROJETO}}
+PROJETO = {"nome": "até 30 letras", "objetivo": "frase curta", "icone": "${ICONES_PROJETO.join('|')}",
+ "prazo": "AAAA-MM-DD", "dias": [0..6], "porSemana": 1 a 7, "minutos": 15 a 240, "horario": "HH:MM",
+ "etapas": ["etapa"], "sessoes": [{"data": "AAAA-MM-DD", "titulo": "até 40 letras", "minutos": 60,
+ "tarefas": ["tarefa curta", "tarefa curta"]}]}
+`;
+
+// "90" -> "1h30", "60" -> "1h", "45" -> "45 min"
+export const formatarDuracao = (minutos) => {
+  const horas = Math.floor(minutos / 60);
+  const resto = minutos % 60;
+  if (horas === 0) {
+    return `${resto} min`;
+  }
+  return resto === 0 ? `${horas}h` : `${horas}h${String(resto).padStart(2, '0')}`;
+};

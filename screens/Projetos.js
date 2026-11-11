@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Tela from '../components/Tela';
 import PixelsDecorativos from '../components/PixelsDecorativos';
@@ -6,29 +7,34 @@ import MolduraPixel from '../components/MolduraPixel';
 import IconePixel from '../components/IconePixel';
 import BarraProgresso from '../components/BarraProgresso';
 import Botao from '../components/Botao';
+import LinkTexto from '../components/LinkTexto';
 import Pressionavel from '../components/Pressionavel';
-import MascoteRevi from '../components/MascoteRevi';
-import BalaoFala from '../components/BalaoFala';
 import Entrada from '../components/Entrada';
+import ChatRevi from '../components/ChatRevi';
 import BarraInferior from '../components/BarraInferior';
+import { BotaoHoje, JanelaHoje } from '../components/HojeNoProjeto';
 import { useHabitos } from '../contexto/HabitosContexto';
 import { cores, fontes } from '../styles/tema';
-import { chaveDia, rotuloData } from '../utils/datas';
+import { rotuloData } from '../utils/datas';
+import { instrucoesPlanejarProjeto } from '../utils/reviIA';
 
-const proximaSessao = (projeto, hoje) =>
-  projeto.sessoes.find(({ data, feita }) => !feita && data >= hoje);
+const visoes = [
+  { id: 'lista', rotulo: 'Meus projetos' },
+  { id: 'chat', rotulo: 'Planejar com o Revi' },
+];
 
-export default function Projetos({ navigation }) {
-  const { projetos, revi } = useHabitos();
-  const hoje = chaveDia(new Date());
+const atalhos = ['Estudar pra uma prova', 'Fazer meu TCC', 'Aprender a programar'];
 
-  const deHoje = projetos.flatMap((projeto) =>
-    projeto.sessoes
-      .filter(({ data, feita }) => data === hoje && !feita)
-      .map((sessao) => ({ projeto, sessao })),
+export default function Projetos({ navigation, route }) {
+  const { projetos, revi, usuario } = useHabitos();
+  const [visao, setVisao] = useState(
+    route.params?.aba ?? (projetos.length === 0 ? 'chat' : 'lista'),
   );
+  const [abertoId, setAbertoId] = useState(null);
+  const aberto = projetos.find(({ id }) => id === abertoId) ?? null;
 
-  const focar = (projeto, sessao) =>
+  const focar = (projeto, sessao) => {
+    setAbertoId(null);
     navigation.navigate('Foco', {
       sessao: {
         projetoId: projeto.id,
@@ -37,159 +43,168 @@ export default function Projetos({ navigation }) {
         titulo: `${projeto.nome}: ${sessao.titulo}`,
       },
     });
+  };
 
   return (
     <Tela bordas={['top']}>
       <PixelsDecorativos />
-      <ScrollView contentContainerStyle={styles.conteudo} showsVerticalScrollIndicator={false}>
+      <View style={styles.topo}>
         <CabecalhoTela titulo="Projetos" />
-
-        <Entrada tipo="escala" style={styles.conversa}>
-          <MascoteRevi humor="feliz" aparencia={revi} bloco={4} />
-          <BalaoFala
-            texto={
-              projetos.length === 0
-                ? 'Me conta um projeto e o prazo. Eu separo os dias de foco na sua semana!'
-                : deHoje.length > 0
-                  ? `Hoje tem ${deHoje.length} sessão de projeto. Bora focar?`
-                  : 'Nada de projeto hoje. Aproveita pra descansar!'
-            }
-          />
-        </Entrada>
-
-        <Entrada ordem={1}>
-          <Botao
-            texto={`Novo projeto com o ${revi.nome}`}
-            aoPressionar={() => navigation.navigate('NovoProjeto')}
-          />
-        </Entrada>
-
-        {deHoje.length > 0 ? (
-          <>
-            <Text style={styles.secao}>Foco de hoje</Text>
-            {deHoje.map(({ projeto, sessao }, indice) => (
-              <Entrada key={`${projeto.id}-${sessao.id}`} ordem={2 + indice}>
-                <MolduraPixel corFundo={cores.cartaoDestaque} corTopo={cores.laranja} pixel={3}>
-                  <View style={styles.linhaHoje}>
-                    <IconePixel nome="clock" tamanho={24} cor={cores.laranja} />
-                    <View style={styles.textos}>
-                      <Text style={styles.nomeHoje} numberOfLines={1}>
-                        {sessao.titulo}
-                      </Text>
-                      <Text
-                        style={styles.detalhe}
-                      >{`${projeto.nome} · ${sessao.minutos} min`}</Text>
-                    </View>
-                    <Pressionavel
-                      aoPressionar={() => focar(projeto, sessao)}
-                      escala={0.88}
-                      vibracaoApertar="apertar"
-                    >
-                      <MolduraPixel corFundo={cores.principal} pixel={2} degraus={1}>
-                        <Text style={styles.textoFocar}>Focar</Text>
-                      </MolduraPixel>
-                    </Pressionavel>
-                  </View>
-                </MolduraPixel>
-              </Entrada>
-            ))}
-          </>
-        ) : null}
-
-        {projetos.length > 0 ? <Text style={styles.secao}>Seus projetos</Text> : null}
-        {projetos.map((projeto, indice) => {
-          const feitas = projeto.sessoes.filter(({ feita }) => feita).length;
-          const proxima = proximaSessao(projeto, hoje);
-          return (
-            <Entrada key={projeto.id} ordem={3 + indice}>
-              <Pressionavel
-                aoPressionar={() => navigation.navigate('ProjetoDetalhe', { id: projeto.id })}
-                escala={0.97}
-                style={styles.toque}
-              >
-                <MolduraPixel corFundo={cores.cartao} pixel={3}>
-                  <View style={styles.projeto}>
-                    <View style={styles.linhaProjeto}>
-                      <IconePixel nome="clipboard-note" tamanho={22} cor={cores.turquesa} />
-                      <Text style={styles.nomeProjeto} numberOfLines={1}>
-                        {projeto.nome}
-                      </Text>
-                      <Text style={styles.contagem}>{`${feitas}/${projeto.sessoes.length}`}</Text>
-                    </View>
-                    <BarraProgresso
-                      feitos={Math.round((feitas / Math.max(1, projeto.sessoes.length)) * 10)}
-                      total={10}
-                    />
-                    <Text style={styles.detalhe}>
-                      {proxima
-                        ? `Próxima: ${rotuloData(proxima.data)} · até ${rotuloData(projeto.prazo)}`
-                        : feitas === projeto.sessoes.length
-                          ? 'Concluído! 🎉'
-                          : `Prazo: ${rotuloData(projeto.prazo)}`}
+        <MolduraPixel corFundo={cores.cartao} pixel={3}>
+          <View style={styles.visoes}>
+            {visoes.map(({ id, rotulo }) => {
+              const ativa = id === visao;
+              return (
+                <Pressionavel
+                  key={id}
+                  style={styles.visao}
+                  aoPressionar={() => setVisao(id)}
+                  escala={0.94}
+                  vibracaoSoltar="selecao"
+                  som="navegar"
+                  accessibilityRole="tab"
+                  accessibilityState={{ selected: ativa }}
+                >
+                  <MolduraPixel corFundo={ativa ? cores.cartaoDestaque : 'transparent'} pixel={3}>
+                    <Text style={[styles.textoVisao, ativa && styles.textoVisaoAtiva]}>
+                      {rotulo}
                     </Text>
-                  </View>
-                </MolduraPixel>
-              </Pressionavel>
+                  </MolduraPixel>
+                </Pressionavel>
+              );
+            })}
+          </View>
+        </MolduraPixel>
+      </View>
+
+      {visao === 'chat' ? (
+        <ChatRevi
+          canal="projeto"
+          navigation={navigation}
+          instrucoes={instrucoesPlanejarProjeto}
+          saudacao={`Bora tirar uma ideia do papel, ${usuario.nome}? Me conta o projeto que eu te ajudo a dividir em dias, com o que fazer em cada um.`}
+          atalhos={atalhos}
+        />
+      ) : (
+        <ScrollView contentContainerStyle={styles.conteudo} showsVerticalScrollIndicator={false}>
+          {projetos.length === 0 ? (
+            <Entrada tipo="escala">
+              <MolduraPixel corFundo={cores.cartao} pixel={4}>
+                <View style={styles.vazio}>
+                  <IconePixel nome="clipboard-note" tamanho={40} cor={cores.turquesa} />
+                  <Text style={styles.textoVazio}>Nenhum projeto ainda.</Text>
+                  <Text style={styles.dicaVazio}>
+                    {`Conta sua ideia pro ${revi.nome} e ele monta o plano dia a dia.`}
+                  </Text>
+                </View>
+              </MolduraPixel>
             </Entrada>
-          );
-        })}
-      </ScrollView>
+          ) : null}
+
+          {projetos.map((projeto, indice) => {
+            const feitas = projeto.sessoes.filter(({ feita }) => feita).length;
+            return (
+              <Entrada key={projeto.id} ordem={indice} style={styles.cartao}>
+                <Pressionavel
+                  aoPressionar={() => navigation.navigate('ProjetoDetalhe', { id: projeto.id })}
+                  escala={0.98}
+                >
+                  <MolduraPixel corFundo={cores.cartao} corTopo={projeto.cor} pixel={3}>
+                    <View style={styles.projeto}>
+                      <View style={styles.linhaProjeto}>
+                        <IconePixel
+                          nome={projeto.icone ?? 'clipboard-note'}
+                          tamanho={22}
+                          cor={projeto.cor ?? cores.turquesa}
+                        />
+                        <Text style={styles.nomeProjeto} numberOfLines={1}>
+                          {projeto.nome}
+                        </Text>
+                        <Text style={styles.contagem}>{`${feitas}/${projeto.sessoes.length}`}</Text>
+                      </View>
+                      <BarraProgresso
+                        feitos={Math.round((feitas / Math.max(1, projeto.sessoes.length)) * 10)}
+                        total={10}
+                        cor={projeto.cor ?? cores.turquesa}
+                      />
+                      <Text style={styles.prazo}>{`Prazo: ${rotuloData(projeto.prazo)}`}</Text>
+                    </View>
+                  </MolduraPixel>
+                </Pressionavel>
+                <BotaoHoje projeto={projeto} aoPressionar={() => setAbertoId(projeto.id)} />
+              </Entrada>
+            );
+          })}
+
+          <View style={styles.acoes}>
+            <Botao texto={`Planejar com o ${revi.nome}`} aoPressionar={() => setVisao('chat')} />
+            <LinkTexto
+              texto="Prefiro preencher um formulário"
+              aoPressionar={() => navigation.navigate('NovoProjeto')}
+            />
+          </View>
+        </ScrollView>
+      )}
+
+      <JanelaHoje
+        projeto={aberto}
+        visivel={Boolean(aberto)}
+        aoFechar={() => setAbertoId(null)}
+        aoFocar={(sessao) => focar(aberto, sessao)}
+      />
       <BarraInferior abaAtiva="Projetos" />
     </Tela>
   );
 }
 
 const styles = StyleSheet.create({
-  conteudo: {
-    padding: 20,
+  topo: {
+    paddingHorizontal: 20,
     paddingTop: 48,
   },
-  conversa: {
+  visoes: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
+    padding: 4,
   },
-  secao: {
-    color: cores.branco,
-    fontFamily: fontes.negrito,
-    fontVariant: fontes.semLigaduras,
-    fontSize: 22,
-    marginTop: 18,
-    marginBottom: 10,
-  },
-  linhaHoje: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    paddingTop: 14,
-  },
-  textos: {
+  visao: {
     flex: 1,
-    marginHorizontal: 10,
   },
-  nomeHoje: {
+  textoVisao: {
+    color: cores.cinzaClaro,
+    fontFamily: fontes.media,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 14,
+    textAlign: 'center',
+    paddingVertical: 9,
+  },
+  textoVisaoAtiva: {
+    color: cores.branco,
+    fontFamily: fontes.negrito,
+  },
+  conteudo: {
+    padding: 20,
+  },
+  vazio: {
+    alignItems: 'center',
+    padding: 20,
+  },
+  textoVazio: {
     color: cores.branco,
     fontFamily: fontes.negrito,
     fontVariant: fontes.semLigaduras,
-    fontSize: 16,
+    fontSize: 18,
+    marginTop: 10,
   },
-  detalhe: {
+  dicaVazio: {
     color: cores.cinzaClaro,
     fontFamily: fontes.regular,
     fontVariant: fontes.semLigaduras,
-    fontSize: 13,
-    marginTop: 6,
-  },
-  textoFocar: {
-    color: cores.preto,
-    fontFamily: fontes.negrito,
-    fontVariant: fontes.semLigaduras,
     fontSize: 14,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    textAlign: 'center',
+    marginTop: 4,
   },
-  toque: {
-    marginBottom: 10,
+  cartao: {
+    marginBottom: 18,
   },
   projeto: {
     padding: 14,
@@ -208,9 +223,19 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   contagem: {
-    color: cores.turquesa,
+    color: cores.cinzaClaro,
     fontFamily: fontes.negrito,
     fontVariant: fontes.semLigaduras,
     fontSize: 15,
+  },
+  prazo: {
+    color: cores.cinzaClaro,
+    fontFamily: fontes.regular,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 13,
+    marginTop: 8,
+  },
+  acoes: {
+    marginTop: 6,
   },
 });

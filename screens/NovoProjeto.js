@@ -156,7 +156,7 @@ export default function NovoProjeto({ navigation }) {
       tocar('reviFeliz');
     } catch (falha) {
       if (falha instanceof LimiteAtingido) {
-        avisarLimite();
+        avisarLimite('projeto');
         setPlano(
           local('Atingi o limite gratuito do Gemini (avisei no chat). Montei o plano sozinho.'),
         );
