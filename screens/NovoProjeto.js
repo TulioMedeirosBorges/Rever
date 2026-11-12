@@ -19,6 +19,7 @@ import { LimiteAtingido, chaveDoAmbiente, lerJson, perguntarGemini } from '../ut
 import { instrucoesProjeto, pedidoProjeto, planoLocal, validarSessoes } from '../utils/reviIA';
 import { erro as vibrarErro } from '../utils/tato';
 import { tocar } from '../utils/sons';
+import { TOLERANCIAS, TOLERANCIA_PADRAO } from '../utils/prazos';
 
 const prazosRapidos = [
   { rotulo: '2 semanas', dias: 14 },
@@ -77,6 +78,7 @@ export default function NovoProjeto({ navigation }) {
   const [porSemana, setPorSemana] = useState(3);
   const [minutos, setMinutos] = useState(45);
   const [horario, setHorario] = useState('19:00');
+  const [tolerancia, setTolerancia] = useState(TOLERANCIA_PADRAO);
   const [erro, setErro] = useState('');
   const [pensando, setPensando] = useState(false);
   const [plano, setPlano] = useState(null);
@@ -126,6 +128,7 @@ export default function NovoProjeto({ navigation }) {
       porSemana: Math.min(porSemana, dias.length),
       minutos,
       horario,
+      tolerancia,
     };
     const local = (aviso) => ({ ...planoLocal(pedido, habitos), aviso, pedido });
 
@@ -335,6 +338,19 @@ export default function NovoProjeto({ navigation }) {
               keyboardType="number-pad"
               maxLength={5}
             />
+
+            <Text style={styles.rotulo}>Posso começar até</Text>
+            <View style={styles.linhaChips}>
+              {TOLERANCIAS.map(({ minutos: valor, rotulo }) => (
+                <Chip
+                  key={rotulo}
+                  rotulo={rotulo}
+                  ativo={valor === tolerancia}
+                  aoPressionar={() => setTolerancia(valor)}
+                  largo
+                />
+              ))}
+            </View>
 
             <View style={styles.acoes}>
               {erro !== '' ? <Text style={styles.erro}>{erro}</Text> : null}

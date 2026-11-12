@@ -32,6 +32,16 @@ const pontos = (linha, colunas, tipo) => colunas.map((coluna) => [linha, coluna,
 const olhosAbertos = [...pontos(7, [3, 4, 9, 10], 'e'), ...pontos(8, [3, 4, 9, 10], 'e')];
 
 const rostos = {
+  // Sobrancelhas caídas, olhos baixos, uma lágrima e a boca para baixo.
+  triste: [
+    ...pontos(6, [5, 8], 'd'),
+    ...pontos(7, [3, 4, 9, 10], 'e'),
+    ...pontos(8, [3, 10], 'e'),
+    ...pontos(9, [3], 'T'),
+    ...pontos(10, [3], 'T'),
+    ...pontos(10, [6, 7], 'e'),
+    ...pontos(11, [5, 8], 'e'),
+  ],
   dormindo: [...pontos(8, [3, 4, 9, 10], 'e'), ...pontos(10, [6, 7], 'e')],
   neutro: [...olhosAbertos, ...pontos(10, [5, 6, 7, 8], 'e')],
   feliz: [
@@ -63,6 +73,7 @@ const paleta = (corId) => {
     r: cores.vermelho,
     R: '#962820',
     p: cores.petroleo,
+    T: cores.turquesa,
     w: cores.branco,
   };
 };
@@ -92,6 +103,7 @@ const vozes = {
   neutro: 'reviNeutro',
   feliz: 'reviFeliz',
   radiante: 'reviRadiante',
+  triste: 'reviTriste',
 };
 
 export const humorDoRevi = (concluidos, total) => {

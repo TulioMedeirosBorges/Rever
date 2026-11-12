@@ -9,6 +9,7 @@ import { useHabitos } from '../contexto/HabitosContexto';
 import { cores, fontes } from '../styles/tema';
 import { chaveDia, indiceSemana } from '../utils/datas';
 import { molas } from '../utils/movimento';
+import { chaveHabito, chaveSessao } from '../utils/prazos';
 
 // Ordem das posições na barra; o "+" fica no meio e não é uma aba.
 const posicoes = [
@@ -28,14 +29,24 @@ const ALTURA_BASE = 4;
 
 // Selos: quanto falta hoje (hábitos + sessões) e se há sessão de projeto hoje.
 function useSelos() {
-  const { habitos, projetos } = useHabitos();
+  const { habitos, projetos, puladosHoje } = useHabitos();
   const hoje = new Date();
+  // O que a pessoa confirmou que não vai fazer hoje não conta como pendente.
   const faltam = habitos.filter(
-    ({ frequencia, concluido }) => frequencia.includes(indiceSemana(hoje)) && !concluido,
+    (habito) =>
+      habito.frequencia.includes(indiceSemana(hoje)) &&
+      !habito.concluido &&
+      !puladosHoje.includes(chaveHabito(habito)),
   ).length;
   const sessoesHoje = projetos.reduce(
-    (soma, { sessoes }) =>
-      soma + sessoes.filter(({ data, feita }) => data === chaveDia(hoje) && !feita).length,
+    (soma, projeto) =>
+      soma +
+      projeto.sessoes.filter(
+        (sessao) =>
+          sessao.data === chaveDia(hoje) &&
+          !sessao.feita &&
+          !puladosHoje.includes(chaveSessao(projeto, sessao)),
+      ).length,
     0,
   );
   // O selo da Início soma hábitos e sessões de projeto que ainda faltam hoje.

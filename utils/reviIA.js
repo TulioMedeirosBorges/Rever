@@ -95,6 +95,7 @@ export const validarHabitos = (lista, existentes) => {
         lembrete,
         repetir,
         ate: repetir > 0 ? '21:00' : '',
+        tolerancia: 30,
       };
     })
     .filter(({ nome }) => nome !== '' && !nomesExistentes.has(nome.toLowerCase()))
@@ -279,6 +280,7 @@ export const validarProjeto = (projeto, habitos, hoje = new Date()) => {
     porSemana: Math.max(1, Math.min(7, Math.round(Number(projeto.porSemana) || 7))),
     minutos: Math.max(15, Math.min(180, Math.round(Number(projeto.minutos) || 45))),
     horario: horarioValido(projeto.horario) ? projeto.horario : '19:00',
+    tolerancia: 30,
   };
   pedido.porSemana = Math.min(pedido.porSemana, pedido.dias.length);
 

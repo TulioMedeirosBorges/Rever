@@ -11,6 +11,7 @@ import Pressionavel from './Pressionavel';
 import { erro as vibrarErro } from '../utils/tato';
 import { tocar } from '../utils/sons';
 import { horariosDoLembrete } from '../utils/datas';
+import { TOLERANCIAS, TOLERANCIA_PADRAO, horarioLimite } from '../utils/prazos';
 
 const repeticoes = [
   { horas: 0, rotulo: 'Não' },
@@ -62,6 +63,7 @@ export default function FormularioHabito({ valoresIniciais = {}, textoBotao, aoS
   const [lembrete, setLembrete] = useState(valoresIniciais.lembrete ?? '');
   const [repetir, setRepetir] = useState(valoresIniciais.repetir ?? 0);
   const [ate, setAte] = useState(valoresIniciais.ate || '22:00');
+  const [tolerancia, setTolerancia] = useState(valoresIniciais.tolerancia ?? TOLERANCIA_PADRAO);
   const [categoriasAbertas, setCategoriasAbertas] = useState(false);
   const [erro, setErro] = useState('');
 
@@ -99,6 +101,7 @@ export default function FormularioHabito({ valoresIniciais = {}, textoBotao, aoS
       lembrete,
       repetir,
       ate: repetir > 0 ? ate : '',
+      tolerancia,
     };
     const mensagem = validar(dados);
 
@@ -289,6 +292,49 @@ export default function FormularioHabito({ valoresIniciais = {}, textoBotao, aoS
             maxLength={5}
           />
           {resumoLembrete !== '' ? <Text style={styles.resumo}>{resumoLembrete}</Text> : null}
+        </>
+      ) : null}
+
+      {horarioValido(lembrete) ? (
+        <>
+          <Text style={styles.rotuloPequeno}>Posso começar até</Text>
+          <View style={styles.repeticoes}>
+            {TOLERANCIAS.map(({ minutos, rotulo }) => {
+              const selecionado = minutos === tolerancia;
+              return (
+                <Pressionavel
+                  key={rotulo}
+                  style={styles.opcaoRepetir}
+                  aoPressionar={() => setTolerancia(minutos)}
+                  escala={0.85}
+                  vibracaoSoltar="selecao"
+                  som="navegar"
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected: selecionado }}
+                >
+                  <MolduraPixel
+                    corFundo={selecionado ? cores.sucesso : cores.cartao}
+                    pixel={3}
+                    degraus={1}
+                    style={styles.chip}
+                  >
+                    <Text
+                      style={[styles.textoChip, selecionado && styles.textoChipAtivo]}
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                    >
+                      {rotulo}
+                    </Text>
+                  </MolduraPixel>
+                </Pressionavel>
+              );
+            })}
+          </View>
+          <Text style={styles.resumo}>
+            {tolerancia > 0
+              ? `Se não começar até ${horarioLimite(lembrete, tolerancia)}, o Revi avisa 10 min antes do prazo acabar.`
+              : 'Sem tolerância: o lembrete chega na hora e pronto.'}
+          </Text>
         </>
       ) : null}
 

@@ -20,6 +20,18 @@ import {
 } from '../utils/datas';
 import { formatarDuracao } from '../utils/reviIA';
 import { JanelaHoje } from '../components/HojeNoProjeto';
+import JanelaPrazo from '../components/JanelaPrazo';
+import PopupAtraso from '../components/PopupAtraso';
+import {
+  chaveHabito,
+  chaveSessao,
+  horarioAdiado,
+  horarioDoDia,
+  horarioLimite,
+  situacaoDoPrazo,
+  toleranciaDe,
+} from '../utils/prazos';
+import { tocar } from '../utils/sons';
 import CartaoResumo from '../components/CartaoResumo';
 import Entrada from '../components/Entrada';
 import { XP_POR_FOCO } from '../utils/estatisticas';
@@ -51,10 +63,41 @@ const mensagem = (concluidos, total, sessoesPendentes) => {
   return faltam === 1 ? 'Falta só 1 hábito. Bora!' : `Continue assim, faltam ${faltam}.`;
 };
 
-export default function Inicio({ navigation }) {
-  const { habitos, projetos, usuario, revi, estatisticas, alternarConcluido, alternarSessao } =
-    useHabitos();
+export default function Inicio({ navigation, route }) {
+  const {
+    habitos,
+    projetos,
+    usuario,
+    revi,
+    estatisticas,
+    alternarConcluido,
+    alternarSessao,
+    adiamentosHoje,
+    adiarHoje,
+    puladosHoje,
+    pularHoje,
+  } = useHabitos();
   const [projetoAberto, setProjetoAberto] = useState(null);
+  const [prazoAberto, setPrazoAberto] = useState(null);
+  const [atrasoAberto, setAtrasoAberto] = useState(null);
+
+  // Tocar na notificação de prazo abre a Início com a janela daquele item.
+  const prazoDaNotificacao = route.params?.prazo;
+  useEffect(() => {
+    if (prazoDaNotificacao) {
+      setPrazoAberto(prazoDaNotificacao);
+      navigation.setParams({ prazo: undefined });
+    }
+  }, [prazoDaNotificacao, navigation]);
+
+  // "Passou do horário": a notificação abre o popup do Revi triste na frente da tela.
+  const atrasoDaNotificacao = route.params?.atraso;
+  useEffect(() => {
+    if (atrasoDaNotificacao) {
+      setAtrasoAberto(atrasoDaNotificacao);
+      navigation.setParams({ atraso: undefined });
+    }
+  }, [atrasoDaNotificacao, navigation]);
   const [diaFuturo, setDiaFuturo] = useState(1);
   const [agora, setAgora] = useState(() => new Date());
 
@@ -78,21 +121,89 @@ export default function Inicio({ navigation }) {
   const sessoesPendentes = sessoesHoje.filter(({ sessao }) => !sessao.feita).length;
 
   // Hábitos e sessões de hoje juntos, em ordem de horário (sem horário vai para o fim).
+  // Cada um sabe o horário de hoje (o adiado, se houver) e a situação do prazo para começar.
+  const agoraMinutos = agora.getHours() * 60 + agora.getMinutes();
+  const comPrazo = (entrada, horarioOriginal, tolerancia, feito, nome) => {
+    const horario = horarioDoDia(horarioOriginal, adiamentosHoje, entrada.chave);
+    return {
+      ...entrada,
+      nome,
+      horario,
+      tolerancia,
+      adiado: adiamentosHoje[entrada.chave] ?? null,
+      pulado: puladosHoje.includes(entrada.chave),
+      // Feito ou confirmado que não vai fazer: sem prazo correndo.
+      situacao:
+        feito || puladosHoje.includes(entrada.chave)
+          ? null
+          : situacaoDoPrazo({ horario, tolerancia, agoraMinutos }),
+    };
+  };
   const paraHoje = [
-    ...deHoje.map((habito) => ({
-      tipo: 'habito',
-      chave: `h${habito.id}`,
-      horario: habito.lembrete,
-      habito,
-    })),
-    ...sessoesHoje.map(({ projeto, sessao }) => ({
-      tipo: 'sessao',
-      chave: `s${projeto.id}-${sessao.id}`,
-      horario: projeto.horario ?? '',
-      projeto,
-      sessao,
-    })),
+    ...deHoje.map((habito) =>
+      comPrazo(
+        { tipo: 'habito', chave: chaveHabito(habito), habito },
+        habito.lembrete,
+        toleranciaDe(habito),
+        habito.concluido,
+        habito.nome,
+      ),
+    ),
+    ...sessoesHoje.map(({ projeto, sessao }) =>
+      comPrazo(
+        { tipo: 'sessao', chave: chaveSessao(projeto, sessao), projeto, sessao },
+        projeto.horario ?? '',
+        toleranciaDe(projeto),
+        sessao.feita,
+        sessao.titulo,
+      ),
+    ),
   ].sort((a, b) => (a.horario || '99:99').localeCompare(b.horario || '99:99'));
+
+  // O mais urgente: primeiro o que está acabando, depois o que já atrasou.
+  const urgente =
+    paraHoje.find(({ situacao }) => situacao === 'acabando') ??
+    paraHoje.find(({ situacao }) => situacao === 'atrasado');
+  const itemDoPrazo = paraHoje.find(({ chave }) => chave === prazoAberto) ?? null;
+  const itemAtrasado = paraHoje.find(({ chave }) => chave === atrasoAberto) ?? null;
+
+  // O aviso do topo abre a janela certa: prazo acabando ou o Revi triste (passou do horário).
+  const abrirAviso = (entrada) =>
+    entrada.situacao === 'atrasado'
+      ? setAtrasoAberto(entrada.chave)
+      : setPrazoAberto(entrada.chave);
+
+  const alertaDe = ({ situacao, horario, tolerancia, adiado, pulado }) => {
+    const limite = horarioLimite(horario, tolerancia);
+    if (pulado) {
+      return { texto: 'não vai fazer hoje', cor: cores.cinza };
+    }
+    if (situacao === 'acabando') {
+      return { texto: `prazo acabando · até ${limite}`, cor: cores.laranja };
+    }
+    if (situacao === 'atrasado') {
+      return { texto: `atrasado · era até ${limite}`, cor: cores.vermelho };
+    }
+    if (situacao === 'janela' && tolerancia > 0) {
+      return { texto: `pode começar até ${limite}`, cor: cores.amarelo };
+    }
+    if (adiado && situacao) {
+      return { texto: `adiado pra ${adiado}`, cor: cores.turquesa };
+    }
+    return null;
+  };
+
+  const adiar = (entrada, minutos) => {
+    adiarHoje(entrada.chave, horarioAdiado(entrada.horario, agoraMinutos, minutos));
+    setPrazoAberto(null);
+    setAtrasoAberto(null);
+    tocar('marcar');
+  };
+
+  const pular = (entrada) => {
+    pularHoje(entrada.chave);
+    setAtrasoAberto(null);
+  };
 
   // Próximo lembrete de hoje entre os hábitos e sessões que ainda faltam.
   const agoraHorario = paraHorario(agora.getHours() * 60 + agora.getMinutes());
@@ -156,37 +267,54 @@ export default function Inicio({ navigation }) {
     });
   };
 
-  const itemSessao = ({ chave, projeto, sessao }, indice) => (
-    <Entrada key={chave} ordem={5 + indice}>
-      <ItemHabito
-        nome={sessao.titulo}
-        icone={projeto.icone ?? 'clipboard-note'}
-        cor={projeto.cor ?? cores.turquesa}
-        etiqueta="PROJETO"
-        detalhe={`${projeto.nome} · ${formatarDuracao(sessao.minutos)}${
-          projeto.horario ? ` · ${projeto.horario}` : ''
-        }`}
-        concluido={sessao.feita}
-        mostrarSeta
-        aoMarcar={() => alternarSessao(projeto.id, sessao.id)}
-        aoPressionar={() => setProjetoAberto(projeto.id)}
-      />
-    </Entrada>
-  );
+  const comecar = (entrada) => {
+    setPrazoAberto(null);
+    if (entrada.tipo === 'habito') {
+      navigation.navigate('Foco', { habitoId: entrada.habito.id });
+    } else {
+      focarSessao(entrada.projeto, entrada.sessao);
+    }
+  };
 
-  const item = (habito, indice) => (
-    <Entrada key={habito.id} ordem={5 + indice}>
-      <ItemHabito
-        nome={habito.nome}
-        icone={habito.icone}
-        detalhe={repeticao(habito)}
-        concluido={habito.concluido}
-        mostrarSeta
-        aoMarcar={() => alternarConcluido(habito.id)}
-        aoPressionar={() => navigation.navigate('EditarHabito', { id: habito.id })}
-      />
-    </Entrada>
-  );
+  const itemSessao = (entrada, indice) => {
+    const { chave, projeto, sessao } = entrada;
+    return (
+      <Entrada key={chave} ordem={5 + indice}>
+        <ItemHabito
+          nome={sessao.titulo}
+          icone={projeto.icone ?? 'clipboard-note'}
+          cor={projeto.cor ?? cores.turquesa}
+          etiqueta="PROJETO"
+          detalhe={`${projeto.nome} · ${formatarDuracao(sessao.minutos)}${
+            projeto.horario ? ` · ${projeto.horario}` : ''
+          }`}
+          concluido={sessao.feita}
+          mostrarSeta
+          aoMarcar={() => alternarSessao(projeto.id, sessao.id)}
+          aoPressionar={() => setProjetoAberto(projeto.id)}
+          alerta={alertaDe(entrada)}
+        />
+      </Entrada>
+    );
+  };
+
+  const item = (entrada, indice) => {
+    const { habito } = entrada;
+    return (
+      <Entrada key={habito.id} ordem={5 + indice}>
+        <ItemHabito
+          nome={habito.nome}
+          icone={habito.icone}
+          detalhe={repeticao(habito)}
+          concluido={habito.concluido}
+          mostrarSeta
+          aoMarcar={() => alternarConcluido(habito.id)}
+          aoPressionar={() => navigation.navigate('EditarHabito', { id: habito.id })}
+          alerta={alertaDe(entrada)}
+        />
+      </Entrada>
+    );
+  };
 
   return (
     <Tela bordas={['top']}>
@@ -260,12 +388,51 @@ export default function Inicio({ navigation }) {
           </Pressionavel>
         </Entrada>
 
+        {urgente ? (
+          <Entrada ordem={4} tipo="escala" mola="quique">
+            <Pressionavel
+              aoPressionar={() => abrirAviso(urgente)}
+              escala={0.97}
+              vibracaoApertar="apertar"
+              accessibilityRole="button"
+            >
+              <MolduraPixel
+                corFundo={cores.cartaoDestaque}
+                corTopo={urgente.situacao === 'atrasado' ? cores.vermelho : cores.laranja}
+                pixel={4}
+                style={styles.molduraPrazo}
+              >
+                <View style={styles.prazo}>
+                  <IconePixel
+                    nome="alarm-clock"
+                    tamanho={28}
+                    cor={urgente.situacao === 'atrasado' ? cores.vermelho : cores.laranja}
+                  />
+                  <View style={styles.textosPrazo}>
+                    <Text style={styles.tituloPrazo} numberOfLines={1}>
+                      {urgente.situacao === 'atrasado'
+                        ? `${urgente.nome} atrasou`
+                        : `Prazo acabando: ${urgente.nome}`}
+                    </Text>
+                    <Text style={styles.detalhePrazo}>
+                      {urgente.situacao === 'atrasado'
+                        ? `Era até ${horarioLimite(urgente.horario, urgente.tolerancia)}. Começa ou muda o horário?`
+                        : `Começa até ${horarioLimite(urgente.horario, urgente.tolerancia)} ou muda o horário.`}
+                    </Text>
+                  </View>
+                  <IconePixel nome="chevron-right-2" tamanho={28} cor={cores.cinzaClaro} />
+                </View>
+              </MolduraPixel>
+            </Pressionavel>
+          </Entrada>
+        ) : null}
+
         <Entrada ordem={4} tipo="esquerda">
           <Text style={styles.secao}>Para hoje</Text>
         </Entrada>
 
         {paraHoje.map((entrada, indice) =>
-          entrada.tipo === 'habito' ? item(entrada.habito, indice) : itemSessao(entrada, indice),
+          entrada.tipo === 'habito' ? item(entrada, indice) : itemSessao(entrada, indice),
         )}
 
         {habitos.length > 0 || projetos.length > 0 ? (
@@ -354,6 +521,25 @@ export default function Inicio({ navigation }) {
           </MolduraPixel>
         ) : null}
       </ScrollView>
+      <PopupAtraso
+        item={itemAtrasado}
+        aparencia={revi}
+        visivel={Boolean(itemAtrasado)}
+        aoFechar={() => setAtrasoAberto(null)}
+        aoPular={() => pular(itemAtrasado)}
+        aoAdiar={(minutos) => adiar(itemAtrasado, minutos)}
+        aoComecar={() => {
+          setAtrasoAberto(null);
+          comecar(itemAtrasado);
+        }}
+      />
+      <JanelaPrazo
+        item={itemDoPrazo}
+        visivel={Boolean(itemDoPrazo)}
+        aoFechar={() => setPrazoAberto(null)}
+        aoComecar={() => comecar(itemDoPrazo)}
+        aoAdiar={(minutos) => adiar(itemDoPrazo, minutos)}
+      />
       <JanelaHoje
         projeto={projetos.find(({ id }) => id === projetoAberto) ?? null}
         visivel={Boolean(projetoAberto)}
@@ -441,6 +627,32 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     marginVertical: 12,
+  },
+  molduraPrazo: {
+    marginBottom: 18,
+  },
+  prazo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    paddingTop: 15,
+  },
+  textosPrazo: {
+    flex: 1,
+    marginHorizontal: 10,
+  },
+  tituloPrazo: {
+    color: cores.branco,
+    fontFamily: fontes.negrito,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 16,
+  },
+  detalhePrazo: {
+    color: cores.cinzaClaro,
+    fontFamily: fontes.regular,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 12,
+    marginTop: 2,
   },
   secaoOutros: {
     color: cores.cinzaClaro,

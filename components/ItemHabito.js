@@ -14,6 +14,7 @@ export default function ItemHabito({
   aoMarcar,
   cor,
   etiqueta,
+  alerta,
 }) {
   return (
     <Pressionavel style={styles.toque} aoPressionar={aoPressionar} escala={0.97}>
@@ -59,6 +60,14 @@ export default function ItemHabito({
               <Text style={styles.detalhe} numberOfLines={1}>
                 {detalhe}
               </Text>
+            ) : null}
+            {alerta ? (
+              <View style={styles.linhaAlerta}>
+                <View style={[styles.pontoAlerta, { backgroundColor: alerta.cor }]} />
+                <Text style={[styles.alerta, { color: alerta.cor }]} numberOfLines={1}>
+                  {alerta.texto}
+                </Text>
+              </View>
             ) : null}
           </View>
           {mostrarSeta ? (
@@ -124,6 +133,22 @@ const styles = StyleSheet.create({
     fontVariant: fontes.semLigaduras,
     fontSize: 21,
     letterSpacing: 1,
+  },
+  linhaAlerta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 2,
+  },
+  pontoAlerta: {
+    width: 6,
+    height: 6,
+    marginRight: 6,
+  },
+  alerta: {
+    flexShrink: 1,
+    fontFamily: fontes.negrito,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 12,
   },
   detalhe: {
     color: cores.cinzaClaro,

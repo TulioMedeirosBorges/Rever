@@ -14,9 +14,10 @@ Nome e RGM.
 - **Login** e **Cadastro**: contas locais. Cada conta começa do zero e tem os seus próprios hábitos, projetos e conversas, salvos só no celular (sem servidor nem banco de dados). A senha é guardada só como hash SHA-256 com sal (`expo-crypto`).
 - **Esqueceu a senha**: como não há servidor, não existe e-mail de recuperação; a tela permite apagar a conta do celular e criar outra.
 - **Início**: resumo do dia, Revi com nível e XP, hábitos de hoje e de outros dias.
-- **Criar Hábito** e **Editar Hábito**: formulário do hábito.
+- **Criar Hábito** e **Editar Hábito**: formulário do hábito, com lembrete (pode repetir ao longo do dia) e "Posso começar até": a tolerância para começar. Quando o prazo está acabando, chega uma notificação com os botões "Começar agora" e "Mais tarde", e a Início mostra o aviso para começar ou adiar só hoje. Se passar do horário, chega a notificação "Passou do horário", e o app abre um popup do Revi triste para confirmar que não vai fazer hoje ou mudar o horário.
 - **Agenda**: semana atual; escolha um dia para ver e marcar os hábitos dele.
 - **Revi (conversa com IA)**: chat com o Revi usando o Gemini; ele faz perguntas e sugere hábitos, que entram na rotina com um toque.
+- **Histórico de conversas**: ao sair do chat, a conversa vai para o histórico (por canal: rotina ou projetos). Dá para reler e continuar de onde parou. `ConversaAntiga` recebe `{ canal, id }` por parâmetro.
 - **Projetos**: chat "Planejar com o Revi": você conta a ideia, ele pergunta o que falta (prazo, dias, tempo por dia) com opções prontas, mostra o plano dia a dia (o que fazer e quanto tempo) e cria o projeto com lembretes. Cada projeto tem um botão "Hoje" com o tempo de dedicação e as tarefas do dia. Detalhe do projeto recebe `{ id }` por parâmetro.
 - **Progresso**: gráfico por semana/mês/ano, sequência atual, estatísticas e progresso por hábito.
 - **Perfil**: dados do usuário, estatísticas, vitrine de conquistas e configurações.

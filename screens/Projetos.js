@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Tela from '../components/Tela';
 import PixelsDecorativos from '../components/PixelsDecorativos';
@@ -30,6 +30,15 @@ export default function Projetos({ navigation, route }) {
     route.params?.aba ?? (projetos.length === 0 ? 'chat' : 'lista'),
   );
   const [abertoId, setAbertoId] = useState(null);
+
+  // Ao continuar uma conversa do histórico, a aba abre direto no chat.
+  const abaPedida = route.params?.aba;
+  useEffect(() => {
+    if (abaPedida) {
+      setVisao(abaPedida);
+      navigation.setParams({ aba: undefined });
+    }
+  }, [abaPedida, navigation]);
   const aberto = projetos.find(({ id }) => id === abertoId) ?? null;
 
   const focar = (projeto, sessao) => {

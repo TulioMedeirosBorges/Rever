@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -269,6 +270,8 @@ export default function ChatRevi({
     limparConversa,
     avisarLimite,
     definirChaveGemini,
+    arquivo,
+    arquivarConversa,
   } = useHabitos();
   const [texto, setTexto] = useState('');
   const [pensando, setPensando] = useState(false);
@@ -276,6 +279,23 @@ export default function ChatRevi({
 
   const conversa = conversas[canal] ?? [];
   const chave = config.chaveGemini || chaveDoAmbiente;
+  const antigas = (arquivo[canal] ?? []).length;
+  // Muda quando a conversa vai para o histórico: respostas que chegarem depois são ignoradas.
+  const geracao = useRef(0);
+
+  // Ao sair da tela, a conversa vai para o histórico e a próxima começa limpa.
+  useFocusEffect(
+    useCallback(
+      () => () => {
+        geracao.current += 1;
+        arquivarConversa(canal);
+      },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [canal],
+    ),
+  );
+
+  const abrirHistorico = () => navigation.navigate('HistoricoChat', { canal });
 
   useEffect(() => {
     const tempo = setTimeout(() => rolagem.current?.scrollToEnd({ animated: true }), 80);
@@ -314,6 +334,7 @@ export default function ChatRevi({
     setTexto('');
     adicionarMensagem(canal, { papel: 'pessoa', texto: limpa });
     setPensando(true);
+    const minhaGeracao = geracao.current;
 
     try {
       // O Revi precisa lembrar o que já propôs e criou para poder ajustar depois.
@@ -358,6 +379,9 @@ export default function ChatRevi({
         }),
         mensagens: historico,
       });
+      if (geracao.current !== minhaGeracao) {
+        return;
+      }
       const dados = lerJson(resposta);
       const fala = dados?.resposta ?? 'Hmm, me perdi aqui. Pode falar de novo?';
       const { criado, novos } = executarAcoes(dados?.acoes, fala);
@@ -378,6 +402,9 @@ export default function ChatRevi({
         tocar('reviFeliz');
       }
     } catch (erro) {
+      if (geracao.current !== minhaGeracao) {
+        return;
+      }
       tocar('erro');
       if (erro instanceof LimiteAtingido) {
         avisarLimite(canal);
@@ -455,6 +482,15 @@ export default function ChatRevi({
                 {pensando ? 'pensando…' : chave ? 'online · IA' : 'desconectado'}
               </Text>
             </View>
+            <Pressionavel
+              aoPressionar={abrirHistorico}
+              escala={0.85}
+              style={styles.botaoTopo}
+              accessibilityLabel="Histórico de conversas"
+            >
+              <IconePixel nome="archive" tamanho={24} cor={cores.cinzaClaro} />
+              {antigas > 0 ? <Text style={styles.contagemTopo}>{antigas}</Text> : null}
+            </Pressionavel>
             {conversa.length > 0 ? (
               <Pressionavel
                 aoPressionar={limpar}
@@ -480,6 +516,15 @@ export default function ChatRevi({
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
+          {!mostrarCabecalho && antigas > 0 ? (
+            <View style={styles.linhaHistorico}>
+              <LinkTexto
+                texto={`Histórico de conversas (${antigas})`}
+                tamanho={14}
+                aoPressionar={abrirHistorico}
+              />
+            </View>
+          ) : null}
           {!chave ? <CartaoChave aoConectar={definirChaveGemini} /> : null}
 
           {mensagens.map((mensagem, posicao) => {
@@ -665,6 +710,23 @@ const styles = StyleSheet.create({
     height: 2,
     marginHorizontal: 20,
     backgroundColor: cores.trilha,
+  },
+  botaoTopo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 14,
+  },
+  contagemTopo: {
+    color: cores.cinzaClaro,
+    fontFamily: fontes.negrito,
+    fontVariant: fontes.semLigaduras,
+    fontSize: 12,
+    marginLeft: 3,
+  },
+  linhaHistorico: {
+    alignItems: 'flex-end',
+    marginTop: -6,
+    marginBottom: 6,
   },
   corpo: {
     flex: 1,

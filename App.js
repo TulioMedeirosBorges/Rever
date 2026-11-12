@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { LogBox } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -23,6 +23,8 @@ import Perfil from './screens/Perfil';
 import EditarPerfil from './screens/EditarPerfil';
 import Conquistas from './screens/Conquistas';
 import PersonalizarRevi from './screens/PersonalizarRevi';
+import HistoricoChat from './screens/HistoricoChat';
+import ConversaAntiga from './screens/ConversaAntiga';
 import Foco from './screens/Foco';
 import Conversar from './screens/Conversar';
 import Projetos from './screens/Projetos';
@@ -30,6 +32,7 @@ import NovoProjeto from './screens/NovoProjeto';
 import ProjetoDetalhe from './screens/ProjetoDetalhe';
 import AvisoConquista from './components/AvisoConquista';
 import BarraInferior from './components/BarraInferior';
+import RespostaNotificacoes from './components/RespostaNotificacoes';
 import { HabitosProvider, useHabitos } from './contexto/HabitosContexto';
 import { ContaProvider, useConta } from './contexto/ContaContexto';
 import { cores, fontes } from './styles/tema';
@@ -42,6 +45,8 @@ LogBox.ignoreLogs([/expo-notifications/]);
 
 const Stack = createNativeStackNavigator();
 const Abas = createBottomTabNavigator();
+// Referência da navegação do app logado: as notificações usam para abrir a tela certa.
+const navegacaoApp = createNavigationContainerRef();
 
 // As 6 abas com a barra fixa. A troca de aba só faz um fade rápido no fundo;
 // quem anima são os elementos de cada tela (componente Entrada).
@@ -106,6 +111,7 @@ function NavegacaoEntrada() {
 // Com conta logada: o app inteiro, com os dados daquela conta.
 function NavegacaoApp() {
   const { carregado } = useHabitos();
+  const [navegacaoPronta, setNavegacaoPronta] = useState(false);
   useEsconderSplash(carregado);
 
   if (!carregado) {
@@ -114,7 +120,7 @@ function NavegacaoApp() {
 
   return (
     <>
-      <NavigationContainer>
+      <NavigationContainer ref={navegacaoApp} onReady={() => setNavegacaoPronta(true)}>
         <Stack.Navigator
           initialRouteName="Abas"
           screenOptions={{
@@ -150,6 +156,8 @@ function NavegacaoApp() {
             component={Foco}
             options={{ animation: 'slide_from_bottom', gestureEnabled: false }}
           />
+          <Stack.Screen name="HistoricoChat" component={HistoricoChat} />
+          <Stack.Screen name="ConversaAntiga" component={ConversaAntiga} />
           <Stack.Screen
             name="PersonalizarRevi"
             component={PersonalizarRevi}
@@ -171,6 +179,7 @@ function NavegacaoApp() {
         </Stack.Navigator>
       </NavigationContainer>
       <AvisoConquista />
+      <RespostaNotificacoes navegacao={navegacaoApp} pronto={navegacaoPronta} />
     </>
   );
 }

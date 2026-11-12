@@ -36,6 +36,14 @@ export function HabitosProvider({ conta, children }) {
   const [config, setConfig] = useState({ sons: true, chaveGemini: '' });
   const [conversas, setConversas] = useState({ rotina: [], projeto: [] });
   const [projetos, setProjetos] = useState([]);
+  // Horários adiados só para o dia: { 'AAAA-MM-DD': { chaveDoItem: 'HH:MM' } }.
+  const [adiamentos, setAdiamentos] = useState({});
+  // Conversas antigas com o Revi (vão para cá quando a pessoa sai da tela do chat).
+  const [arquivo, setArquivo] = useState({ rotina: [], projeto: [] });
+  // Atividades que a pessoa confirmou que não vai fazer: { 'AAAA-MM-DD': [chaveDoItem] }.
+  const [pulados, setPulados] = useState({});
+  const conversasAtuais = useRef(conversas);
+  conversasAtuais.current = conversas;
   const nivelAntes = useRef(null);
   const [carregado, setCarregado] = useState(false);
   const [avisos, setAvisos] = useState([]);
@@ -60,6 +68,22 @@ export function HabitosProvider({ conta, children }) {
             projeto: salvo.conversas?.projeto ?? [],
           });
           setProjetos(salvo.projetos ?? []);
+          // Adiamentos de dias que já passaram não servem mais.
+          const hojeChave = chaveDia(new Date());
+          setAdiamentos(
+            Object.fromEntries(
+              Object.entries(salvo.adiamentos ?? {}).filter(([dia]) => dia >= hojeChave),
+            ),
+          );
+          setPulados(
+            Object.fromEntries(
+              Object.entries(salvo.pulados ?? {}).filter(([dia]) => dia >= hojeChave),
+            ),
+          );
+          setArquivo({
+            rotina: salvo.arquivo?.rotina ?? [],
+            projeto: salvo.arquivo?.projeto ?? [],
+          });
         }
       })
       .catch(() => {})
@@ -91,21 +115,47 @@ export function HabitosProvider({ conta, children }) {
             projeto: conversas.projeto.slice(-60),
           },
           projetos,
+          adiamentos,
+          pulados,
+          arquivo,
         }),
       ).catch(() => {});
     }
-  }, [CHAVE, carregado, habitos, historico, usuario, revi, foco, config, conversas, projetos]);
+  }, [
+    CHAVE,
+    carregado,
+    habitos,
+    historico,
+    usuario,
+    revi,
+    foco,
+    config,
+    conversas,
+    projetos,
+    adiamentos,
+    pulados,
+    arquivo,
+  ]);
 
   useEffect(() => {
     definirSonsLigados(config.sons);
   }, [config.sons]);
 
+  const feitosHojeSync = historico[chaveDia(new Date())] ?? [];
+  const feitosHojeChave = feitosHojeSync.join(',');
+
   // Reagenda as notificações quando os hábitos mudam.
   useEffect(() => {
     if (carregado) {
-      sincronizarLembretes(habitos, projetos).catch(() => {});
+      sincronizarLembretes({
+        habitos,
+        projetos,
+        feitosHoje: feitosHojeSync,
+        adiamentos,
+        puladosHoje: pulados[chaveDia(new Date())] ?? [],
+      }).catch(() => {});
     }
-  }, [carregado, habitos, projetos]);
+  }, [carregado, habitos, projetos, feitosHojeChave, adiamentos, pulados]);
 
   const estatisticas = useMemo(
     () => calcularEstatisticas(habitos, historico, foco),
@@ -238,6 +288,51 @@ export function HabitosProvider({ conta, children }) {
 
   const limparConversa = (canal) => mudarCanal(canal, () => []);
 
+  // Guarda a conversa atual no histórico e começa uma nova (só se a pessoa falou algo).
+  // Lê a conversa mais recente por referência: quem chama é a tela saindo de foco,
+  // que pode ter uma cópia antiga dos dados.
+  const arquivarConversa = (canal) => {
+    const mensagens = conversasAtuais.current[canal] ?? [];
+    const primeira = mensagens.find(({ papel }) => papel === 'pessoa');
+    if (!primeira) {
+      return;
+    }
+    conversasAtuais.current = { ...conversasAtuais.current, [canal]: [] };
+    setArquivo((antigos) => ({
+      ...antigos,
+      [canal]: [
+        {
+          id: `c${Date.now()}`,
+          titulo: primeira.texto.slice(0, 60),
+          data: new Date().toISOString(),
+          mensagens,
+        },
+        ...(antigos[canal] ?? []).filter(({ mensagens: outras }) => outras !== mensagens),
+      ].slice(0, 30),
+    }));
+    setConversas((atuais) => ({ ...atuais, [canal]: [] }));
+  };
+
+  // Volta uma conversa do histórico para continuar de onde parou.
+  const continuarConversa = (canal, id) => {
+    const escolhida = (arquivo[canal] ?? []).find((conversa) => conversa.id === id);
+    if (!escolhida) {
+      return;
+    }
+    arquivarConversa(canal);
+    setArquivo((antigos) => ({
+      ...antigos,
+      [canal]: (antigos[canal] ?? []).filter((conversa) => conversa.id !== id),
+    }));
+    setConversas((atuais) => ({ ...atuais, [canal]: escolhida.mensagens }));
+  };
+
+  const apagarDoHistorico = (canal, id) =>
+    setArquivo((antigos) => ({
+      ...antigos,
+      [canal]: (antigos[canal] ?? []).filter((conversa) => conversa.id !== id),
+    }));
+
   // Quando a cota gratuita do Gemini acaba, o Revi avisa no chat (no máximo uma vez por hora).
   const avisarLimite = (canal = 'rotina') =>
     mudarCanal(canal, (atual) => {
@@ -308,6 +403,24 @@ export function HabitosProvider({ conta, children }) {
       return { tarefasFeitas, feita: todas };
     });
 
+  // A pessoa confirmou que não vai fazer a atividade hoje: param os avisos dela por hoje.
+  const pularHoje = (chaveItem) => {
+    const hoje = chaveDia(new Date());
+    setPulados((atuais) => ({
+      ...atuais,
+      [hoje]: [...new Set([...(atuais[hoje] ?? []), chaveItem])],
+    }));
+  };
+
+  // Adia um item só hoje (o horário normal volta amanhã) e reagenda os lembretes.
+  const adiarHoje = (chaveItem, horario) => {
+    const hoje = chaveDia(new Date());
+    setAdiamentos((atuais) => ({
+      ...atuais,
+      [hoje]: { ...(atuais[hoje] ?? {}), [chaveItem]: horario },
+    }));
+  };
+
   const excluirProjeto = (id) =>
     setProjetos((atuais) => atuais.filter((projeto) => projeto.id !== id));
 
@@ -338,6 +451,10 @@ export function HabitosProvider({ conta, children }) {
         adicionarMensagem,
         marcarSugestaoAdicionada,
         limparConversa,
+        arquivo,
+        arquivarConversa,
+        continuarConversa,
+        apagarDoHistorico,
         atualizarMensagem,
         avisarLimite,
         adicionarProjeto,
@@ -345,6 +462,10 @@ export function HabitosProvider({ conta, children }) {
         concluirSessao,
         excluirProjeto,
         alternarTarefa,
+        adiamentosHoje: adiamentos[chaveDia(new Date())] ?? {},
+        adiarHoje,
+        puladosHoje: pulados[chaveDia(new Date())] ?? [],
+        pularHoje,
       }}
     >
       {children}
