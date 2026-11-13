@@ -1,3 +1,8 @@
+## Aluno
+• Nome: Tulio Medeiros Borges
+• RGM: 42288231
+• Unifran - Análise e Desenvolvimento de Sistemas - Euller Da Silva Ferreira
+
 # Rever
 
 **Pequenos hábitos, grandes mudanças.** Rever é um app de hábitos e rotina em pixel art, feito com React Native e Expo. Você monta a sua rotina, recebe lembretes na hora certa e cuida do **Revi**, um mascote que reage ao seu dia, ganha XP e sobe de nível com você. Ele também conversa com você por IA e ajuda a montar rotinas e planejar projetos.
@@ -149,9 +154,6 @@ docs/gifs/          GIFs deste README
 | JavaScript moderno | `const` e `let`, arrow functions, desestruturação, `===` e nenhum `console.log` |
 | StyleSheet | `StyleSheet.create` em todos os componentes e telas |
 | Feedback ao usuário | Validação de formulários, vibração, sons, avisos, popups e mensagens de erro |
-
-## Aluno
-Nome e RGM.
 
 ## Vídeo de demonstração
 `demo/demo.mp4`
