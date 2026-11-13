@@ -1,22 +1,26 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Crypto from 'expo-crypto';
-import { cancelarLembretes } from '../utils/lembretes';
+import { createContext, useContext, useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Crypto from "expo-crypto";
+import { cancelarLembretes } from "../utils/lembretes";
+import { CONTA_DEMO, criarDadosDemo } from "../data/demo";
 
 // Contas locais: tudo fica só neste celular, sem servidor nem banco de dados.
 // A senha nunca é guardada; só o hash SHA-256 dela com um sal aleatório.
-const CHAVE_CONTAS = 'rever:contas:v1';
-const CHAVE_SESSAO = 'rever:sessao:v1';
+const CHAVE_CONTAS = "rever:contas:v1";
+const CHAVE_SESSAO = "rever:sessao:v1";
 export const chaveDadosDaConta = (contaId) => `rever:dados:v2:${contaId}`;
 // Dados da versão antiga, sem login: agora cada conta começa do zero.
-const CHAVE_ANTIGA = 'rever:dados:v1';
+const CHAVE_ANTIGA = "rever:dados:v1";
 
 const ContaContexto = createContext(null);
 
 const normalizarEmail = (email) => email.trim().toLowerCase();
 
 const gerarHash = (senha, sal) =>
-  Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, `${sal}:${senha}`);
+  Crypto.digestStringAsync(
+    Crypto.CryptoDigestAlgorithm.SHA256,
+    `${sal}:${senha}`,
+  );
 
 export class ErroConta extends Error {}
 
@@ -28,7 +32,10 @@ export function ContaProvider({ children }) {
   useEffect(() => {
     let ativo = true;
     AsyncStorage.removeItem(CHAVE_ANTIGA).catch(() => {});
-    Promise.all([AsyncStorage.getItem(CHAVE_CONTAS), AsyncStorage.getItem(CHAVE_SESSAO)])
+    Promise.all([
+      AsyncStorage.getItem(CHAVE_CONTAS),
+      AsyncStorage.getItem(CHAVE_SESSAO),
+    ])
       .then(([textoContas, sessao]) => {
         if (!ativo) {
           return;
@@ -38,6 +45,7 @@ export function ContaProvider({ children }) {
         if (sessao && lista.some(({ id }) => id === sessao)) {
           setContaId(sessao);
         }
+        return garantirContaDemo(lista);
       })
       .catch(() => {})
       .finally(() => {
@@ -49,6 +57,23 @@ export function ContaProvider({ children }) {
       ativo = false;
     };
   }, []);
+
+  // A conta de demonstração sempre existe neste celular (e-mail e senha no README).
+  const garantirContaDemo = async (lista) => {
+    if (lista.some(({ email }) => email === CONTA_DEMO.email)) {
+      return;
+    }
+    const sal = Crypto.randomUUID();
+    const demo = {
+      id: "demo",
+      nome: CONTA_DEMO.nome,
+      email: CONTA_DEMO.email,
+      sal,
+      hash: await gerarHash(CONTA_DEMO.senha, sal),
+      criadaEm: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+    };
+    await salvarContas([...lista, demo]);
+  };
 
   const salvarContas = async (lista) => {
     setContas(lista);
@@ -63,7 +88,7 @@ export function ContaProvider({ children }) {
   const cadastrar = async ({ nome, email, senha }) => {
     const emailLimpo = normalizarEmail(email);
     if (contas.some((conta) => conta.email === emailLimpo)) {
-      throw new ErroConta('Já existe uma conta com esse e-mail neste celular.');
+      throw new ErroConta("Já existe uma conta com esse e-mail neste celular.");
     }
     const sal = Crypto.randomUUID();
     const conta = {
@@ -82,10 +107,20 @@ export function ContaProvider({ children }) {
     const conta = contas.find((item) => item.email === normalizarEmail(email));
     // Mesma mensagem para e-mail ou senha errados: não revela quais e-mails existem.
     if (!conta || (await gerarHash(senha, conta.sal)) !== conta.hash) {
-      throw new ErroConta('E-mail ou senha incorretos.');
+      throw new ErroConta("E-mail ou senha incorretos.");
+    }
+    // A demonstração é recriada a cada login, com as datas de hoje.
+    if (conta.email === CONTA_DEMO.email) {
+      await AsyncStorage.setItem(
+        chaveDadosDaConta(conta.id),
+        JSON.stringify(criarDadosDemo()),
+      );
     }
     await iniciarSessao(conta.id);
   };
+
+  const entrarNaDemo = () =>
+    entrar({ email: CONTA_DEMO.email, senha: CONTA_DEMO.senha });
 
   const sair = async () => {
     await cancelarLembretes().catch(() => {});
@@ -102,8 +137,10 @@ export function ContaProvider({ children }) {
     }
   };
 
-  const existeEmail = (email) => contas.some((conta) => conta.email === normalizarEmail(email));
-  const contaPorEmail = (email) => contas.find((conta) => conta.email === normalizarEmail(email));
+  const existeEmail = (email) =>
+    contas.some((conta) => conta.email === normalizarEmail(email));
+  const contaPorEmail = (email) =>
+    contas.find((conta) => conta.email === normalizarEmail(email));
 
   const contaAtual = contas.find(({ id }) => id === contaId) ?? null;
 
@@ -123,7 +160,9 @@ export function ContaProvider({ children }) {
         entrar,
         sair,
         apagarConta,
-        temContas: contas.length > 0,
+        // A conta de demonstração não conta: quem é novo ainda vê a abertura do app.
+        temContas: contas.some(({ email }) => email !== CONTA_DEMO.email),
+        entrarNaDemo,
         existeEmail,
         contaPorEmail,
       }}

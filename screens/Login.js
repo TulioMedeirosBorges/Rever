@@ -1,45 +1,49 @@
-import { useState } from 'react';
-import TelaAuth from '../components/TelaAuth';
-import CampoTexto from '../components/CampoTexto';
-import Botao from '../components/Botao';
-import LinkTexto from '../components/LinkTexto';
-import RodapeAuth from '../components/RodapeAuth';
-import { ErroFormulario, NotaPrivacidade } from '../components/AvisoConta';
-import { ErroConta, useConta } from '../contexto/ContaContexto';
-import { erro as vibrarErro } from '../utils/tato';
-import { tocar } from '../utils/sons';
+import { useState } from "react";
+import TelaAuth from "../components/TelaAuth";
+import CampoTexto from "../components/CampoTexto";
+import Botao from "../components/Botao";
+import LinkTexto from "../components/LinkTexto";
+import RodapeAuth from "../components/RodapeAuth";
+import { ErroFormulario, NotaPrivacidade } from "../components/AvisoConta";
+import { ErroConta, useConta } from "../contexto/ContaContexto";
+import { erro as vibrarErro } from "../utils/tato";
+import { tocar } from "../utils/sons";
 
 export default function Login({ navigation }) {
-  const { entrar } = useConta();
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
-  const [erro, setErro] = useState('');
+  const { entrar, entrarNaDemo } = useConta();
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [erro, setErro] = useState("");
   const [entrando, setEntrando] = useState(false);
 
   const falhar = (mensagem) => {
     vibrarErro();
-    tocar('erro');
+    tocar("erro");
     setErro(mensagem);
   };
 
   // Ao entrar, o app troca sozinho para as telas da conta (não precisa navegar).
   const confirmar = async () => {
     if (!email.trim() || !senha) {
-      falhar('Preencha e-mail e senha.');
+      falhar("Preencha e-mail e senha.");
       return;
     }
     setEntrando(true);
     try {
       await entrar({ email, senha });
     } catch (falha) {
-      falhar(falha instanceof ErroConta ? falha.message : 'Não deu para entrar agora.');
+      falhar(
+        falha instanceof ErroConta
+          ? falha.message
+          : "Não deu para entrar agora.",
+      );
       setEntrando(false);
     }
   };
 
   const limparErro = (definir) => (texto) => {
     definir(texto);
-    setErro('');
+    setErro("");
   };
 
   return (
@@ -64,10 +68,26 @@ export default function Login({ navigation }) {
         onSubmitEditing={confirmar}
       />
       <ErroFormulario texto={erro} />
-      <Botao texto={entrando ? 'Entrando…' : 'Entrar'} aoPressionar={entrando ? null : confirmar} />
+      <Botao
+        texto={entrando ? "Entrando…" : "Entrar"}
+        aoPressionar={entrando ? null : confirmar}
+      />
       <LinkTexto
         texto="Esqueceu sua senha?"
-        aoPressionar={() => navigation.navigate('EsqueceuSenha')}
+        aoPressionar={() => navigation.navigate("EsqueceuSenha")}
+      />
+
+      <Botao
+        texto="Entrar na demonstração"
+        variante="claro"
+        aoPressionar={
+          entrando
+            ? null
+            : () =>
+                entrarNaDemo().catch(() =>
+                  falhar("Não deu para abrir a demonstração."),
+                )
+        }
       />
 
       <NotaPrivacidade />
@@ -75,7 +95,7 @@ export default function Login({ navigation }) {
       <RodapeAuth
         texto="Não tem conta?"
         textoLink="Criar conta"
-        aoPressionar={() => navigation.navigate('Cadastro')}
+        aoPressionar={() => navigation.navigate("Cadastro")}
       />
     </TelaAuth>
   );

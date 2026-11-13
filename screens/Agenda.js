@@ -1,27 +1,40 @@
-import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import Tela from '../components/Tela';
-import PixelsDecorativos from '../components/PixelsDecorativos';
-import CabecalhoTela from '../components/CabecalhoTela';
-import ItemHabito from '../components/ItemHabito';
-import MolduraPixel from '../components/MolduraPixel';
-import Pressionavel from '../components/Pressionavel';
-import Entrada from '../components/Entrada';
-import { useHabitos } from '../contexto/HabitosContexto';
-import { cores, fontes } from '../styles/tema';
-import { chaveDia, indiceSemana, inicioDaSemana, nomesMeses, somarDias } from '../utils/datas';
+import { useState } from "react";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import Tela from "../components/Tela";
+import PixelsDecorativos from "../components/PixelsDecorativos";
+import CabecalhoTela from "../components/CabecalhoTela";
+import ItemHabito from "../components/ItemHabito";
+import MolduraPixel from "../components/MolduraPixel";
+import Pressionavel from "../components/Pressionavel";
+import Entrada from "../components/Entrada";
+import { useHabitos } from "../contexto/HabitosContexto";
+import { cores, fontes } from "../styles/tema";
+import {
+  chaveDia,
+  indiceSemana,
+  inicioDaSemana,
+  nomesMeses,
+  somarDias,
+} from "../utils/datas";
 
-const siglas = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB', 'DOM'];
+const siglas = ["SEG", "TER", "QUA", "QUI", "SEX", "SAB", "DOM"];
 
 export default function Agenda() {
-  const { habitos, historico, alternarConcluido, projetos, alternarSessao } = useHabitos();
+  const { habitos, historico, alternarConcluido, projetos, alternarSessao } =
+    useHabitos();
   const hoje = new Date();
   const [indiceDia, setIndiceDia] = useState(indiceSemana(hoje));
 
   const segunda = inicioDaSemana(hoje);
-  const semana = siglas.map((sigla, indice) => ({ sigla, data: somarDias(segunda, indice) }));
+  const semana = siglas.map((sigla, indice) => ({
+    sigla,
+    data: somarDias(segunda, indice),
+  }));
   const dataSelecionada = semana[indiceDia].data;
   const futuro = chaveDia(dataSelecionada) > chaveDia(hoje);
+  const passado = chaveDia(dataSelecionada) < chaveDia(hoje);
+  // Só o dia de hoje pode ser marcado.
+  const podeMarcar = !futuro && !passado;
   const feitos = historico[chaveDia(dataSelecionada)] ?? [];
   const habitosDoDia = habitos
     .filter(({ frequencia }) => frequencia.includes(indiceDia))
@@ -35,11 +48,16 @@ export default function Agenda() {
   );
 
   return (
-    <Tela bordas={['top']}>
+    <Tela bordas={["top"]}>
       <PixelsDecorativos />
-      <ScrollView contentContainerStyle={styles.conteudo} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.conteudo}
+        showsVerticalScrollIndicator={false}
+      >
         <CabecalhoTela titulo="Agenda" />
-        <Text style={styles.mes}>{`${nomesMeses[hoje.getMonth()]} ${hoje.getFullYear()}`}</Text>
+        <Text
+          style={styles.mes}
+        >{`${nomesMeses[hoje.getMonth()]} ${hoje.getFullYear()}`}</Text>
 
         <View style={styles.semana}>
           {semana.map(({ sigla, data }, indice) => {
@@ -48,7 +66,13 @@ export default function Agenda() {
             const teveFeito = (historico[chaveDia(data)] ?? []).length > 0;
 
             return (
-              <Entrada key={sigla} ordem={indice} tipo="escala" mola="quique" style={styles.coluna}>
+              <Entrada
+                key={sigla}
+                ordem={indice}
+                tipo="escala"
+                mola="quique"
+                style={styles.coluna}
+              >
                 <Pressionavel
                   style={styles.coluna}
                   aoPressionar={() => setIndiceDia(indice)}
@@ -58,18 +82,27 @@ export default function Agenda() {
                   accessibilityRole="tab"
                   accessibilityState={{ selected: selecionado }}
                 >
-                  <Text style={[styles.sigla, ehHoje && styles.siglaHoje]}>{sigla}</Text>
+                  <Text style={[styles.sigla, ehHoje && styles.siglaHoje]}>
+                    {sigla}
+                  </Text>
                   <MolduraPixel
-                    corFundo={selecionado ? cores.sucesso : 'transparent'}
+                    corFundo={selecionado ? cores.sucesso : "transparent"}
                     pixel={3}
                     degraus={1}
                     style={styles.dia}
                   >
-                    <Text style={[styles.numeroDia, selecionado && styles.numeroSelecionado]}>
+                    <Text
+                      style={[
+                        styles.numeroDia,
+                        selecionado && styles.numeroSelecionado,
+                      ]}
+                    >
                       {data.getDate()}
                     </Text>
                   </MolduraPixel>
-                  <View style={[styles.ponto, teveFeito && styles.pontoAtivo]} />
+                  <View
+                    style={[styles.ponto, teveFeito && styles.pontoAtivo]}
+                  />
                 </Pressionavel>
               </Entrada>
             );
@@ -78,38 +111,62 @@ export default function Agenda() {
 
         <View style={styles.cabecalhoLista}>
           <Text style={styles.secao}>Hábitos do dia</Text>
-          <Text style={styles.contagem}>{`${concluidos} de ${habitosDoDia.length}`}</Text>
+          <Text
+            style={styles.contagem}
+          >{`${concluidos} de ${habitosDoDia.length}`}</Text>
         </View>
         {/* A chave inclui o dia: trocar de dia faz a lista entrar de novo. */}
-        {habitosDoDia.map(({ id, nome, icone, lembrete, concluido }, indice) => (
-          <Entrada key={`${indiceDia}-${id}`} ordem={indice + 2}>
-            <ItemHabito
-              nome={nome}
-              icone={icone}
-              detalhe={lembrete || undefined}
-              concluido={concluido}
-              aoMarcar={futuro ? undefined : () => alternarConcluido(id, dataSelecionada)}
-            />
-          </Entrada>
-        ))}
+        {habitosDoDia.map(
+          ({ id, nome, icone, lembrete, concluido }, indice) => (
+            <Entrada key={`${indiceDia}-${id}`} ordem={indice + 2}>
+              <ItemHabito
+                nome={nome}
+                icone={icone}
+                detalhe={lembrete || undefined}
+                concluido={concluido}
+                aoMarcar={
+                  podeMarcar
+                    ? () => alternarConcluido(id, dataSelecionada)
+                    : undefined
+                }
+              />
+            </Entrada>
+          ),
+        )}
         {habitosDoDia.length === 0 ? (
           <Text style={styles.vazio}>Nenhum hábito neste dia.</Text>
         ) : null}
         {futuro && habitosDoDia.length > 0 ? (
-          <Text style={styles.vazio}>Dia futuro: dá para marcar quando ele chegar.</Text>
+          <Text style={styles.vazio}>
+            Dia futuro: dá para marcar quando ele chegar.
+          </Text>
+        ) : null}
+        {passado && habitosDoDia.length > 0 ? (
+          <Text style={styles.vazio}>
+            Esse dia já passou: não dá mais para marcar.
+          </Text>
         ) : null}
 
         {sessoesDoDia.length > 0 ? (
           <>
-            <Text style={[styles.secao, styles.secaoProjetos]}>Projetos do dia</Text>
+            <Text style={[styles.secao, styles.secaoProjetos]}>
+              Projetos do dia
+            </Text>
             {sessoesDoDia.map(({ projeto, sessao }, indice) => (
-              <Entrada key={`${indiceDia}-${projeto.id}-${sessao.id}`} ordem={indice + 2}>
+              <Entrada
+                key={`${indiceDia}-${projeto.id}-${sessao.id}`}
+                ordem={indice + 2}
+              >
                 <ItemHabito
                   nome={sessao.titulo}
                   icone="clipboard-note"
                   detalhe={`${projeto.nome} · ${sessao.minutos} min`}
                   concluido={sessao.feita}
-                  aoMarcar={futuro ? undefined : () => alternarSessao(projeto.id, sessao.id)}
+                  aoMarcar={
+                    podeMarcar
+                      ? () => alternarSessao(projeto.id, sessao.id)
+                      : undefined
+                  }
                 />
               </Entrada>
             ))}
@@ -130,22 +187,22 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontFamily: fontes.negrito,
     fontVariant: fontes.semLigaduras,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 32,
     marginBottom: 16,
   },
   semana: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 40,
   },
   coluna: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
   },
   cabecalhoLista: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 12,
   },
   secao: {
@@ -170,8 +227,8 @@ const styles = StyleSheet.create({
   dia: {
     width: 32,
     height: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   numeroDia: {
     color: cores.branco,
@@ -203,7 +260,7 @@ const styles = StyleSheet.create({
     fontFamily: fontes.regular,
     fontVariant: fontes.semLigaduras,
     fontSize: 15,
-    textAlign: 'center',
+    textAlign: "center",
     marginVertical: 12,
   },
 });
