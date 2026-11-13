@@ -143,6 +143,8 @@ assets/             imagens, logo em camadas, fontes e sons
 docs/gifs/          GIFs deste README
 ```
 
+Para entender o código por dentro (navegação, contextos, `useState`, `useEffect`, lembretes e IA), veja a **[Documentação](docs/DOCUMENTACAO.md)**.
+
 ## Requisitos do trabalho
 
 | Requisito | Onde está |
