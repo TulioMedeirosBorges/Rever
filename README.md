@@ -160,4 +160,4 @@ Para entender o código por dentro (navegação, contextos, `useState`, `useEffe
 | Feedback ao usuário | Validação de formulários, vibração, sons, avisos, popups e mensagens de erro |
 
 ## Vídeo de demonstração
-[▶️ Assistir ao vídeo de demonstração](docs/reverapp.mp4) (25 s)
+https://github.com/user-attachments/assets/aa59734e-0a59-48eb-9732-15a0bc3c9eb5
